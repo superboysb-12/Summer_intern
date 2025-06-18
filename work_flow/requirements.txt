@@ -1,0 +1,19 @@
+# 基础依赖
+aiohttp>=3.12.0
+asyncio>=3.4.3
+docx2txt>=0.8
+json5>=0.9.10
+networkx>=3.4.0
+numpy>=2.2.0
+openai>=1.80.0
+pathlib>=1.0.1
+pyvis>=0.3.2
+python-docx>=1.1.0
+pywin32>=310
+tqdm>=4.60.0
+
+# Neo4j支持
+neo4j>=5.28.0
+
+# 文档处理
+python-magic>=0.4.27 
