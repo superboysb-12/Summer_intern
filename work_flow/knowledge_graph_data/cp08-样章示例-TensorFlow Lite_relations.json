@@ -1,0 +1,2227 @@
+[
+  [
+    "MobileNet V2",
+    "用途",
+    "创建、训练和导出自定义 TensorFlow Lite 模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "是什么",
+    "轻量级机器学习框架"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "在移动设备上部署机器学习模型"
+  ],
+  [
+    "Android 应用",
+    "用途",
+    "识别花卉图片"
+  ],
+  [
+    "TensorFlow Lite 示例",
+    "包含",
+    "flower_classification"
+  ],
+  [
+    "flower_classification",
+    "组成部分",
+    "start 目录和 finish 目录"
+  ],
+  [
+    "start 目录",
+    "用途",
+    "项目模板"
+  ],
+  [
+    "finish 目录",
+    "用途",
+    "项目完整代码"
+  ],
+  [
+    "Android Studio",
+    "用途",
+    "开发 Android 应用"
+  ],
+  [
+    "Android Studio",
+    "用途",
+    "打开现有 Android Studio 项目"
+  ],
+  [
+    "Android Studio",
+    "组成部分",
+    "启动图标"
+  ],
+  [
+    "Android Studio",
+    "组成部分",
+    "打开项目图标"
+  ],
+  [
+    "TensorFlow Lite 模型文件",
+    "用途",
+    "在 Android 项目中使用"
+  ],
+  [
+    "label.txt",
+    "用途",
+    "在 Android 项目中使用"
+  ],
+  [
+    "build.gradle",
+    "用途",
+    "配置项目依赖"
+  ],
+  [
+    "build.gradle",
+    "组成部分",
+    "dependencies"
+  ],
+  [
+    "org.tensorflow:tensorflow-lite:+",
+    "用途",
+    "导入 TensorFlow Lite 库"
+  ],
+  [
+    "Gradle 同步",
+    "用途",
+    "同步项目配置"
+  ],
+  [
+    "assets 目录",
+    "用途",
+    "存放模型文件和标签文件"
+  ],
+  [
+    "TFLite 模型转换过程",
+    "执行步骤",
+    "用户在自己的工作台中使用 TensorFlow API 构造 TensorFlow 模型，然后使用 TFLite 模型转换器转换成 TFLite 文件格式(FlatBuffers 格式)"
+  ],
+  [
+    "TFLite 解释器",
+    "用途",
+    "接受 TFLite 模型，调用不同的硬件加速器比如 GPU 进行执行"
+  ],
+  [
+    "TFLite 文件格式",
+    "是什么",
+    "FlatBuffers 格式"
+  ],
+  [
+    "TFLite 模型转换器",
+    "用途",
+    "将 TensorFlow 模型转换成 TFLite 文件格式"
+  ],
+  [
+    "TensorFlow Lite",
+    "执行步骤",
+    "选择模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "执行步骤",
+    "转换模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "执行步骤",
+    "部署到设备"
+  ],
+  [
+    "TensorFlow Lite",
+    "执行步骤",
+    "优化模型"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将自定义模型转换为 TensorFlow Lite 格式"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "在设备端运行模型"
+  ],
+  [
+    "模型优化工具包",
+    "用途",
+    "缩减模型的大小并提高其效率，同时最大限度地降低对准确率的影响"
+  ],
+  [
+    "TensorFlow Lite 工作流程",
+    "包含",
+    "选择模型、转换模型、部署到设备、优化模型"
+  ],
+  [
+    "TFLite 解释执行器",
+    "是什么",
+    "针对移动设备从头开始构建的执行器"
+  ],
+  [
+    "TFLite 解释执行器",
+    "特点",
+    "轻量级"
+  ],
+  [
+    "TFLite 解释执行器",
+    "特点",
+    "快速启动"
+  ],
+  [
+    "TFLite 解释执行器",
+    "特点",
+    "内存高效"
+  ],
+  [
+    "TFLite 解释执行器",
+    "组成部分",
+    "核心运行时"
+  ],
+  [
+    "TFLite 解释执行器",
+    "组成部分",
+    "标准算子"
+  ],
+  [
+    "TFLite 解释执行器",
+    "执行步骤",
+    "加载模型"
+  ],
+  [
+    "TFLite 解释执行器",
+    "执行步骤",
+    "转换数据"
+  ],
+  [
+    "TFLite 解释执行器",
+    "执行步骤",
+    "运行模型推理"
+  ],
+  [
+    "TFLite 解释执行器",
+    "执行步骤",
+    "解释输出"
+  ],
+  [
+    "TFLite 解释执行器",
+    "工作原理",
+    "将模型直接映射到内存中"
+  ],
+  [
+    "TFLite 解释执行器",
+    "工作原理",
+    "采取静态执行计划"
+  ],
+  [
+    "TFLite 解释执行器",
+    "工作原理",
+    "算子内部可以多线程执行"
+  ],
+  [
+    "TFLite 解释执行器",
+    "工作原理",
+    "静态内存分配"
+  ],
+  [
+    "TFLite 解释执行器",
+    "使用方法",
+    "使用 Java API"
+  ],
+  [
+    "TFLite 解释执行器",
+    "使用方法",
+    "使用 C++ API"
+  ],
+  [
+    "TFLite 解释执行器",
+    "使用方法",
+    "使用 Python API"
+  ],
+  [
+    "TFLite 解释执行器",
+    "使用方法",
+    "Android 开发者使用 JCenter Bintray 的 TFLite AAR"
+  ],
+  [
+    "TFLite 解释执行器",
+    "使用方法",
+    "iOS 开发者通过 CocoaPods 获取"
+  ],
+  [
+    "MobileNet V2",
+    "是什么",
+    "一个预训练的深度学习模型"
+  ],
+  [
+    "MobileNet V2",
+    "组成部分",
+    "155层网络结构"
+  ],
+  [
+    "微调",
+    "执行步骤",
+    "取消冻结模型的顶层，设置前100层为不可训练，重新编译模型并使用低学习率训练"
+  ],
+  [
+    "微调",
+    "用途",
+    "提高模型在新数据集上的性能"
+  ],
+  [
+    "微调",
+    "优点",
+    "可以使专用功能适应新数据集而不覆盖通用学习"
+  ],
+  [
+    "微调",
+    "缺点",
+    "可能导致模型过拟合"
+  ],
+  [
+    "TFLite",
+    "是什么",
+    "TensorFlow的轻量级模型格式"
+  ],
+  [
+    "TFLite",
+    "用途",
+    "在移动设备和嵌入式系统上部署模型"
+  ],
+  [
+    "模型训练",
+    "执行步骤",
+    "使用model.fit方法进行训练，设置epochs和validation_data"
+  ],
+  [
+    "模型训练",
+    "组成部分",
+    "训练生成器和验证生成器"
+  ],
+  [
+    "Dropout",
+    "用途",
+    "防止神经网络过拟合"
+  ],
+  [
+    "GlobalAveragePooling2D",
+    "用途",
+    "减少参数数量并防止过拟合"
+  ],
+  [
+    "Adam优化器",
+    "用途",
+    "优化神经网络中的权重参数"
+  ],
+  [
+    "Adam优化器",
+    "特点",
+    "使用自适应学习率"
+  ],
+  [
+    "categorical_crossentropy",
+    "用途",
+    "多分类问题的损失函数"
+  ],
+  [
+    "TensorFlow Lite解释器",
+    "是什么",
+    "用于执行推理过程的组件"
+  ],
+  [
+    "TensorFlow Lite解释器",
+    "执行步骤",
+    "读取模型、加载.tflite模型到内存、执行推理"
+  ],
+  [
+    "ClassifierFloatMobileNet类",
+    "组成部分",
+    "model.tflite和label.txt"
+  ],
+  [
+    "Classifier类",
+    "组成部分",
+    "TFLite解释器tflite和GPU代理gpuDelegate"
+  ],
+  [
+    "GPU代理",
+    "用途",
+    "加速模型推理过程"
+  ],
+  [
+    "TFLite解释器",
+    "工作原理",
+    "使用tfliteModel和tfliteOptions初始化"
+  ],
+  [
+    "图像预处理",
+    "执行步骤",
+    "使用ImageProcessor进行resize、crop、rotate和normalize操作"
+  ],
+  [
+    "recognizeImage方法",
+    "执行步骤",
+    "运行TFLite推理并获取输出概率"
+  ],
+  [
+    "TensorLabel",
+    "用途",
+    "将模型输出概率与类别标签关联"
+  ],
+  [
+    "PoseNet模型",
+    "用途",
+    "实现人体姿势估计"
+  ],
+  [
+    "PoseNet模型",
+    "执行步骤",
+    "检测关键身体部位位置并估计姿势"
+  ],
+  [
+    "PoseNet示例应用",
+    "执行步骤",
+    "获取图像数据、转换格式、调用estimateSinglePose、绘制关键点"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将输入的 TensorFlow 模型生成 TensorFlow Lite 模型"
+  ],
+  [
+    "TensorFlow Lite 模型",
+    "特点",
+    "优化的 FlatBuffer 格式"
+  ],
+  [
+    "TensorFlow Lite 模型",
+    "特点",
+    "以 .tflite 为文件扩展名"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "使用方法",
+    "可以通过命令行与 Python API 使用"
+  ],
+  [
+    "Google",
+    "推荐",
+    "使用 Python API 进行转换"
+  ],
+  [
+    "命令行工具",
+    "特点",
+    "只提供了基本的转化功能"
+  ],
+  [
+    "转换后的原模型",
+    "特点",
+    "FlatBuffers 格式"
+  ],
+  [
+    "FlatBuffers",
+    "用途",
+    "主要应用于游戏场景"
+  ],
+  [
+    "FlatBuffers",
+    "特点",
+    "为了高性能场景创建的序列化库"
+  ],
+  [
+    "FlatBuffers",
+    "比较",
+    "相比 Protocol Buffer 有更高的性能和更小的大小"
+  ],
+  [
+    "FlatBuffers",
+    "用途",
+    "更适合于边缘设备部署"
+  ],
+  [
+    "tflite_convert",
+    "是什么",
+    "TensorFlow Lite 转换器命令行工具"
+  ],
+  [
+    "tflite_convert",
+    "组成部分",
+    "与 TensorFlow 一起安装"
+  ],
+  [
+    "tflite_convert",
+    "执行步骤",
+    "在终端运行命令"
+  ],
+  [
+    "--output_file",
+    "特点",
+    "类型: string"
+  ],
+  [
+    "--output_file",
+    "用途",
+    "指定输出文件的绝对路径"
+  ],
+  [
+    "--saved_model_dir",
+    "特点",
+    "类型: string"
+  ],
+  [
+    "--saved_model_dir",
+    "用途",
+    "指定含有 TensorFlow 1.x 或者"
+  ],
+  [
+    "tf.lite.TFLiteConverter",
+    "是什么",
+    "用于将TensorFlow模型转换为TensorFlow Lite模型的转换器"
+  ],
+  [
+    "tf.lite.TFLiteConverter.from_saved_model",
+    "使用方法",
+    "通过传入saved_model_dir参数来加载已保存的模型"
+  ],
+  [
+    "tf.lite.TFLiteConverter",
+    "用途",
+    "将TensorFlow模型转换为TensorFlow Lite格式"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "优化模型大小和性能"
+  ],
+  [
+    "模型优化",
+    "目标",
+    "在给定设备上实现性能、模型大小和准确性的理想平衡"
+  ],
+  [
+    "模型复杂度",
+    "比较",
+    "模型大小"
+  ],
+  [
+    "大而复杂的模型",
+    "用途",
+    "需要高准确率的任务"
+  ],
+  [
+    "小一点的模型",
+    "优点",
+    "占用更少的磁盘和内存，更快更高效"
+  ],
+  [
+    "量化",
+    "工作原理",
+    "降低权重的精确表示，并且可选的降低存储和计算的激活值"
+  ],
+  [
+    "量化",
+    "优点",
+    "对现有 CPU 平台的支持"
+  ],
+  [
+    "量化",
+    "优点",
+    "降低用于读取和存储中间激活值的存储器访问成本"
+  ],
+  [
+    "量化",
+    "优点",
+    "许多 CPU 和硬件加速器实现提供 SIMD 指令功能，这对量化特别有益"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "多种级别的量化支持"
+  ],
+  [
+    "Tensorflow Lite post-training quantization",
+    "用途",
+    "使权重和激活值的 Post training 更简单"
+  ],
+  [
+    "Quantization-aware training",
+    "用途",
+    "以最小精度下降来训练网络"
+  ],
+  [
+    "Quantization-aware training",
+    "特点",
+    "仅适用于卷积神经网络的一个子集"
+  ],
+  [
+    "Python 代码片段",
+    "示例",
+    "展示如何使用预训练量化进行模型转换"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将输入的 TensorFlow 模型生成 TensorFlow Lite 模型"
+  ],
+  [
+    "TensorFlow Lite 模型",
+    "特点",
+    "优化的 FlatBuffer 格式，以 .tflite 为文件扩展名"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "使用方法",
+    "可以通过命令行与 Python API 使用"
+  ],
+  [
+    "Google",
+    "推荐",
+    "使用 Python API 进行转换"
+  ],
+  [
+    "命令行工具",
+    "特点",
+    "只提供了基本的转化功能"
+  ],
+  [
+    "FlatBuffers",
+    "用途",
+    "主要应用于游戏场景"
+  ],
+  [
+    "FlatBuffers",
+    "特点",
+    "为了高性能场景创建的序列化库"
+  ],
+  [
+    "FlatBuffers",
+    "比较",
+    "相比 Protocol Buffer 有更高的性能和更小的大小等优势"
+  ],
+  [
+    "FlatBuffers",
+    "用途",
+    "更适合于边缘设备部署"
+  ],
+  [
+    "tflite_convert",
+    "是什么",
+    "TensorFlow Lite 转换器命令行工具"
+  ],
+  [
+    "tflite_convert",
+    "组成部分",
+    "--output_file, --saved_model_dir, --keras_model_file, --enable_v1_converter"
+  ],
+  [
+    "--output_file",
+    "是什么",
+    "指定输出文件的绝对路径"
+  ],
+  [
+    "--saved_model_dir",
+    "是什么",
+    "指定含有 TensorFlow 1.x 或者 2.0 使用 SavedModel 生成文件的绝对路径目录"
+  ],
+  [
+    "--keras_model_file",
+    "是什么",
+    "指定含有 TensorFlow 1.x 或者 2.0 使用 tf.keras model 生成 HDF5 文件的绝对路径目录"
+  ],
+  [
+    "TensorFlow 模型导出",
+    "组成部分",
+    "SavedModel 和 Keras Sequential"
+  ],
+  [
+    "tf.lite.TFLiteConverter",
+    "是什么",
+    "将 TensorFlow 模型格式转换为 TensorFlow Lite 的 Python API"
+  ],
+  [
+    "TFLiteConverter",
+    "组成部分",
+    "from_saved_model(), from_keras_model(), from_concrete_functions()"
+  ],
+  [
+    "TFLiteConverter.from_saved_model()",
+    "用途",
+    "用来转换 SavedModel 格式模型"
+  ],
+  [
+    "TFLiteConverter.from_keras_model()",
+    "用途",
+    "用来转换 tf.keras 模型"
+  ],
+  [
+    "TFLiteConverter.from_concrete_functions()",
+    "用途",
+    "用来转换 concrete functions"
+  ],
+  [
+    "TensorFlow 2.x 模型",
+    "特点",
+    "使用 SavedModel 格式存储"
+  ],
+  [
+    "TensorFlow Lite",
+    "是什么",
+    "一个轻量、快速、兼容度高的专门针对移动式应用场景的深度学习工具"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "在移动设备、嵌入式设备和 IoT 设备上运行 TensorFlow 模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "二进制文件的大小约为 1 MB（针对 32 位 ARM build）"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "支持各种端侧设备优化的算子库"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "能够利用各种硬件加速"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "TensorFlow Lite 解释器(Interpreter)"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "TensorFlow Lite 转换器(Converter)"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "算子库(Op kernels)"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "硬件加速代理(Hardware accelerator delegate)"
+  ],
+  [
+    "TensorFlow Lite",
+    "工作原理",
+    "采用更小的模型格式，并提供了方便的模型转换器，可将 TensorFlow 模型转换为方便解释器使用的格式"
+  ],
+  [
+    "TensorFlow Lite",
+    "工作原理",
+    "采用更小的解释器，可在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "应用",
+    "Google Assistant，Google Photos 等、Uber、Airbnb、以及国内的许多大公司如网易、爱奇艺和 WPS 等"
+  ],
+  [
+    "TensorFlow Lite",
+    "应用",
+    "图像、文本和语音等方面"
+  ],
+  [
+    "TensorFlow Lite",
+    "应用",
+    "支持微控制器(MCU)，可以应用于 IoT 领域"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将 TensorFlow 模型转换为 TensorFlow Lite 格式"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "工作原理",
+    "算子优化和常见的编译优化，比如算子融合、常数折叠或无用代码删除等"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "工作原理",
+    "量化的原生支持"
+  ],
+  [
+    "FlatBuffers 格式",
+    "用途",
+    "TFLite 模型文件格式"
+  ],
+  [
+    "FlatBuffers 格式",
+    "特点",
+    "更注重考虑实时性，内存高效"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "特点",
+    "轻量级"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "特点",
+    "快速启动"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "特点",
+    "内存高效"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "执行步骤",
+    "加载模型"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "执行步骤",
+    "转换数据"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "执行步骤",
+    "运行模型推理"
+  ],
+  [
+    "TensorFlow Lite 解释执行器",
+    "执行步骤",
+    "解释输出"
+  ],
+  [
+    "TensorFlow Lite 开发工作流程",
+    "执行步骤",
+    "选择模型"
+  ],
+  [
+    "TensorFlow Lite 开发工作流程",
+    "执行步骤",
+    "转换模型"
+  ],
+  [
+    "TensorFlow Lite 开发工作流程",
+    "执行步骤",
+    "部署到设备"
+  ],
+  [
+    "TensorFlow Lite 开发工作流程",
+    "执行步骤",
+    "优化模型"
+  ],
+  [
+    "TensorFlow Hub",
+    "用途",
+    "开发人员可以复用这些已经训练好且经过充分认证的模型，节省训练时间和计算资源"
+  ],
+  [
+    "tf.keras model",
+    "用途",
+    "生成 HDF5 文件的绝对路径目录"
+  ],
+  [
+    "TensorFlow 模型导出",
+    "支持",
+    "SavedModel 和 Keras Sequential 两种模型导出方法和格式"
+  ],
+  [
+    "SavedModel",
+    "示例",
+    "tflite_convert --saved_model_dir=/tmp/mobilenet_saved_model --output_file=/tmp/mobilenet.tflite"
+  ],
+  [
+    "Keras H5",
+    "示例",
+    "tflite_convert --keras_model_file=/tmp/mobilenet_keras_model.h5 --output_file=/tmp/mobilenet.tflite"
+  ],
+  [
+    "Keras 模型",
+    "转换为",
+    "TensorFlow Lite 模型"
+  ],
+  [
+    "TensorFlow Lite 模型",
+    "保存方法",
+    "使用 open('model.tflite', 'wb') 写入文件"
+  ],
+  [
+    "TensorFlow",
+    "包含",
+    "TensorFlow Lite"
+  ],
+  [
+    "tf.keras.models.Sequential",
+    "是什么",
+    "一个用于创建线性堆叠层的Keras模型"
+  ],
+  [
+    "tf.keras.models.Sequential",
+    "组成部分",
+    "多个Dense层"
+  ],
+  [
+    "Dense层",
+    "特点",
+    "具有units参数指定输出维度"
+  ],
+  [
+    "Dense层",
+    "特点",
+    "可以指定激活函数如relu"
+  ],
+  [
+    "model.compile",
+    "用途",
+    "配置模型的训练过程"
+  ],
+  [
+    "model.compile",
+    "组成部分",
+    "optimizer参数指定优化器"
+  ],
+  [
+    "model.compile",
+    "组成部分",
+    "loss参数指定损失函数"
+  ],
+  [
+    "sgd",
+    "是什么",
+    "随机梯度下降优化器"
+  ],
+  [
+    "mean_squared_error",
+    "是什么",
+    "均方误差损失函数"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "是什么",
+    "接收一个模型文件，执行模型文件在输入数据上定义的运算符，输出推理结果，通过模型运行数据以获得预测的过程"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "从 Java、Swift、Objective-C、C++ 和 Python 运行 TensorFlow Lite 模型"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "特点",
+    "适用于多个平台，提供了一个简单的 API"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "使用方法",
+    "try (Interpreter interpreter = new Interpreter(tensorflow_lite_model_file)) { interpreter.run(input, output); }"
+  ],
+  [
+    "GPU",
+    "比较",
+    "比 CPU 执行更快的浮点矩阵运算"
+  ],
+  [
+    "GPU",
+    "优点",
+    "在有 GPU 加速的手机上运行 MobileNet 图像分类，模型运行速度可以提高"
+  ],
+  [
+    "model.fit",
+    "执行步骤",
+    "使用输入数据x=[-1, 0, 1]和输出数据y=[-3, -1, 1]进行训练，设置epochs=5"
+  ],
+  [
+    "model.fit",
+    "用途",
+    "训练模型"
+  ],
+  [
+    "tf.lite.TFLiteConverter",
+    "是什么",
+    "将 TensorFlow 模型格式转换为 TensorFlow Lite 的 Python API"
+  ],
+  [
+    "TFLiteConverter.from_saved_model()",
+    "用途",
+    "转换 SavedModel 格式模型"
+  ],
+  [
+    "TFLiteConverter.from_keras_model()",
+    "用途",
+    "转换 tf.keras 模型"
+  ],
+  [
+    "TFLiteConverter.from_concrete_functions()",
+    "用途",
+    "转换 concrete functions"
+  ],
+  [
+    "TensorFlow 2.x 模型",
+    "特点",
+    "使用 SavedModel 格式存储"
+  ],
+  [
+    "TensorFlow 2.x 模型",
+    "组成部分",
+    "高阶 tf.keras.* API（Keras 模型）或低阶 tf.* API（用于生成具体函数）"
+  ],
+  [
+    "SavedModel 转换为 TensorFlow Lite 模型",
+    "执行步骤",
+    "import tensorflow as tf, converter = tf.lite.TFLiteConverter.from_saved_model(saved_model_dir), tflite_model = converter.convert(), with open('model.tflite', 'wb') as f: f.write(tflite_model)"
+  ],
+  [
+    "Keras 模型转换为 TensorFlow Lite 模型",
+    "执行步骤",
+    "import tensorflow as tf, model = tf.keras.models.Sequential([...]), model.compile(...), model.fit(...), tf.saved_model.save(model, \"saved_model_keras_dir\"), converter = tf.lite.TFLiteConverter.from_keras_model(model), tflite_model = converter.convert(), with open('model.tflite', 'wb') as f: f.write(tflite_model)"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "TensorFlow Lite 解释器(Interpreter)"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "TensorFlow Lite 转换器(Converter)"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "算子库(Op kernels)"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "硬件加速代理(Hardware accelerator delegate)"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将 TensorFlow 模型转换为方便解释器使用的格式"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "引入优化以减小二进制文件的大小和提高性能"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "执行步骤",
+    "将 SavedModel 或 GraphDef 格式的 TensorFlow 模型转换成 TFLite 专用的模型文件格式"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "执行步骤",
+    "进行算子融合和模型优化，以压缩模型，提高性能"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "特点",
+    "更小的解释器"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型"
+  ],
+  [
+    "TensorFlow Lite 算子库",
+    "特点",
+    "目前有130个左右"
+  ],
+  [
+    "TensorFlow Lite 算子库",
+    "特点",
+    "与 TensorFlow 的核心算子库略有不同"
+  ],
+  [
+    "TensorFlow Lite 算子库",
+    "特点",
+    "做了移动设备相关的优化"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "采用更小的模型格式"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "安卓应用只需 1 兆左右的运行环境"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "在 MCU 上甚至可以小于 100KB"
+  ],
+  [
+    "TensorFlow Lite",
+    "工作原理",
+    "在硬件加速层面，对于 CPU 利用了 ARM 的 NEON 指令集做了大量的优化"
+  ],
+  [
+    "TensorFlow Lite",
+    "工作原理",
+    "可以利用手机上的加速器，比如 GPU 或者 DSP"
+  ],
+  [
+    "TensorFlow Lite",
+    "工作原理",
+    "最新的安卓系统提供了 Android 神经网络 API（Android NN API)，让硬件厂商可以扩展支持这样的接口"
+  ],
+  [
+    "tf.saved_model.save",
+    "用途",
+    "生成SavedModel"
+  ],
+  [
+    "tf.saved_model.save",
+    "执行步骤",
+    "保存模型到指定目录"
+  ],
+  [
+    "SavedModel",
+    "是什么",
+    "TensorFlow模型的保存格式"
+  ],
+  [
+    "tf.saved_model.save",
+    "使用方法",
+    "传入模型对象和保存目录路径"
+  ],
+  [
+    "tf.lite.TFLiteConverter",
+    "用途",
+    "将Keras模型转换为TensorFlow Lite模型"
+  ],
+  [
+    "tf.lite.TFLiteConverter.from_keras_model",
+    "执行步骤",
+    "使用Keras模型作为输入创建TFLite转换器"
+  ],
+  [
+    "converter.convert",
+    "执行步骤",
+    "执行模型转换过程生成TFLite模型"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "是什么",
+    "可以将不同形式的模型转换为TFLite格式的工具"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "用途",
+    "将Keras Model和SavedModel转换为TFLite格式"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "使用方法",
+    "通过Python API调用tf.lite.TFLiteConverter或命令行tflite_convert"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "执行步骤",
+    "调用from_saved_model()或from_keras_model()方法进行转换"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "特点",
+    "支持算子优化和常见的编译优化"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "特点",
+    "支持量化的原生支持"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "工作原理",
+    "通过算子融合、常数折叠或无用代码删除等优化技术提升性能"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "组成部分",
+    "优化的算子内核"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "优点",
+    "在移动设备上实现性能大幅度提升"
+  ],
+  [
+    "TensorFlow Lite 转换器",
+    "优点",
+    "训练后量化非常简单，不需要改变模型"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "在不同设备上使用硬件加速"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "组成部分",
+    "GPU 委托"
+  ],
+  [
+    "GPU 委托",
+    "用途",
+    "在设备的 GPU 上运行适当的运算符"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "使用方法",
+    "在 Java 中使用 GPU 委托"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "在 Android 与 iOS 平台上使用"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "使用方法",
+    "Android 开发人员使用 TensorFlow Lite AAR"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "使用方法",
+    "iOS 开发人员使用 CocoaPods for Swift or Objective-C"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "部署在 Raspberry Pi 和基于 Arm64 的主板的嵌入式 Linux 系统上"
+  ],
+  [
+    "MobileNet V2",
+    "是什么",
+    "基于流线型架构的轻量级深层神经网络"
+  ],
+  [
+    "MobileNet V2",
+    "特点",
+    "使用深度可分离的卷积"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "图像分类任务"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "猫狗分类"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "花卉分类"
+  ],
+  [
+    "迁移学习",
+    "执行步骤",
+    "载入预训练模型并在顶部添加全连接的分类器"
+  ],
+  [
+    "迁移学习",
+    "执行步骤",
+    "冻结预训练模型并仅在训练期间更新分类器的权重"
+  ],
+  [
+    "迁移学习",
+    "执行步骤",
+    "微调预训练模型的顶层权重以提高性能"
+  ],
+  [
+    "ImageDataGenerator",
+    "是什么",
+    "keras.preprocessing.image模块中的图片生成器"
+  ],
+  [
+    "ImageDataGenerator",
+    "用途",
+    "生成批次的图片以进行模型训练"
+  ],
+  [
+    "ImageDataGenerator",
+    "特点",
+    "可以指定像素缩放和数据增强"
+  ],
+  [
+    "flow_from_directory",
+    "用途",
+    "逐步加载单个数据集的图像"
+  ],
+  [
+    "flow_from_directory",
+    "特点",
+    "可以配置与加载图像相关的细节"
+  ],
+  [
+    "flow_from_directory",
+    "特点",
+    "允许将所有图像加载到特定大小"
+  ],
+  [
+    "flow_from_directory",
+    "特点",
+    "可以设置batch_size和shuffle参数"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "实现花卉识别 app"
+  ],
+  [
+    "花卉识别 app",
+    "执行步骤",
+    "通过迁移学习实现花卉识别模型"
+  ],
+  [
+    "花卉识别 app",
+    "执行步骤",
+    "使用 TFLite 转换器转换模型"
+  ],
+  [
+    "花卉识别 app",
+    "执行步骤",
+    "在 Android 应用中使用 TFLite 解释器运行它"
+  ],
+  [
+    "花卉识别 app",
+    "执行步骤",
+    "使用 TensorFlow Lite 支持库预处理模型输入和后处理模型输出"
+  ],
+  [
+    "花卉识别 app",
+    "执行步骤",
+    "实现一个在手机上运行的 app，可以实时识别照相机所拍摄的花卉"
+  ],
+  [
+    "花卉识别 app",
+    "特点",
+    "在 Android 设备上运行图像识别模型 MobileNets_v2来识别花卉"
+  ],
+  [
+    "花卉识别模型",
+    "组成部分",
+    "MobileNets_v2"
+  ],
+  [
+    "TFLite 模型文件格式",
+    "是什么",
+    "采用 FlatBuffers 的格式"
+  ],
+  [
+    "TFLite 模型文件格式",
+    "特点",
+    "注重实时性，内存高效"
+  ],
+  [
+    "TFLite 模型文件格式",
+    "特点",
+    "支持将文件映射到内存中直接读取和解释，不需要额外解析"
+  ],
+  [
+    "TFLite 模型文件格式",
+    "特点",
+    "减少内存碎片化"
+  ],
+  [
+    "TFLite 模型文件格式",
+    "组成部分",
+    "子图、算子库和共享的内存缓冲区"
+  ],
+  [
+    "TFLite 模型",
+    "包含",
+    "子图"
+  ],
+  [
+    "TFLite 模型",
+    "包含",
+    "算子库"
+  ],
+  [
+    "TFLite 模型",
+    "包含",
+    "共享的内存缓冲区"
+  ],
+  [
+    "张量",
+    "用途",
+    "存储模型权重"
+  ],
+  [
+    "张量",
+    "用途",
+    "存储计算节点的输入和输出"
+  ],
+  [
+    "张量",
+    "特点",
+    "引用 Model 的内存缓冲区的一片区域，提高内存效率"
+  ],
+  [
+    "算子实现",
+    "包含",
+    "OperatorCode"
+  ],
+  [
+    "OperatorCode",
+    "特点",
+    "可以是内置的算子或自定制算子"
+  ],
+  [
+    "OperatorCode",
+    "特点",
+    "有一个名字"
+  ],
+  [
+    "模型的计算节点",
+    "包含",
+    "用到的算子索引"
+  ],
+  [
+    "模型的计算节点",
+    "包含",
+    "输入输出用到的 Tensor 索引"
+  ],
+  [
+    "子图",
+    "包含",
+    "一系列的计算节点"
+  ],
+  [
+    "子图",
+    "包含",
+    "多个张量"
+  ],
+  [
+    "子图",
+    "包含",
+    "子图本身的输入和输出"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "端侧机器学习"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "移动应用中的OCR处理"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "视频中的AR效果"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "文字处理"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "图像和视频处理"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "离线语音识别"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "IoT领域"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "工业物联智能设备开发"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "高性能"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "模型优化工具"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "微控制器(MCU)支持"
+  ],
+  [
+    "Google Assistant",
+    "用途",
+    "移动端语音识别"
+  ],
+  [
+    "Google Assistant",
+    "用途",
+    "语音功能部署"
+  ],
+  [
+    "Google Photos",
+    "用途",
+    "图像处理"
+  ],
+  [
+    "Google Arts & Culture",
+    "用途",
+    "图像处理"
+  ],
+  [
+    "Live Caption",
+    "用途",
+    "视频和对话中的语言转化为文字"
+  ],
+  [
+    "MCU",
+    "是什么",
+    "单一芯片的小型计算机"
+  ],
+  [
+    "MCU",
+    "特点",
+    "没有操作系统"
+  ],
+  [
+    "MCU",
+    "特点",
+    "内存只有几十KB"
+  ],
+  [
+    "出门问问智能音箱",
+    "用途",
+    "热词唤醒"
+  ],
+  [
+    "科沃斯扫地机器人",
+    "用途",
+    "室内避开障碍物"
+  ],
+  [
+    "科沃斯扫地机器人",
+    "优点",
+    "推理速度提高了30%"
+  ],
+  [
+    "创新奇智",
+    "用途",
+    "开发智能质检一体机"
+  ],
+  [
+    "创新奇智",
+    "用途",
+    "开发智能读码机"
+  ],
+  [
+    "智能质检一体机",
+    "用途",
+    "服装厂质检"
+  ],
+  [
+    "TensorFlow",
+    "是什么",
+    "一个端到端的机器学习开源框架"
+  ],
+  [
+    "TensorFlow",
+    "用途",
+    "支持大规模的模型训练和各种环境的部署"
+  ],
+  [
+    "TensorFlow",
+    "特点",
+    "支持服务器和移动端的部署"
+  ],
+  [
+    "TensorFlow",
+    "特点",
+    "支持多种语言包括Python、C++、Java、Swift和Javascript"
+  ],
+  [
+    "TensorFlow Lite",
+    "是什么",
+    "一个轻量、快速、兼容度高的专门针对移动式应用场景的深度学习工具"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "轻量化"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "快速"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "兼容度高"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "移动端及IoT设备端的深度学习"
+  ],
+  [
+    "TensorFlow Lite",
+    "优点",
+    "大大降低移动端及IoT设备端的深度学习技术门槛"
+  ],
+  [
+    "TensorFlow Lite",
+    "属于",
+    "TensorFlow团队开发的产品"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "用途",
+    "执行模型文件在输入数据上定义的运算符，输出推理结果"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "特点",
+    "适用于多个平台，提供了一个简单的 API"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "使用方法",
+    "从 Java、Swift、Objective-C、C++ 和 Python 运行 TensorFlow Lite 模型"
+  ],
+  [
+    "GPU",
+    "比较",
+    "比 CPU 执行更快的浮点矩阵运算"
+  ],
+  [
+    "GPU 委托",
+    "用途",
+    "允许解释器在设备的 GPU 上运行适当的运算符"
+  ],
+  [
+    "TensorFlow Lite 解释器",
+    "组成部分",
+    "GPU 委托"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "优化模型大小和性能"
+  ],
+  [
+    "量化",
+    "用途",
+    "降低权重的精确表示，并且可选的降低存储和计算的激活值"
+  ],
+  [
+    "量化",
+    "优点",
+    "对现有 CPU 平台的支持"
+  ],
+  [
+    "量化",
+    "优点",
+    "降低存储器访问成本"
+  ],
+  [
+    "量化",
+    "优点",
+    "对 SIMD 指令功能特别有益"
+  ],
+  [
+    "TensorFlow Lite",
+    "包含",
+    "Post training quantization 和 Quantization-aware training"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "实现识别花卉模型"
+  ],
+  [
+    "MobileNet V2",
+    "特点",
+    "基于一个流线型的架构，使用深度可分离的卷积来构建轻量级的深层神经网"
+  ],
+  [
+    "迁移学习",
+    "用途",
+    "利用在同一域中的较大数据集上训练的模型所学习的特征"
+  ],
+  [
+    "迁移学习",
+    "执行步骤",
+    "实例化预先训练的模型，并在顶部添加全连接的分类器"
+  ],
+  [
+    "微调",
+    "用途",
+    "调整预训练模型的顶层权重，以便模型学习特定于数据集的高级特征"
+  ],
+  [
+    "ImageDataGenerator",
+    "用途",
+    "生成一个批次一个批次的图片，以生成器的形式给模型训练"
+  ],
+  [
+    "flow_from_directory",
+    "用途",
+    "逐步加载单个数据集的图像"
+  ],
+  [
+    "MobileNet V2",
+    "是什么",
+    "一个预训练的深度学习模型"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "图片分类"
+  ],
+  [
+    "MobileNet V2",
+    "特点",
+    "默认将图片分类到1000类"
+  ],
+  [
+    "MobileNet V2",
+    "组成部分",
+    "瓶颈层"
+  ],
+  [
+    "MobileNet V2",
+    "组成部分",
+    "分类层"
+  ],
+  [
+    "迁移学习",
+    "用途",
+    "改造预训练模型"
+  ],
+  [
+    "迁移学习",
+    "特点",
+    "保留原来大规模训练的优势"
+  ],
+  [
+    "model.trainable",
+    "用途",
+    "设置基础模型的参数变量不会被新的训练修改"
+  ],
+  [
+    "GlobalAveragePooling2D",
+    "用途",
+    "将特征转换为每个图像对应一个1280元素向量"
+  ],
+  [
+    "GlobalAveragePooling2D",
+    "工作原理",
+    "在空间位置上进行平均"
+  ],
+  [
+    "tf.keras.Sequential",
+    "组成部分",
+    "base_model"
+  ],
+  [
+    "tf.keras.Sequential",
+    "组成部分",
+    "Conv2D层"
+  ],
+  [
+    "tf.keras.Sequential",
+    "组成部分",
+    "Dropout层"
+  ],
+  [
+    "tf.keras.Sequential",
+    "组成部分",
+    "GlobalAveragePooling2D层"
+  ],
+  [
+    "tf.keras.Sequential",
+    "组成部分",
+    "Dense层"
+  ],
+  [
+    "Dense层",
+    "特点",
+    "5个节点"
+  ],
+  [
+    "Dense层",
+    "用途",
+    "输出分类结果"
+  ],
+  [
+    "model.compile",
+    "执行步骤",
+    "设置优化器为Adam"
+  ],
+  [
+    "model.compile",
+    "执行步骤",
+    "设置损失函数为类别交叉熵"
+  ],
+  [
+    "model.compile",
+    "执行步骤",
+    "设置评估指标为准确率"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "在移动端、嵌入式和物联网设备上运行 TensorFlow 模型"
+  ],
+  [
+    "TensorFlow 模型",
+    "是什么",
+    "一种数据结构，包含了在解决特定问题时训练得到的机器学习网络的逻辑和知识"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "转换和运行 TensorFlow 模型的工具"
+  ],
+  [
+    "TensorFlow Hub",
+    "用途",
+    "存放训练好的模型供开发人员复用"
+  ],
+  [
+    "TensorFlow Hub",
+    "特点",
+    "提供已经训练好且经过充分认证的模型"
+  ],
+  [
+    "预训练模型",
+    "用途",
+    "可以直接部署或用于迁移学习"
+  ],
+  [
+    "MobileNet",
+    "属于",
+    "TensorFlow Hub 中的模型"
+  ],
+  [
+    "hub.KerasLayer",
+    "使用方法",
+    "用于加载 TensorFlow Hub 中的模型"
+  ],
+  [
+    "train_generator",
+    "用途",
+    "从指定目录生成训练数据批次"
+  ],
+  [
+    "train_generator",
+    "特点",
+    "支持指定目标图像大小和批次大小"
+  ],
+  [
+    "val_generator",
+    "用途",
+    "从指定目录生成验证数据批次"
+  ],
+  [
+    "val_generator",
+    "特点",
+    "支持指定目标图像大小和批次大小"
+  ],
+  [
+    "MobileNetV2",
+    "是什么",
+    "预加载了ImageNet训练权重的深度学习模型"
+  ],
+  [
+    "MobileNetV2",
+    "用途",
+    "作为迁移学习的基础模型"
+  ],
+  [
+    "MobileNetV2",
+    "特点",
+    "支持自定义输入形状和是否包含顶层分类器"
+  ],
+  [
+    "labels.txt",
+    "用途",
+    "保存训练数据的类别标签信息"
+  ],
+  [
+    "迁移学习",
+    "执行步骤",
+    "实例化预训练模型作为基础模型"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "组成部分",
+    "conv2d (Conv2D)"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "组成部分",
+    "dropout (Dropout)"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "组成部分",
+    "global_average_pooling2d (GlobalAveragePooling2D)"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "组成部分",
+    "dense (Dense)"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "特点",
+    "Total params: 2,626,821"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "特点",
+    "Trainable params: 368,837"
+  ],
+  [
+    "mobilenetv2_1.00_224",
+    "特点",
+    "Non-trainable params: 2,257,984"
+  ],
+  [
+    "model.fit",
+    "执行步骤",
+    "train_generator, steps_per_epoch=len(train_generator), epochs=epochs, validation_data=val_generator, validation_steps=len(val_generator)"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "预训练网络"
+  ],
+  [
+    "MobileNet V2",
+    "特点",
+    "训练期间不更新预训练网络的权重"
+  ],
+  [
+    "微调",
+    "执行步骤",
+    "设置 model.trainable = False"
+  ],
+  [
+    "微调",
+    "执行步骤",
+    "训练预训练模型的顶层的权重以及刚添加的分类器的训练"
+  ],
+  [
+    "微调",
+    "执行步骤",
+    "取消冻结模型的顶层"
+  ],
+  [
+    "微调",
+    "工作原理",
+    "使专用功能适应新数据集，而不是覆盖通用学习"
+  ],
+  [
+    "预训练模型",
+    "特点",
+    "前几层学习非常简单和通用的功能"
+  ],
+  [
+    "预训练模型",
+    "特点",
+    "随着层越来越高，功能越来越多地针对训练模型的数据集"
+  ],
+  [
+    "TensorFlow Lite",
+    "是什么",
+    "一组工具，可帮助开发者在移动设备、嵌入式设备和 IoT 设备上运行 TensorFlow 模型"
+  ],
+  [
+    "TensorFlow Lite",
+    "用途",
+    "支持设备端机器学习推断"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "延迟较低"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "二进制文件很小"
+  ],
+  [
+    "MobileNet V2",
+    "用途",
+    "将图片分类到1000类"
+  ],
+  [
+    "MobileNet V2",
+    "特点",
+    "默认包含1000类的分类层"
+  ],
+  [
+    "include_top=False",
+    "用途",
+    "移除原有模型中最后的神经网络层（分类到1000类）"
+  ],
+  [
+    "迁移学习",
+    "特点",
+    "不改变基础模型的各项参数变量"
+  ],
+  [
+    "迁移学习",
+    "优点",
+    "保留原来大规模训练的优势"
+  ],
+  [
+    "model.trainable = False",
+    "用途",
+    "设置在训练中基础模型的参数不会被新的训练修改"
+  ],
+  [
+    "瓶颈层",
+    "特点",
+    "保持了很多通用性"
+  ],
+  [
+    "瓶颈层",
+    "用途",
+    "用于特征提取"
+  ],
+  [
+    "池化层",
+    "用途",
+    "对数据降维"
+  ],
+  [
+    "输出层",
+    "组成部分",
+    "5个节点"
+  ],
+  [
+    "GlobalAveragePooling2D",
+    "用途",
+    "将特征转换为每个图像对应一个1280元素向量"
+  ],
+  [
+    "GlobalAveragePooling2D",
+    "工作原理",
+    "用5x5在空间位置上进行平均"
+  ],
+  [
+    "TensorFlow Lite",
+    "是什么",
+    "在边缘设备上运行 TensorFlow 模型推理的官方框架"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "跨平台运行，包括 Android、iOS 以及基于 Linux 的 IoT 设备和微控制器"
+  ],
+  [
+    "TensorFlow Lite",
+    "组成部分",
+    "特别为各种端侧设备优化的算子库"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "能够利用各种硬件加速"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "二进制文件的大小约为 1 MB（针对 32 位 ARM build）"
+  ],
+  [
+    "TensorFlow Lite",
+    "特点",
+    "如果仅使用支持常见图像分类模型（InceptionV3 和 MobileNet）所需的运算符，二进制文件的大小不到 300 KB"
+  ],
+  [
+    "TF Mobile",
+    "是什么",
+    "Google 的尝试简化 TensorFlow 并在移动设备上运行的项目"
+  ],
+  [
+    "TF Mobile",
+    "特点",
+    "缩减版的 TensorFlow，简化了算子集，也缩小了运行库"
+  ],
+  [
+    "TFMini",
+    "是什么",
+    "Google 内部用于计算机视觉场景的解决方案"
+  ],
+  [
+    "TFMini",
+    "用途",
+    "提供了一些转换工具压缩模型，进行算子融合并生成代码"
+  ],
+  [
+    "TFMini",
+    "特点",
+    "将模型嵌入到二进制文件中，这样就可以在设备上运行和部署模型"
+  ],
+  [
+    "TFMini",
+    "缺点",
+    "在把模型嵌入到实际的二进制文件中时兼容性存在较大挑战"
+  ],
+  [
+    "TensorFlow Lite",
+    "发展历史",
+    "基于 TF Mobile 的经验，也继承了 TFMini 和内部其他类似项目的很多优秀工作"
+  ],
+  [
+    "MobileNet V2",
+    "组成部分",
+    "155层网络"
+  ],
+  [
+    "微调过程",
+    "执行步骤",
+    "冻结前100层，设置不可训练"
+  ],
+  [
+    "微调过程",
+    "执行步骤",
+    "使用低学习率编译模型"
+  ],
+  [
+    "微调过程",
+    "执行步骤",
+    "重新训练模型"
+  ],
+  [
+    "模型编译",
+    "组成部分",
+    "损失函数categorical_crossentropy"
+  ],
+  [
+    "模型编译",
+    "组成部分",
+    "优化器Adam"
+  ],
+  [
+    "模型编译",
+    "组成部分",
+    "评估指标accuracy"
+  ],
+  [
+    "微调后模型",
+    "特点",
+    "精度达到98%"
+  ],
+  [
+    "微调后模型",
+    "缺点",
+    "验证损失高于训练损失"
+  ],
+  [
+    "微调后模型",
+    "缺点",
+    "可能存在过拟合"
+  ],
+  [
+    "TFLite转换",
+    "执行步骤",
+    "使用tf.saved_model.save保存模型"
+  ],
+  [
+    "TFLite转换",
+    "执行步骤",
+    "使用TFLiteConverter转换模型"
+  ],
+  [
+    "TFLite模型",
+    "特点",
+    "包含完整TensorFlow程序"
+  ],
+  [
+    "TFLite模型",
+    "特点",
+    "不需要原始构建代码"
+  ],
+  [
+    "Android部署",
+    "执行步骤",
+    "配置build.gradle文件"
+  ],
+  [
+    "Android部署",
+    "执行步骤",
+    "添加TensorFlow Lite依赖"
+  ],
+  [
+    "Android部署",
+    "执行步骤",
+    "防止模型文件压缩"
+  ],
+  [
+    "Android部署",
+    "执行步骤",
+    "初始化TFLite解释器"
+  ],
+  [
+    "TFLite解释器",
+    "用途",
+    "执行模型推理"
+  ],
+  [
+    "GPU代理",
+    "用途",
+    "加速模型推理"
+  ],
+  [
+    "图像预处理",
+    "执行步骤",
+    "使用ImageProcessor进行转换"
+  ],
+  [
+    "图像预处理",
+    "执行步骤",
+    "调整图像大小和方向"
+  ],
+  [
+    "推理过程",
+    "执行步骤",
+    "提供预处理图像给解释器"
+  ],
+  [
+    "推理过程",
+    "执行步骤",
+    "获取类别概率"
+  ],
+  [
+    "PoseNet模型",
+    "用途",
+    "人体姿势估计"
+  ],
+  [
+    "PoseNet模型",
+    "特点",
+    "检测关键身体部位位置"
+  ]
+]

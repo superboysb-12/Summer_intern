@@ -1,0 +1,5933 @@
+{
+  "make 命令": {
+    "successors": [
+      {
+        "target": "如果提示 Python 模块无法编译，需要按照错误提示排查原因，通常是没安装相应的依赖包",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "如果提示 Python 模块无法编译，需要按照错误提示排查原因，通常是没安装相应的依赖包": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "make 命令",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "make install": {
+    "successors": [
+      {
+        "target": "将 Python 相关程序模块拷贝到/opt/python",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将 Python 相关程序模块拷贝到/opt/python": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "make install",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Python 模块": {
+    "successors": [
+      {
+        "target": "Python 相关程序模块",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "Python 相关程序模块": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python 模块",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Python": {
+    "successors": [
+      {
+        "target": "一种功能强大的编程语言",
+        "relation": "是什么"
+      },
+      {
+        "target": "易于使用，易于阅读和编写",
+        "relation": "特点"
+      },
+      {
+        "target": "与树莓派结合可以将项目与现实世界轻松的联系起来",
+        "relation": "用途"
+      },
+      {
+        "target": "下载时选择特定版本",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "包含"
+      }
+    ]
+  },
+  "一种功能强大的编程语言": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "易于使用，易于阅读和编写": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python",
+        "relation": "特点"
+      }
+    ]
+  },
+  "与树莓派结合可以将项目与现实世界轻松的联系起来": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python",
+        "relation": "用途"
+      }
+    ]
+  },
+  "树莓派": {
+    "successors": [
+      {
+        "target": "Python开发环境",
+        "relation": "包含"
+      },
+      {
+        "target": "打开终端窗口，执行python来测试是否安装了Python开发环境，并查看当前的Python版本",
+        "relation": "使用方法"
+      },
+      {
+        "target": "GPIO端口",
+        "relation": "包含"
+      },
+      {
+        "target": "Python",
+        "relation": "包含"
+      },
+      {
+        "target": "控制外部硬件设备",
+        "relation": "用途"
+      },
+      {
+        "target": "GPIO引脚",
+        "relation": "组成部分"
+      },
+      {
+        "target": "一款设计用于教育的廉价开发板，目前已进化到第4代",
+        "relation": "是什么"
+      },
+      {
+        "target": "廉价且周边设备多，互联网上有丰富的接口设备和项目案例资料",
+        "relation": "特点"
+      },
+      {
+        "target": "物联网与人工智能项目开发",
+        "relation": "用途"
+      },
+      {
+        "target": "40个GPIO引脚，包括电源接口、I2C接口、SPI接口、UART串口接口、PWM接口等",
+        "relation": "组成部分"
+      },
+      {
+        "target": "嵌入式开发平台",
+        "relation": "属于"
+      },
+      {
+        "target": "与NVIDIA Jetson Nano相比，树莓派更廉价且周边设备多",
+        "relation": "比较"
+      }
+    ],
+    "predecessors": []
+  },
+  "Python开发环境": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "包含"
+      }
+    ]
+  },
+  "打开终端窗口，执行python来测试是否安装了Python开发环境，并查看当前的Python版本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "Jupyter Notebook": {
+    "successors": [
+      {
+        "target": "一个功能强大的交互式Python开发环境",
+        "relation": "是什么"
+      },
+      {
+        "target": "功能强大，交互式、富文本，还有丰富的插件、主题修改、多语言支持",
+        "relation": "优点"
+      }
+    ],
+    "predecessors": []
+  },
+  "一个功能强大的交互式Python开发环境": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jupyter Notebook",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "功能强大，交互式、富文本，还有丰富的插件、主题修改、多语言支持": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jupyter Notebook",
+        "relation": "优点"
+      }
+    ]
+  },
+  "JupyterLab": {
+    "successors": [
+      {
+        "target": "Jupyter Notebook的全面升级版本",
+        "relation": "是什么"
+      },
+      {
+        "target": "集Jupyter Notebook、文本编辑器、终端以及各种个性化组件于一体的全能IDE",
+        "relation": "特点"
+      },
+      {
+        "target": "通过pip安装，网络环境差时可考虑更换源",
+        "relation": "安装方法"
+      },
+      {
+        "target": "Jupyter Notebook、文本编辑器、终端以及各种个性化组件",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "Jupyter Notebook的全面升级版本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JupyterLab",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "集Jupyter Notebook、文本编辑器、终端以及各种个性化组件于一体的全能IDE": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JupyterLab",
+        "relation": "特点"
+      }
+    ]
+  },
+  "通过pip安装，网络环境差时可考虑更换源": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JupyterLab",
+        "relation": "安装方法"
+      }
+    ]
+  },
+  "Jupyter Notebook、文本编辑器、终端以及各种个性化组件": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JupyterLab",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Jetson Nano 开发板": {
+    "successors": [
+      {
+        "target": "不支持 CUDA",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "不支持 CUDA": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "OpenCV": {
+    "successors": [
+      {
+        "target": "在 Jetson Nano 开发板上手动编译与安装",
+        "relation": "安装方法"
+      },
+      {
+        "target": "已经训练好的分类器，其中包括面部，眼睛，微笑等",
+        "relation": "包含"
+      },
+      {
+        "target": "不支持 CUDA 且版本是固定搭配的",
+        "relation": "特点"
+      },
+      {
+        "target": "计算机视觉应用，如物体检测、人脸识别、图像分割等",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "包含"
+      },
+      {
+        "source": "JetPack",
+        "relation": "包含"
+      }
+    ]
+  },
+  "在 Jetson Nano 开发板上手动编译与安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV",
+        "relation": "安装方法"
+      }
+    ]
+  },
+  "OpenCV 安装": {
+    "successors": [
+      {
+        "target": "安装依赖项",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "下载 OpenCV",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "编译 OpenCV",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "安装 OpenCV 项目",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "整个安装需要两个小时才能完成",
+        "relation": "特点"
+      },
+      {
+        "target": "可以创建了一个安装脚本",
+        "relation": "特点"
+      },
+      {
+        "target": "以依赖项的安装开始",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "以 ldconfig 结束",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "安装依赖项": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "下载 OpenCV": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "编译 OpenCV": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "安装 OpenCV 项目": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "OpenCV 编译": {
+    "successors": [
+      {
+        "target": "需要设置 OpenCV 的内容、位置和方式",
+        "relation": "特点"
+      },
+      {
+        "target": "涉及许多内容",
+        "relation": "特点"
+      },
+      {
+        "target": "运行配置后需要检查输出结果",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "准备好所有编译指令后开始编译",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "将需要大约两个半小时",
+        "relation": "特点"
+      },
+      {
+        "target": "-D WITH_QT=OFF 禁用了 Qt5 支持",
+        "relation": "示例"
+      }
+    ],
+    "predecessors": []
+  },
+  "需要设置 OpenCV 的内容、位置和方式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "特点"
+      }
+    ]
+  },
+  "涉及许多内容": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "特点"
+      }
+    ]
+  },
+  "运行配置后需要检查输出结果": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "准备好所有编译指令后开始编译": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "将需要大约两个半小时": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "特点"
+      }
+    ]
+  },
+  "整个安装需要两个小时才能完成": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "特点"
+      }
+    ]
+  },
+  "可以创建了一个安装脚本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "特点"
+      }
+    ]
+  },
+  "以依赖项的安装开始": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "以 ldconfig 结束": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 安装",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "-D WITH_QT=OFF 禁用了 Qt5 支持": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV 编译",
+        "relation": "示例"
+      }
+    ]
+  },
+  "Jetson Nano": {
+    "successors": [
+      {
+        "target": "MIPI的相机串行接口（CSI）端口",
+        "relation": "包含"
+      },
+      {
+        "target": "开机前先安装CSI摄像头，系统才能识别",
+        "relation": "使用方法"
+      },
+      {
+        "target": "将已写入系统映像的 microSD 卡插入 Jetson Nano 模块底部的插槽中",
+        "relation": "使用方法"
+      },
+      {
+        "target": "有两种方式可以与 Jetson Nano 开发板进行交互，一个是连接显示器、键盘和鼠标，二是通过 SSH 或 VNC 服务从另一台计算机远程访问",
+        "relation": "使用方法"
+      },
+      {
+        "target": "第一次请连接显示器，键盘和鼠标，然后连接的 Micro-USB 电源，开发板将自动开机并启动",
+        "relation": "使用方法"
+      },
+      {
+        "target": "部署TensorFlow Lite模型",
+        "relation": "用途"
+      },
+      {
+        "target": "OpenCV",
+        "relation": "包含"
+      },
+      {
+        "target": "资源有限，训练网络时可能出现内存溢出错误",
+        "relation": "缺点"
+      },
+      {
+        "target": "运行各种深度学习模型",
+        "relation": "用途"
+      },
+      {
+        "target": "TensorFlow, PyTorch, Caffe / Caffe2, Keras, MXNet 等深度学习框架",
+        "relation": "包含"
+      },
+      {
+        "target": "构建小型移动机器人、人脸签到打卡、口罩识别、智能门锁、智能音箱等复杂 AI 系统",
+        "relation": "用途"
+      },
+      {
+        "target": "microSD 卡作为启动设备和主存储器",
+        "relation": "组成部分"
+      },
+      {
+        "target": "需要 5V⎓2A 的高品质电源供电",
+        "relation": "特点"
+      },
+      {
+        "target": "只有 Ethernet 有线网络，不包括无线网卡",
+        "relation": "缺点"
+      },
+      {
+        "target": "已经训练好的分类器，其中包括面部，眼睛，微笑等",
+        "relation": "间接包含"
+      },
+      {
+        "target": "Jetson Nano",
+        "relation": "可能与...相关"
+      },
+      {
+        "target": "JetPack",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "MIPI的相机串行接口（CSI）端口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "包含"
+      }
+    ]
+  },
+  "MIPI": {
+    "successors": [
+      {
+        "target": "MIPI联盟发起的为移动应用处理器制定的开放标准",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "MIPI联盟发起的为移动应用处理器制定的开放标准": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "MIPI",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "CSI端口": {
+    "successors": [
+      {
+        "target": "支持Raspberry Pi、Arducam等常见的相机模块",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "支持Raspberry Pi、Arducam等常见的相机模块": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "CSI端口",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Raspberry Camera V2": {
+    "successors": [
+      {
+        "target": "800万像素、感光芯片为索尼IMX219",
+        "relation": "特点"
+      },
+      {
+        "target": "静态图片分辨率为3280 × 2464",
+        "relation": "特点"
+      },
+      {
+        "target": "支持1080p30, 720p60以及640 × 480p90视频录像",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "800万像素、感光芯片为索尼IMX219": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Raspberry Camera V2",
+        "relation": "特点"
+      }
+    ]
+  },
+  "静态图片分辨率为3280 × 2464": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Raspberry Camera V2",
+        "relation": "特点"
+      }
+    ]
+  },
+  "支持1080p30, 720p60以及640 × 480p90视频录像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Raspberry Camera V2",
+        "relation": "特点"
+      }
+    ]
+  },
+  "开机前先安装CSI摄像头，系统才能识别": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "JetPack SDK": {
+    "successors": [
+      {
+        "target": "支持预装驱动程序的RPi相机，可以很容易地用作即插即用外围设备",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "支持预装驱动程序的RPi相机，可以很容易地用作即插即用外围设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JetPack SDK",
+        "relation": "特点"
+      }
+    ]
+  },
+  "GStreamer": {
+    "successors": [
+      {
+        "target": "一个多媒体框架，用于后端处理任务",
+        "relation": "是什么"
+      },
+      {
+        "target": "处理媒体应用程序，如格式修改、显示驱动程序协调和数据处理",
+        "relation": "用途"
+      },
+      {
+        "target": "创建 GStreamer 管道，将管道绑定 opencv 的视频流，逐帧提取和显示",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "摄像头预捕获的图像宽度、高度，窗口显示的图像宽度、高度，捕获帧率，是否旋转图像",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "一个多媒体框架，用于后端处理任务": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GStreamer",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "处理媒体应用程序，如格式修改、显示驱动程序协调和数据处理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GStreamer",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Haar特征的cascade分类器": {
+    "successors": [
+      {
+        "target": "一种有效的物品检测方法",
+        "relation": "是什么"
+      },
+      {
+        "target": "通过许多正负样例中训练得到cascade方程，然后将其应用于其他图片",
+        "relation": "工作原理"
+      },
+      {
+        "target": "一种有效的物品检测方法，通过许多正负样例中训练得到cascade方程",
+        "relation": "是什么"
+      },
+      {
+        "target": "检测面部、眼睛、微笑等",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "一种有效的物品检测方法": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Haar特征的cascade分类器",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "通过许多正负样例中训练得到cascade方程，然后将其应用于其他图片": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Haar特征的cascade分类器",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "已经训练好的分类器，其中包括面部，眼睛，微笑等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV",
+        "relation": "包含"
+      },
+      {
+        "source": "Jetson Nano",
+        "relation": "间接包含"
+      },
+      {
+        "source": "JetPack",
+        "relation": "间接包含"
+      }
+    ]
+  },
+  "face_cascade.detectMultiScale": {
+    "successors": [
+      {
+        "target": "在图像中检测面部",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "在图像中检测面部": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "face_cascade.detectMultiScale",
+        "relation": "用途"
+      }
+    ]
+  },
+  "pip install": {
+    "successors": [
+      {
+        "target": "添加--no-cache-dir 参数",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "手动下载安装需要的 Package 后用 pip 安装",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "添加--no-cache-dir 参数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip install",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "手动下载安装需要的 Package 后用 pip 安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip install",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "jupyter": {
+    "successors": [
+      {
+        "target": "jupyter_notebook_config.py",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "jupyter_notebook_config.py": {
+    "successors": [
+      {
+        "target": "由 jupyter 软件生成",
+        "relation": "特点"
+      },
+      {
+        "target": "配置 Jupyter lab",
+        "relation": "用途"
+      },
+      {
+        "target": "修改运行服务监听的 IP 地址，端口，用于 notebooks 内核的目录，是否打开浏览器",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "jupyter",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "由 jupyter 软件生成": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "jupyter_notebook_config.py",
+        "relation": "特点"
+      }
+    ]
+  },
+  "配置 Jupyter lab": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "jupyter_notebook_config.py",
+        "relation": "用途"
+      }
+    ]
+  },
+  "修改运行服务监听的 IP 地址，端口，用于 notebooks 内核的目录，是否打开浏览器": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "jupyter_notebook_config.py",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "Jupyter lab": {
+    "successors": [
+      {
+        "target": "设置访问密码",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "重启树莓派后尝试启动",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "在树莓派浏览器中输入 http://",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "设置访问密码": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jupyter lab",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "重启树莓派后尝试启动": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jupyter lab",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "在树莓派浏览器中输入 http://": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jupyter lab",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "/usr/bin/python": {
+    "successors": [
+      {
+        "target": "一个软链接",
+        "relation": "是什么"
+      },
+      {
+        "target": "python",
+        "relation": "指向"
+      }
+    ],
+    "predecessors": []
+  },
+  "一个软链接": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "/usr/bin/python",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "python": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "/usr/bin/python",
+        "relation": "指向"
+      }
+    ]
+  },
+  "minNeighbors": {
+    "successors": [
+      {
+        "target": "构成检测目标的相邻矩形的最小个数",
+        "relation": "是什么"
+      },
+      {
+        "target": "默认为3个",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "构成检测目标的相邻矩形的最小个数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "minNeighbors",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "默认为3个": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "minNeighbors",
+        "relation": "特点"
+      }
+    ]
+  },
+  "CSI 摄像头": {
+    "successors": [
+      {
+        "target": "需要使用 Gstreamer 读取视频流",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "需要使用 Gstreamer 读取视频流": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "CSI 摄像头",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "创建 GStreamer 管道，将管道绑定 opencv 的视频流，逐帧提取和显示": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GStreamer",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "摄像头预捕获的图像宽度、高度，窗口显示的图像宽度、高度，捕获帧率，是否旋转图像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GStreamer",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "人脸检测": {
+    "successors": [
+      {
+        "target": "将彩色图像转换为灰度图像，检测图像中是否包含人脸，在边界周围绘制矩形",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "将彩色图像转换为灰度图像，检测图像中是否包含人脸，在边界周围绘制矩形": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "人脸检测",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "Face Recognition": {
+    "successors": [
+      {
+        "target": "一个强大、简单、易上手的人脸识别开源项目",
+        "relation": "是什么"
+      },
+      {
+        "target": "dlib 这一 C++ 图形库",
+        "relation": "组成部分"
+      },
+      {
+        "target": "实现刷脸登录的功能",
+        "relation": "用途"
+      },
+      {
+        "target": "人脸检测、检测面部特征点、给脸部编码、从编码中找出人的名字",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "face_recognition",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": []
+  },
+  "一个强大、简单、易上手的人脸识别开源项目": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Face Recognition",
+        "relation": "是什么"
+      },
+      {
+        "source": "face_recognition",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "dlib 这一 C++ 图形库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Face Recognition",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "实现刷脸登录的功能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Face Recognition",
+        "relation": "用途"
+      }
+    ]
+  },
+  "人脸检测、检测面部特征点、给脸部编码、从编码中找出人的名字": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Face Recognition",
+        "relation": "执行步骤"
+      },
+      {
+        "source": "face_recognition",
+        "relation": "用途"
+      }
+    ]
+  },
+  "face_encodings": {
+    "successors": [
+      {
+        "target": "返回图像中每张人脸的 128 维人脸编码",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "返回图像中每张人脸的 128 维人脸编码": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "face_encodings",
+        "relation": "用途"
+      }
+    ]
+  },
+  "compare_faces": {
+    "successors": [
+      {
+        "target": "将人脸编码列表与候选编码进行比较，以查看它们是否匹配",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将人脸编码列表与候选编码进行比较，以查看它们是否匹配": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "compare_faces",
+        "relation": "用途"
+      }
+    ]
+  },
+  "face_distance": {
+    "successors": [
+      {
+        "target": "计算已知人脸和未知人脸特征向量的距离",
+        "relation": "用途"
+      },
+      {
+        "target": "将给定人脸编码列表与已知的人脸编码进行比较，并得到每个比较人脸的欧氏距离",
+        "relation": "工作原理"
+      }
+    ],
+    "predecessors": []
+  },
+  "计算已知人脸和未知人脸特征向量的距离": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "face_distance",
+        "relation": "用途"
+      }
+    ]
+  },
+  "将给定人脸编码列表与已知的人脸编码进行比较，并得到每个比较人脸的欧氏距离": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "face_distance",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "load_image_file": {
+    "successors": [
+      {
+        "target": "加载面孔照片",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "加载面孔照片": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "load_image_file",
+        "relation": "用途"
+      }
+    ]
+  },
+  "face_locations": {
+    "successors": [
+      {
+        "target": "定位图像中的人脸位置",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "定位图像中的人脸位置": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "face_locations",
+        "relation": "用途"
+      }
+    ]
+  },
+  "number_of_times_to_upsample": {
+    "successors": [
+      {
+        "target": "设置对图像进行多少次上采样以查找人脸",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "设置对图像进行多少次上采样以查找人脸": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "number_of_times_to_upsample",
+        "relation": "用途"
+      }
+    ]
+  },
+  "model": {
+    "successors": [
+      {
+        "target": "\"hog\"则结果不太准确，但在 CPU 上运行更快；\"cnn\"是更准确的深度学习模型，需要 GPU 加速",
+        "relation": "比较"
+      },
+      {
+        "target": "Conv2D, MaxPooling2D, Flatten, Dense层",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "\"hog\"则结果不太准确，但在 CPU 上运行更快；\"cnn\"是更准确的深度学习模型，需要 GPU 加速": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model",
+        "relation": "比较"
+      }
+    ]
+  },
+  "LED": {
+    "successors": [
+      {
+        "target": "用于电路中的发光元件",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于电路中的发光元件": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "LED",
+        "relation": "用途"
+      }
+    ]
+  },
+  "电阻": {
+    "successors": [
+      {
+        "target": "限制电流以保护LED和GPIO引脚",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "限制电流以保护LED和GPIO引脚": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "电阻",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO引脚": {
+    "successors": [
+      {
+        "target": "为LED提供电源",
+        "relation": "用途"
+      },
+      {
+        "target": "有两种编号模式：BCM编号模式和物理引脚Broad编号模式",
+        "relation": "特点"
+      },
+      {
+        "target": "输出电压约为3.3V",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "为LED提供电源": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO引脚",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO端口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "包含"
+      }
+    ]
+  },
+  "GPIO21": {
+    "successors": [
+      {
+        "target": "树莓派的GPIO端口",
+        "relation": "属于"
+      },
+      {
+        "target": "激活、设置为输出状态、写入1以点亮LED",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "输出控制信号",
+        "relation": "用途"
+      },
+      {
+        "target": "LED的控制引脚",
+        "relation": "用途"
+      },
+      {
+        "target": "输出模式",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "树莓派的GPIO端口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO21",
+        "relation": "属于"
+      }
+    ]
+  },
+  "激活、设置为输出状态、写入1以点亮LED": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO21",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "Python程序": {
+    "successors": [
+      {
+        "target": "使用GPIO.setmod()方法指定引脚编号系统",
+        "relation": "使用方法"
+      },
+      {
+        "target": "使用GPIO.setup()方法设置引脚为输入或输出",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "使用GPIO.setmod()方法指定引脚编号系统": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python程序",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "使用GPIO.setup()方法设置引脚为输入或输出": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python程序",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "有两种编号模式：BCM编号模式和物理引脚Broad编号模式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO引脚",
+        "relation": "特点"
+      }
+    ]
+  },
+  "Linux系统": {
+    "successors": [
+      {
+        "target": "通过文件读写操作控制外设",
+        "relation": "工作原理"
+      }
+    ],
+    "predecessors": []
+  },
+  "通过文件读写操作控制外设": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Linux系统",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "Jetson": {
+    "successors": [
+      {
+        "target": "CSI 相机接口",
+        "relation": "包含"
+      }
+    ],
+    "predecessors": []
+  },
+  "CSI 相机接口": {
+    "successors": [
+      {
+        "target": "B02版本有两路",
+        "relation": "特点"
+      },
+      {
+        "target": "可以使用树莓派摄像头，IMX219模组800万像素",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Jetson",
+        "relation": "包含"
+      }
+    ]
+  },
+  "B02版本有两路": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "CSI 相机接口",
+        "relation": "特点"
+      }
+    ]
+  },
+  "可以使用树莓派摄像头，IMX219模组800万像素": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "CSI 相机接口",
+        "relation": "用途"
+      }
+    ]
+  },
+  "镜像写入 microSD 卡": {
+    "successors": [
+      {
+        "target": "首先到英伟达官方下载官方镜像，也可以去开源社区下载配置好的镜像",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "把 microSD 卡插到读卡器上之后插到电脑，使用 SD Memory Card Formatter 格式化 microSD 卡",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "使用 Etcher 将镜像写入 microSD 卡",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "首先到英伟达官方下载官方镜像，也可以去开源社区下载配置好的镜像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "镜像写入 microSD 卡",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "把 microSD 卡插到读卡器上之后插到电脑，使用 SD Memory Card Formatter 格式化 microSD 卡": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "镜像写入 microSD 卡",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "使用 Etcher 将镜像写入 microSD 卡": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "镜像写入 microSD 卡",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "Etcher": {
+    "successors": [
+      {
+        "target": "下载、安装并启动 Etcher",
+        "relation": "使用方法"
+      },
+      {
+        "target": "单击“Select image”（选择镜像），然后选择先前下载的压缩镜像文件",
+        "relation": "使用方法"
+      },
+      {
+        "target": "插入 microSD 卡",
+        "relation": "使用方法"
+      },
+      {
+        "target": "单击“Select drive”（选择驱动器），并选择正确设备",
+        "relation": "使用方法"
+      },
+      {
+        "target": "单击“Flash!”（闪存！）",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "下载、安装并启动 Etcher": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Etcher",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "单击“Select image”（选择镜像），然后选择先前下载的压缩镜像文件": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Etcher",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "插入 microSD 卡": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Etcher",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "单击“Select drive”（选择驱动器），并选择正确设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Etcher",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "单击“Flash!”（闪存！）": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Etcher",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "microSD 卡": {
+    "successors": [
+      {
+        "target": "如果通过 USB3 连接，Etcher 写入和验证镜像需要10 分钟",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "如果通过 USB3 连接，Etcher 写入和验证镜像需要10 分钟": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "microSD 卡",
+        "relation": "特点"
+      }
+    ]
+  },
+  "将已写入系统映像的 microSD 卡插入 Jetson Nano 模块底部的插槽中": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "有两种方式可以与 Jetson Nano 开发板进行交互，一个是连接显示器、键盘和鼠标，二是通过 SSH 或 VNC 服务从另一台计算机远程访问": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "第一次请连接显示器，键盘和鼠标，然后连接的 Micro-USB 电源，开发板将自动开机并启动": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "NVIDIA Jetson 开发者专区": {
+    "successors": [
+      {
+        "target": "获取更多的 Jetson 平台信息",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取更多的 Jetson 平台信息": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson 开发者专区",
+        "relation": "用途"
+      }
+    ]
+  },
+  "NVIDIA Jetson 论坛": {
+    "successors": [
+      {
+        "target": "提问或分享项目",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "提问或分享项目": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson 论坛",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Jetson 项目社区": {
+    "successors": [
+      {
+        "target": "获取一些非常有意思的项目",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取一些非常有意思的项目": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson 项目社区",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Hello AI World": {
+    "successors": [
+      {
+        "target": "快速的启动并运行一组深度学习推理演示，体验 Jetson 的强大功能",
+        "relation": "用途"
+      },
+      {
+        "target": "演示使用计算机视觉相关的模型，包括实时摄像机的使用，使用带有 JetPack SDK 和 NVIDIA TensorRT 的 Jetson 开发工具包上的预训练模型进行实时图像分类和对象检测",
+        "relation": "特点"
+      },
+      {
+        "target": "还可以使用 C++ 编写自己的易于理解的识别程序",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "快速的启动并运行一组深度学习推理演示，体验 Jetson 的强大功能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Hello AI World",
+        "relation": "用途"
+      }
+    ]
+  },
+  "演示使用计算机视觉相关的模型，包括实时摄像机的使用，使用带有 JetPack SDK 和 NVIDIA TensorRT 的 Jetson 开发工具包上的预训练模型进行实时图像分类和对象检测": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Hello AI World",
+        "relation": "特点"
+      }
+    ]
+  },
+  "还可以使用 C++ 编写自己的易于理解的识别程序": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Hello AI World",
+        "relation": "特点"
+      }
+    ]
+  },
+  "JetBot": {
+    "successors": [
+      {
+        "target": "面向有兴趣学习 AI 和构建有趣应用程序的创客、学生和爱好者",
+        "relation": "用途"
+      },
+      {
+        "target": "易于设置和使用，并且与许多流行的配件兼容",
+        "relation": "特点"
+      },
+      {
+        "target": "通过几个交互式教程展示如何利用 AI 的力量来教 JetBot 跟随物体、避免碰撞等",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "面向有兴趣学习 AI 和构建有趣应用程序的创客、学生和爱好者": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JetBot",
+        "relation": "用途"
+      }
+    ]
+  },
+  "易于设置和使用，并且与许多流行的配件兼容": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JetBot",
+        "relation": "特点"
+      }
+    ]
+  },
+  "通过几个交互式教程展示如何利用 AI 的力量来教 JetBot 跟随物体、避免碰撞等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "JetBot",
+        "relation": "特点"
+      }
+    ]
+  },
+  "VNC 服务器": {
+    "successors": [
+      {
+        "target": "实现 headless 远程桌面访问 Jetson Nano",
+        "relation": "用途"
+      },
+      {
+        "target": "可以从同一网络上的另一台计算机控制 Jetson Nano 开发板",
+        "relation": "特点"
+      },
+      {
+        "target": "安装 vino，可以用 dpkg -l |grep vino 查看是否已经安装",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "配置 VNC 服务",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "设置 VNC 密码 thepassword 修改为你的密码",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "只有在本地登录到 Jetson 之后才可用",
+        "relation": "特点"
+      },
+      {
+        "target": "使用系统设置应用程序来启用自动登录",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "实现 headless 远程桌面访问 Jetson Nano": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "用途"
+      }
+    ]
+  },
+  "可以从同一网络上的另一台计算机控制 Jetson Nano 开发板": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "特点"
+      }
+    ]
+  },
+  "安装 vino，可以用 dpkg -l |grep vino 查看是否已经安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "配置 VNC 服务": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "设置 VNC 密码 thepassword 修改为你的密码": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "只有在本地登录到 Jetson 之后才可用": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "特点"
+      }
+    ]
+  },
+  "使用系统设置应用程序来启用自动登录": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC 服务器",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "VNC Viewer": {
+    "successors": [
+      {
+        "target": "首先需要查询 ip 地址",
+        "relation": "使用方法"
+      },
+      {
+        "target": "输入 IP 地址后点击 OK，双击对应的 VNC 用户输入密码，最后进入到 VNC 界面",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "首先需要查询 ip 地址": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC Viewer",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "Python 2.7": {
+    "successors": [
+      {
+        "target": "官方已经停止维护",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "官方已经停止维护": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python 2.7",
+        "relation": "特点"
+      }
+    ]
+  },
+  "图像识别": {
+    "successors": [
+      {
+        "target": "利用计算机对图像进行处理、分析和理解，以识别各种不同模式的目标和对象的技术",
+        "relation": "是什么"
+      },
+      {
+        "target": "应用深度学习算法的一种实践应用",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "利用计算机对图像进行处理、分析和理解，以识别各种不同模式的目标和对象的技术": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "图像识别",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "应用深度学习算法的一种实践应用": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "图像识别",
+        "relation": "用途"
+      }
+    ]
+  },
+  "图像识别技术": {
+    "successors": [
+      {
+        "target": "人脸识别与商品识别",
+        "relation": "包含"
+      }
+    ],
+    "predecessors": []
+  },
+  "人脸识别与商品识别": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "图像识别技术",
+        "relation": "包含"
+      }
+    ]
+  },
+  "人脸识别": {
+    "successors": [
+      {
+        "target": "安全检查、身份核验与移动支付",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "安全检查、身份核验与移动支付": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "人脸识别",
+        "relation": "用途"
+      }
+    ]
+  },
+  "商品识别": {
+    "successors": [
+      {
+        "target": "商品流通过程中，特别是无人货架、智能零售柜等无人零售领域",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "商品流通过程中，特别是无人货架、智能零售柜等无人零售领域": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "商品识别",
+        "relation": "用途"
+      }
+    ]
+  },
+  "边缘计算": {
+    "successors": [
+      {
+        "target": "在靠近物或数据源头的一侧，采用网络、计算、存储、应用核心能力为一体的开放平台，就近提供最近端服务",
+        "relation": "是什么"
+      },
+      {
+        "target": "应用程序在边缘侧发起，产生更快的网络服务响应，满足行业在实时业务、应用智能、安全与隐私保护等方面的基本需求",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "在靠近物或数据源头的一侧，采用网络、计算、存储、应用核心能力为一体的开放平台，就近提供最近端服务": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "边缘计算",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "应用程序在边缘侧发起，产生更快的网络服务响应，满足行业在实时业务、应用智能、安全与隐私保护等方面的基本需求": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "边缘计算",
+        "relation": "特点"
+      }
+    ]
+  },
+  "TensorFlow Lite": {
+    "successors": [
+      {
+        "target": "一组工具，可帮助开发者在移动设备、嵌入式设备和 IoT 设备上运行 TensorFlow 模型",
+        "relation": "是什么"
+      },
+      {
+        "target": "支持设备端机器学习推断，延迟较低，并且二进制文件很小",
+        "relation": "特点"
+      },
+      {
+        "target": "TensorFlow Lite 解释器(Interpreter)、TensorFlow Lite 转换器(Converter)、算子库(Op kernels)、硬件加速代理(Hardware accelerator delegate)",
+        "relation": "组成部分"
+      },
+      {
+        "target": "采用更小的模型格式，并提供了方便的模型转换器，可将 TensorFlow 模型转换为方便解释器使用的格式，并可引入优化以减小二进制文件的大小和提高性能",
+        "relation": "工作原理"
+      },
+      {
+        "target": "在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型",
+        "relation": "用途"
+      },
+      {
+        "target": "安卓应用只需 1 兆左右的运行环境，在 MCU 上甚至可以小于 100KB",
+        "relation": "特点"
+      },
+      {
+        "target": "在硬件加速层面，对于 CPU 利用了 ARM 的 NEON 指令集做了大量的优化",
+        "relation": "工作原理"
+      },
+      {
+        "target": "可以利用手机上的加速器，比如 GPU 或者 DSP 等",
+        "relation": "工作原理"
+      },
+      {
+        "target": "最新的安卓系统提供了 Android 神经网络 API（Android NN API)，让硬件厂商可以扩展支持这样的接口",
+        "relation": "工作原理"
+      },
+      {
+        "target": "执行推理以识别输入图像",
+        "relation": "用途"
+      },
+      {
+        "target": "一组工具，帮助开发者在移动设备、嵌入式设备和IoT设备上运行TensorFlow模型",
+        "relation": "是什么"
+      },
+      {
+        "target": "解释器、转换器、算子库和硬件加速代理",
+        "relation": "组成部分"
+      },
+      {
+        "target": "设备端机器学习推断，延迟较低，二进制文件很小",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "一组工具，可帮助开发者在移动设备、嵌入式设备和 IoT 设备上运行 TensorFlow 模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "支持设备端机器学习推断，延迟较低，并且二进制文件很小": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "特点"
+      }
+    ]
+  },
+  "TensorFlow Lite 解释器(Interpreter)、TensorFlow Lite 转换器(Converter)、算子库(Op kernels)、硬件加速代理(Hardware accelerator delegate)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "采用更小的模型格式，并提供了方便的模型转换器，可将 TensorFlow 模型转换为方便解释器使用的格式，并可引入优化以减小二进制文件的大小和提高性能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorFlow Lite 解释器": {
+    "successors": [
+      {
+        "target": "可在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "可在手机、嵌入式 Linux 设备和微控制器等很多不同类型的硬件上运行经过专门优化的模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 解释器",
+        "relation": "特点"
+      }
+    ]
+  },
+  "TensorFlow Lite 转换器": {
+    "successors": [
+      {
+        "target": "将 TensorFlow 模型转换为方便解释器使用的格式，并可引入优化以减小二进制文件的大小和提高性能",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将 TensorFlow 模型转换为方便解释器使用的格式，并可引入优化以减小二进制文件的大小和提高性能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 转换器",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TFLite 算子库": {
+    "successors": [
+      {
+        "target": "目前有130个左右，它与 TensorFlow 的核心算子库略有不同，并做了移动设备相关的优化",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "目前有130个左右，它与 TensorFlow 的核心算子库略有不同，并做了移动设备相关的优化": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TFLite 算子库",
+        "relation": "特点"
+      }
+    ]
+  },
+  "安卓应用只需 1 兆左右的运行环境，在 MCU 上甚至可以小于 100KB": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "特点"
+      }
+    ]
+  },
+  "在硬件加速层面，对于 CPU 利用了 ARM 的 NEON 指令集做了大量的优化": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "可以利用手机上的加速器，比如 GPU 或者 DSP 等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "最新的安卓系统提供了 Android 神经网络 API（Android NN API)，让硬件厂商可以扩展支持这样的接口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "TFLite": {
+    "successors": [
+      {
+        "target": "TensorFlow Lite的简称，用于在移动和嵌入式设备上运行机器学习模型",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "TensorFlow Lite的简称，用于在移动和嵌入式设备上运行机器学习模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TFLite",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "TFLite模型转换器": {
+    "successors": [
+      {
+        "target": "将TensorFlow模型转换为TFLite文件格式(FlatBuffers格式)",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将TensorFlow模型转换为TFLite文件格式(FlatBuffers格式)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TFLite模型转换器",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TFLite解释器": {
+    "successors": [
+      {
+        "target": "在设备端运行TFLite模型，调用不同的硬件加速器",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "在设备端运行TFLite模型，调用不同的硬件加速器": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TFLite解释器",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorFlow Lite工作流程": {
+    "successors": [
+      {
+        "target": "选择模型、转换模型、部署到设备、优化模型",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "选择模型、转换模型、部署到设备、优化模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite工作流程",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "花卉识别模型": {
+    "successors": [
+      {
+        "target": "卷积层与全连接层",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "卷积层与全连接层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "花卉识别模型",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "卷积层": {
+    "successors": [
+      {
+        "target": "3个Conv2D和2个MaxPooling2D层",
+        "relation": "组成部分"
+      },
+      {
+        "target": "使用3×3的卷积核，并在输出上使用Relu激活函数",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "3个Conv2D和2个MaxPooling2D层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "卷积层",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Conv2D": {
+    "successors": [
+      {
+        "target": "识别图像里的空间模式，例如线条和物体局部",
+        "relation": "用途"
+      },
+      {
+        "target": "输出三维张量，形状为(height, width, channels)",
+        "relation": "特点"
+      },
+      {
+        "target": "一个用于构建卷积神经网络的层，输出三维张量",
+        "relation": "是什么"
+      },
+      {
+        "target": "输出的通道数量取决于声明层时的filters参数",
+        "relation": "特点"
+      },
+      {
+        "target": "filters参数、kernel_size参数、padding参数和activation参数",
+        "relation": "组成部分"
+      },
+      {
+        "target": "MaxPooling2D",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": []
+  },
+  "识别图像里的空间模式，例如线条和物体局部": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "用途"
+      }
+    ]
+  },
+  "MaxPooling2D": {
+    "successors": [
+      {
+        "target": "降低卷积层对位置的敏感",
+        "relation": "用途"
+      },
+      {
+        "target": "输出三维张量，形状为(height, width, channels)",
+        "relation": "特点"
+      },
+      {
+        "target": "一个用于构建卷积神经网络的池化层，输出三维张量",
+        "relation": "是什么"
+      },
+      {
+        "target": "使输出宽度和高度收缩",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "降低卷积层对位置的敏感": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "MaxPooling2D",
+        "relation": "用途"
+      }
+    ]
+  },
+  "使用3×3的卷积核，并在输出上使用Relu激活函数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "卷积层",
+        "relation": "特点"
+      }
+    ]
+  },
+  "第一个卷积层": {
+    "successors": [
+      {
+        "target": "输出通道数为32",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "输出通道数为32": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "第一个卷积层",
+        "relation": "特点"
+      }
+    ]
+  },
+  "第二、三卷积层": {
+    "successors": [
+      {
+        "target": "输出通道数为64",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "输出通道数为64": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "第二、三卷积层",
+        "relation": "特点"
+      }
+    ]
+  },
+  "卷积层输入": {
+    "successors": [
+      {
+        "target": "张量形状是(image_height, image_width, color_channels)",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "张量形状是(image_height, image_width, color_channels)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "卷积层输入",
+        "relation": "特点"
+      }
+    ]
+  },
+  "花卉数据集": {
+    "successors": [
+      {
+        "target": "图片形状是(224,224,3)",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "图片形状是(224,224,3)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "花卉数据集",
+        "relation": "特点"
+      }
+    ]
+  },
+  "ImageDataGenerator": {
+    "successors": [
+      {
+        "target": "生成一个批次的图片，以生成器的形式给模型训练",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "生成一个批次的图片，以生成器的形式给模型训练": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "ImageDataGenerator",
+        "relation": "用途"
+      }
+    ]
+  },
+  "flow_from_directory": {
+    "successors": [
+      {
+        "target": "逐步加载单个数据集的图像",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "逐步加载单个数据集的图像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "flow_from_directory",
+        "relation": "用途"
+      }
+    ]
+  },
+  "target_size": {
+    "successors": [
+      {
+        "target": "将所有图像加载到一个模型需要的特定的大小",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将所有图像加载到一个模型需要的特定的大小": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "target_size",
+        "relation": "用途"
+      }
+    ]
+  },
+  "batch_size": {
+    "successors": [
+      {
+        "target": "训练时从数据集中的不同类中随机选出的图像数量",
+        "relation": "用途"
+      },
+      {
+        "target": "受限于GPU内存的大小",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "训练时从数据集中的不同类中随机选出的图像数量": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "batch_size",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Python 源码包": {
+    "successors": [
+      {
+        "target": "从 Python 官网下载",
+        "relation": "组成部分"
+      },
+      {
+        "target": "下载解压",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "从 Python 官网下载": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python 源码包",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "下载解压": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python 源码包",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "树莓派通用输入/输出接口（GPIO）": {
+    "successors": [
+      {
+        "target": "一组数字引脚，可用于将树莓派连接到其他电子设备",
+        "relation": "是什么"
+      },
+      {
+        "target": "读取传感器数据，控制 LED 等外部设备",
+        "relation": "用途"
+      },
+      {
+        "target": "可以配置为输入或输出",
+        "relation": "特点"
+      },
+      {
+        "target": "通过软件编程进行控制，例如使用 Python 或其他编程语言编写程序",
+        "relation": "使用方法"
+      },
+      {
+        "target": "40个 GPIO 引脚，其中26个引脚可以用作数字输入或输出，另外14个引脚用于其他功能",
+        "relation": "组成部分"
+      },
+      {
+        "target": "错误的连接和编程可能会导致设备损坏或故障",
+        "relation": "缺点"
+      },
+      {
+        "target": "需要小心谨慎，建议在使用之前仔细阅读相关文档，并确保采取适当的安全措施",
+        "relation": "使用方法"
+      },
+      {
+        "target": "电源接口（5V）",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "一组数字引脚，可用于将树莓派连接到其他电子设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "读取传感器数据，控制 LED 等外部设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "用途"
+      }
+    ]
+  },
+  "可以配置为输入或输出": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "特点"
+      }
+    ]
+  },
+  "通过软件编程进行控制，例如使用 Python 或其他编程语言编写程序": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "40个 GPIO 引脚，其中26个引脚可以用作数字输入或输出，另外14个引脚用于其他功能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "错误的连接和编程可能会导致设备损坏或故障": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "缺点"
+      }
+    ]
+  },
+  "需要小心谨慎，建议在使用之前仔细阅读相关文档，并确保采取适当的安全措施": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "电源接口（5V）": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派通用输入/输出接口（GPIO）",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "train_ds": {
+    "successors": [
+      {
+        "target": "用于训练模型",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于训练模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "train_ds",
+        "relation": "用途"
+      }
+    ]
+  },
+  "val_ds": {
+    "successors": [
+      {
+        "target": "用于验证模型",
+        "relation": "用途"
+      },
+      {
+        "target": "x—images, y—labels",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于验证模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "val_ds",
+        "relation": "用途"
+      }
+    ]
+  },
+  "class_names": {
+    "successors": [
+      {
+        "target": "['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']",
+        "relation": "包含"
+      },
+      {
+        "target": "郁金香(tulips)、玫瑰(roses)、浦公英(dandelion)、向日葵(sunflowers)、雏菊(daisy)",
+        "relation": "包含"
+      },
+      {
+        "target": "daisy, dandelion, roses, sunflowers, tulips",
+        "relation": "包含"
+      }
+    ],
+    "predecessors": []
+  },
+  "['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "class_names",
+        "relation": "包含"
+      }
+    ]
+  },
+  "normalization_layer": {
+    "successors": [
+      {
+        "target": "对图像数据进行归一化处理",
+        "relation": "用途"
+      },
+      {
+        "target": "对x进行归一化处理",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "对图像数据进行归一化处理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "normalization_layer",
+        "relation": "用途"
+      }
+    ]
+  },
+  "AUTOTUNE": {
+    "successors": [
+      {
+        "target": "优化数据加载性能",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "优化数据加载性能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "AUTOTUNE",
+        "relation": "用途"
+      }
+    ]
+  },
+  "输出三维张量，形状为(height, width, channels)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "特点"
+      },
+      {
+        "source": "MaxPooling2D",
+        "relation": "特点"
+      }
+    ]
+  },
+  "Dense": {
+    "successors": [
+      {
+        "target": "全连接层",
+        "relation": "是什么"
+      },
+      {
+        "target": "全连接层，等同于Full Connected层",
+        "relation": "是什么"
+      },
+      {
+        "target": "完成分类任务",
+        "relation": "用途"
+      },
+      {
+        "target": "units参数和activation参数",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "全连接层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Dense",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "layers.Flatten()": {
+    "successors": [
+      {
+        "target": "将三维张量展开到一维",
+        "relation": "用途"
+      },
+      {
+        "target": "将三维张量展开到一维以便传入Dense层",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将三维张量展开到一维": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "layers.Flatten()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Conv2D, MaxPooling2D, Flatten, Dense层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "model.compile": {
+    "successors": [
+      {
+        "target": "配置优化器、损失函数和评估指标",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "配置优化器、损失函数和评估指标": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model.compile",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "tf.keras.optimizers.Adam()": {
+    "successors": [
+      {
+        "target": "优化模型参数",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "优化模型参数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.keras.optimizers.Adam()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "tf.keras.losses.SparseCategoricalCrossentropy": {
+    "successors": [
+      {
+        "target": "计算分类损失",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "计算分类损失": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.keras.losses.SparseCategoricalCrossentropy",
+        "relation": "用途"
+      }
+    ]
+  },
+  "tensorboard_callback": {
+    "successors": [
+      {
+        "target": "记录训练过程数据",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "记录训练过程数据": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tensorboard_callback",
+        "relation": "用途"
+      }
+    ]
+  },
+  "model.fit": {
+    "successors": [
+      {
+        "target": "训练模型并验证",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "训练模型并记录训练和验证准确性/损失",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "训练模型并验证": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model.fit",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "saved_model_dir": {
+    "successors": [
+      {
+        "target": "保存训练好的模型",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "保存训练好的模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "saved_model_dir",
+        "relation": "用途"
+      }
+    ]
+  },
+  "converter": {
+    "successors": [
+      {
+        "target": "将模型转换为TFLite格式",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将模型转换为TFLite格式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "converter",
+        "relation": "用途"
+      }
+    ]
+  },
+  "tflite_model": {
+    "successors": [
+      {
+        "target": "部署到嵌入式设备",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "部署到嵌入式设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tflite_model",
+        "relation": "用途"
+      }
+    ]
+  },
+  "部署TensorFlow Lite模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "用途"
+      }
+    ]
+  },
+  "interpreter": {
+    "successors": [
+      {
+        "target": "执行TensorFlow Lite模型推理",
+        "relation": "用途"
+      },
+      {
+        "target": "加载和运行TFLite模型",
+        "relation": "用途"
+      },
+      {
+        "target": "allocate_tensors",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "get_input_details",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "get_output_details",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "set_tensor",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "invoke",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "TFLite模型",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "执行TensorFlow Lite模型推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "用途"
+      }
+    ]
+  },
+  "input_details": {
+    "successors": [
+      {
+        "target": "获取模型输入张量信息",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取模型输入张量信息": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "input_details",
+        "relation": "用途"
+      }
+    ]
+  },
+  "output_details": {
+    "successors": [
+      {
+        "target": "获取模型输出张量信息",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取模型输出张量信息": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "output_details",
+        "relation": "用途"
+      }
+    ]
+  },
+  "output_data": {
+    "successors": [
+      {
+        "target": "存储模型推理结果",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "存储模型推理结果": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "output_data",
+        "relation": "用途"
+      }
+    ]
+  },
+  "tf.nn.softmax": {
+    "successors": [
+      {
+        "target": "计算分类概率",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "计算分类概率": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.nn.softmax",
+        "relation": "用途"
+      }
+    ]
+  },
+  "输入 IP 地址后点击 OK，双击对应的 VNC 用户输入密码，最后进入到 VNC 界面": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "VNC Viewer",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "TensorFlow": {
+    "successors": [
+      {
+        "target": "一个使用数据流图进行数值计算的开源软件库",
+        "relation": "是什么"
+      },
+      {
+        "target": "灵活的架构可以将模型部署到桌面、服务器或移动设备中的 CPU 或 GPU 上",
+        "relation": "特点"
+      },
+      {
+        "target": "数值计算",
+        "relation": "用途"
+      },
+      {
+        "target": "版本变化后API函数会改变",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "一个使用数据流图进行数值计算的开源软件库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "灵活的架构可以将模型部署到桌面、服务器或移动设备中的 CPU 或 GPU 上": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow",
+        "relation": "特点"
+      }
+    ]
+  },
+  "TensorFlow GPU 版本": {
+    "successors": [
+      {
+        "target": "CUDA",
+        "relation": "组成部分"
+      },
+      {
+        "target": "安装依赖项，安装 TensorFlow 所需的系统包，安装和升级 pip3，安装 Python 包依赖项，确认 CUDA 已经被正常安装，安装 TensorFlow，验证安装",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "CUDA": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow GPU 版本",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "安装依赖项，安装 TensorFlow 所需的系统包，安装和升级 pip3，安装 Python 包依赖项，确认 CUDA 已经被正常安装，安装 TensorFlow，验证安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow GPU 版本",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "数值计算": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow",
+        "relation": "用途"
+      }
+    ]
+  },
+  "JetPack": {
+    "successors": [
+      {
+        "target": "OpenCV",
+        "relation": "包含"
+      },
+      {
+        "target": "已经训练好的分类器，其中包括面部，眼睛，微笑等",
+        "relation": "间接包含"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "不支持 CUDA 且版本是固定搭配的": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV",
+        "relation": "特点"
+      }
+    ]
+  },
+  "jtop 命令": {
+    "successors": [
+      {
+        "target": "查看开发板系统信息",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "查看开发板系统信息": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "jtop 命令",
+        "relation": "用途"
+      }
+    ]
+  },
+  "控制外部硬件设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "用途"
+      }
+    ]
+  },
+  "LED灯": {
+    "successors": [
+      {
+        "target": "通过GPIO控制展示基础硬件控制能力",
+        "relation": "用途"
+      },
+      {
+        "target": "限流电阻",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "通过GPIO控制展示基础硬件控制能力": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "LED灯",
+        "relation": "用途"
+      }
+    ]
+  },
+  "限流电阻": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "LED灯",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "点亮LED灯": {
+    "successors": [
+      {
+        "target": "将LED灯通过限流电阻连接到GPIO21，负极连接到GND形成回路",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "HIGH电平",
+        "relation": "用途"
+      }
+    ]
+  },
+  "将LED灯通过限流电阻连接到GPIO21，负极连接到GND形成回路": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "点亮LED灯",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "输出控制信号": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO21",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GND": {
+    "successors": [
+      {
+        "target": "提供电路回路的地线连接",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "提供电路回路的地线连接": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GND",
+        "relation": "用途"
+      }
+    ]
+  },
+  "面包板": {
+    "successors": [
+      {
+        "target": "搭建电路原型",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "搭建电路原型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "面包板",
+        "relation": "用途"
+      }
+    ]
+  },
+  "杜邦线公对母": {
+    "successors": [
+      {
+        "target": "连接电路元件",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "连接电路元件": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "杜邦线公对母",
+        "relation": "用途"
+      }
+    ]
+  },
+  "330欧姆电阻": {
+    "successors": [
+      {
+        "target": "作为LED灯的限流电阻",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "作为LED灯的限流电阻": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "330欧姆电阻",
+        "relation": "用途"
+      }
+    ]
+  },
+  "输出电压约为3.3V": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO引脚",
+        "relation": "特点"
+      }
+    ]
+  },
+  "GPIO口": {
+    "successors": [
+      {
+        "target": "I2C接口(SCL、SDA)",
+        "relation": "包含"
+      },
+      {
+        "target": "SPI接口（MISO、MOSI、CLK、CS片选信号SPICE0_N）",
+        "relation": "包含"
+      },
+      {
+        "target": "UART串口接口（TXD、RXD）",
+        "relation": "包含"
+      },
+      {
+        "target": "PWM接口",
+        "relation": "包含"
+      },
+      {
+        "target": "普通GPIO口",
+        "relation": "包含"
+      }
+    ],
+    "predecessors": []
+  },
+  "I2C接口(SCL、SDA)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO口",
+        "relation": "包含"
+      }
+    ]
+  },
+  "SPI接口（MISO、MOSI、CLK、CS片选信号SPICE0_N）": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO口",
+        "relation": "包含"
+      }
+    ]
+  },
+  "UART串口接口（TXD、RXD）": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO口",
+        "relation": "包含"
+      }
+    ]
+  },
+  "PWM接口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO口",
+        "relation": "包含"
+      }
+    ]
+  },
+  "普通GPIO口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO口",
+        "relation": "包含"
+      }
+    ]
+  },
+  "树莓派接口": {
+    "successors": [
+      {
+        "target": "Wiring Pi编号",
+        "relation": "组成部分"
+      },
+      {
+        "target": "BCM编号",
+        "relation": "组成部分"
+      },
+      {
+        "target": "物理引脚Broad编号",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "Wiring Pi编号": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派接口",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "BCM编号": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派接口",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "物理引脚Broad编号": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派接口",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Wiring Pi": {
+    "successors": [
+      {
+        "target": "应用于树莓派的GPIO控制库函数",
+        "relation": "是什么"
+      },
+      {
+        "target": "使用C、C++开发并且可以被其他语言包使用",
+        "relation": "特点"
+      },
+      {
+        "target": "GPIO库",
+        "relation": "包含"
+      },
+      {
+        "target": "I2C库",
+        "relation": "包含"
+      },
+      {
+        "target": "SPI库",
+        "relation": "包含"
+      },
+      {
+        "target": "UART库",
+        "relation": "包含"
+      },
+      {
+        "target": "软件PWM库",
+        "relation": "包含"
+      },
+      {
+        "target": "控制GPIO管脚",
+        "relation": "用途"
+      },
+      {
+        "target": "通过下载源代码来安装",
+        "relation": "使用方法"
+      },
+      {
+        "target": "使用GIT工具下载代码，然后编译安装",
+        "relation": "使用方法"
+      },
+      {
+        "target": "在官网下载安装包后安装",
+        "relation": "使用方法"
+      },
+      {
+        "target": "控制GPIO管脚，可以在Shell脚本中使用",
+        "relation": "用途"
+      },
+      {
+        "target": "GPIO库、I2C库、SPI库、UART库和软件PWM库等",
+        "relation": "组成部分"
+      },
+      {
+        "target": "Wiring Pi",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "应用于树莓派的GPIO控制库函数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "使用C、C++开发并且可以被其他语言包使用": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "特点"
+      }
+    ]
+  },
+  "GPIO库": {
+    "successors": [
+      {
+        "target": "控制GPIO引脚",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "包含"
+      }
+    ]
+  },
+  "I2C库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "包含"
+      }
+    ]
+  },
+  "SPI库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "包含"
+      }
+    ]
+  },
+  "UART库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "包含"
+      }
+    ]
+  },
+  "软件PWM库": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "包含"
+      }
+    ]
+  },
+  "控制GPIO管脚": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "用途"
+      }
+    ]
+  },
+  "通过下载源代码来安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "使用GIT工具下载代码，然后编译安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "在官网下载安装包后安装": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "gpio readall命令": {
+    "successors": [
+      {
+        "target": "查看树莓派的GPIO引脚信息",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "查看树莓派的GPIO引脚信息": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "gpio readall命令",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Wiring Pi编号模式": {
+    "successors": [
+      {
+        "target": "在C语言中使用",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "在C语言中使用": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi编号模式",
+        "relation": "用途"
+      }
+    ]
+  },
+  "BCM编号模式": {
+    "successors": [
+      {
+        "target": "在Python程序中控制硬件",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "在Python程序中控制硬件": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "BCM编号模式",
+        "relation": "用途"
+      }
+    ]
+  },
+  "x—images, y—labels": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "val_ds",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "val_ds.map": {
+    "successors": [
+      {
+        "target": "lambda x, y: (normalization_layer(x), y)",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "lambda x, y: (normalization_layer(x), y)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "val_ds.map",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "对x进行归一化处理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "normalization_layer",
+        "relation": "用途"
+      }
+    ]
+  },
+  "pip3": {
+    "successors": [
+      {
+        "target": "Python 官方集成的包管理工具",
+        "relation": "是什么"
+      },
+      {
+        "target": "Python 生态系统",
+        "relation": "属于"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "pip",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "Python 官方集成的包管理工具": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip3",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "pip": {
+    "successors": [
+      {
+        "target": "Python 的包管理工具",
+        "relation": "是什么"
+      },
+      {
+        "target": "Python 生态系统",
+        "relation": "属于"
+      },
+      {
+        "target": "pip3 是 pip 的 Python 3 版本",
+        "relation": "比较"
+      },
+      {
+        "target": "pip3",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": []
+  },
+  "Python 的包管理工具": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "Python 生态系统": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip",
+        "relation": "属于"
+      },
+      {
+        "source": "pip3",
+        "relation": "属于"
+      }
+    ]
+  },
+  "pip3 是 pip 的 Python 3 版本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "pip",
+        "relation": "比较"
+      }
+    ]
+  },
+  "控制GPIO引脚": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO库",
+        "relation": "用途"
+      }
+    ]
+  },
+  "BCM编号方式": {
+    "successors": [
+      {
+        "target": "GPIO引脚编号模式的一种",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "GPIO引脚编号模式的一种": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "BCM编号方式",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "LED的控制引脚": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO21",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO.setup()方法": {
+    "successors": [
+      {
+        "target": "设置GPIO引脚模式",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "设置GPIO引脚模式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO.setup()方法",
+        "relation": "用途"
+      }
+    ]
+  },
+  "输出模式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO21",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "HIGH电平": {
+    "successors": [
+      {
+        "target": "点亮LED灯",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "time.sleep()方法": {
+    "successors": [
+      {
+        "target": "延迟一秒钟",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "延迟一秒钟": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "time.sleep()方法",
+        "relation": "用途"
+      }
+    ]
+  },
+  "LOW电平": {
+    "successors": [
+      {
+        "target": "关闭LED灯",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "关闭LED灯": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "LOW电平",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO.cleanup()方法": {
+    "successors": [
+      {
+        "target": "清理GPIO引脚的设置",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "清理GPIO引脚的设置": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO.cleanup()方法",
+        "relation": "用途"
+      }
+    ]
+  },
+  "四引脚按键": {
+    "successors": [
+      {
+        "target": "用于控制LED灯的亮暗的按键",
+        "relation": "是什么"
+      },
+      {
+        "target": "由常开触点、常闭触点组合而成",
+        "relation": "工作原理"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于控制LED灯的亮暗的按键": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "四引脚按键",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "由常开触点、常闭触点组合而成": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "四引脚按键",
+        "relation": "工作原理"
+      }
+    ]
+  },
+  "常开触点": {
+    "successors": [
+      {
+        "target": "当压力施压时电路接通",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "当压力施压时电路接通": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "常开触点",
+        "relation": "用途"
+      }
+    ]
+  },
+  "常闭触点": {
+    "successors": [
+      {
+        "target": "当压力撤销时电路恢复",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "当压力撤销时电路恢复": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "常闭触点",
+        "relation": "用途"
+      }
+    ]
+  },
+  "上拉电阻": {
+    "successors": [
+      {
+        "target": "在18号引脚处设置上拉电阻",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "在18号引脚处设置上拉电阻": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "上拉电阻",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)": {
+    "successors": [
+      {
+        "target": "设置上拉电阻",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "设置上拉电阻": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO.setup(18, GPIO.IN, pull_up_down=GPIO.PUD_UP)",
+        "relation": "用途"
+      }
+    ]
+  },
+  "一个用于构建卷积神经网络的层，输出三维张量": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "一个用于构建卷积神经网络的池化层，输出三维张量": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "MaxPooling2D",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "全连接层，等同于Full Connected层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Dense",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "输出的通道数量取决于声明层时的filters参数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "特点"
+      }
+    ]
+  },
+  "filters参数、kernel_size参数、padding参数和activation参数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Conv2D",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "使输出宽度和高度收缩": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "MaxPooling2D",
+        "relation": "特点"
+      }
+    ]
+  },
+  "完成分类任务": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Dense",
+        "relation": "用途"
+      }
+    ]
+  },
+  "将三维张量展开到一维以便传入Dense层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "layers.Flatten()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "units参数和activation参数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Dense",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "卷积神经网络模型": {
+    "successors": [
+      {
+        "target": "Conv2D层、MaxPooling2D层、Flatten层和Dense层",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "Conv2D层、MaxPooling2D层、Flatten层和Dense层": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "卷积神经网络模型",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "模型训练": {
+    "successors": [
+      {
+        "target": "编译模型、设置损失函数、设置优化器、设置评估指标",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "编译模型、设置损失函数、设置优化器、设置评估指标": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "模型训练",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "SparseCategoricalCrossentropy": {
+    "successors": [
+      {
+        "target": "作为损失函数用于多分类任务",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "作为损失函数用于多分类任务": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "SparseCategoricalCrossentropy",
+        "relation": "用途"
+      }
+    ]
+  },
+  "Adam": {
+    "successors": [
+      {
+        "target": "作为优化器用于模型训练",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "作为优化器用于模型训练": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Adam",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorBoard": {
+    "successors": [
+      {
+        "target": "记录训练日志用于可视化",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "记录训练日志用于可视化": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorBoard",
+        "relation": "用途"
+      }
+    ]
+  },
+  "RandomFlip": {
+    "successors": [
+      {
+        "target": "对训练图像随机变换以增加数据多样性",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "对训练图像随机变换以增加数据多样性": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "RandomFlip",
+        "relation": "用途"
+      }
+    ]
+  },
+  "RandomRotation": {
+    "successors": [
+      {
+        "target": "对训练图像随机旋转以增加数据多样性",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "对训练图像随机旋转以增加数据多样性": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "RandomRotation",
+        "relation": "用途"
+      }
+    ]
+  },
+  "训练模型并记录训练和验证准确性/损失": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model.fit",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "tf.saved_model.save": {
+    "successors": [
+      {
+        "target": "保存完整的TensorFlow程序，包括权重值和计算",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "保存完整的TensorFlow程序，包括权重值和计算": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.saved_model.save",
+        "relation": "用途"
+      }
+    ]
+  },
+  "SavedModel": {
+    "successors": [
+      {
+        "target": "不需要原始模型构建代码就可以运行",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "不需要原始模型构建代码就可以运行": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "SavedModel",
+        "relation": "特点"
+      }
+    ]
+  },
+  "tf.lite.TFLiteConverter.from_saved_model": {
+    "successors": [
+      {
+        "target": "将SavedModel转换为TFLite兼容格式",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "将SavedModel转换为TFLite兼容格式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.lite.TFLiteConverter.from_saved_model",
+        "relation": "用途"
+      }
+    ]
+  },
+  "model.tflite": {
+    "successors": [
+      {
+        "target": "用于在Jetson Nano开发板上识别花卉图片",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于在Jetson Nano开发板上识别花卉图片": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "model.tflite",
+        "relation": "用途"
+      }
+    ]
+  },
+  "郁金香(tulips)、玫瑰(roses)、浦公英(dandelion)、向日葵(sunflowers)、雏菊(daisy)": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "class_names",
+        "relation": "包含"
+      }
+    ]
+  },
+  "资源有限，训练网络时可能出现内存溢出错误": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "缺点"
+      }
+    ]
+  },
+  "受限于GPU内存的大小": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "batch_size",
+        "relation": "特点"
+      }
+    ]
+  },
+  "执行推理以识别输入图像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorFlow Lite支持库": {
+    "successors": [
+      {
+        "target": "简化图像预处理和模型输出处理",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "简化图像预处理和模型输出处理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite支持库",
+        "relation": "用途"
+      }
+    ]
+  },
+  "数据转换": {
+    "successors": [
+      {
+        "target": "将输入数据转换成模型接收的形式或排布，如resize原始图像到模型输入大小",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "将输入数据转换成模型接收的形式或排布，如resize原始图像到模型输入大小": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "数据转换",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "HDMI 接口": {
+    "successors": [
+      {
+        "target": "用于连接显示设备的接口",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "用于连接显示设备的接口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "HDMI 接口",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "Display Port 接口": {
+    "successors": [
+      {
+        "target": "连接 DP 屏幕",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "连接 DP 屏幕": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Display Port 接口",
+        "relation": "用途"
+      }
+    ]
+  },
+  "直流桶式插座": {
+    "successors": [
+      {
+        "target": "5V 电源输入",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "5V 电源输入": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "直流桶式插座",
+        "relation": "用途"
+      }
+    ]
+  },
+  "MIPI CSI-2 摄像头接口": {
+    "successors": [
+      {
+        "target": "连接摄像头",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "连接摄像头": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "MIPI CSI-2 摄像头接口",
+        "relation": "用途"
+      }
+    ]
+  },
+  "运行各种深度学习模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorFlow, PyTorch, Caffe / Caffe2, Keras, MXNet 等深度学习框架": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "包含"
+      }
+    ]
+  },
+  "构建小型移动机器人、人脸签到打卡、口罩识别、智能门锁、智能音箱等复杂 AI 系统": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "用途"
+      }
+    ]
+  },
+  "microSD 卡作为启动设备和主存储器": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "需要 5V⎓2A 的高品质电源供电": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "特点"
+      }
+    ]
+  },
+  "只有 Ethernet 有线网络，不包括无线网卡": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano",
+        "relation": "缺点"
+      }
+    ]
+  },
+  "AC8265": {
+    "successors": [
+      {
+        "target": "官方推荐的无线网卡",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "官方推荐的无线网卡": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "AC8265",
+        "relation": "用途"
+      }
+    ]
+  },
+  "一款设计用于教育的廉价开发板，目前已进化到第4代": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "廉价且周边设备多，互联网上有丰富的接口设备和项目案例资料": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "特点"
+      }
+    ]
+  },
+  "物联网与人工智能项目开发": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "用途"
+      }
+    ]
+  },
+  "40个GPIO引脚，包括电源接口、I2C接口、SPI接口、UART串口接口、PWM接口等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "嵌入式开发平台": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "属于"
+      }
+    ]
+  },
+  "与NVIDIA Jetson Nano相比，树莓派更廉价且周边设备多": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派",
+        "relation": "比较"
+      }
+    ]
+  },
+  "敏捷开发": {
+    "successors": [
+      {
+        "target": "一种应对快速变化需求的软件开发模式",
+        "relation": "是什么"
+      },
+      {
+        "target": "强调自组织的跨功能团队协作、进化开发、提前交付与持续改进",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "一种应对快速变化需求的软件开发模式": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "敏捷开发",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "强调自组织的跨功能团队协作、进化开发、提前交付与持续改进": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "敏捷开发",
+        "relation": "特点"
+      }
+    ]
+  },
+  "GPIO": {
+    "successors": [
+      {
+        "target": "通用输入/输出接口，一组数字引脚，可用于将树莓派连接到其他电子设备",
+        "relation": "是什么"
+      },
+      {
+        "target": "读取传感器数据，控制LED等外部设备",
+        "relation": "用途"
+      },
+      {
+        "target": "40个引脚，其中26个可用作数字输入或输出，14个用于其他功能",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "通用输入/输出接口，一组数字引脚，可用于将树莓派连接到其他电子设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "读取传感器数据，控制LED等外部设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO",
+        "relation": "用途"
+      }
+    ]
+  },
+  "40个引脚，其中26个可用作数字输入或输出，14个用于其他功能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "GPIO",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "控制GPIO管脚，可以在Shell脚本中使用": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "用途"
+      }
+    ]
+  },
+  "GPIO库、I2C库、SPI库、UART库和软件PWM库等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Wiring Pi",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "NVIDIA Jetson Nano": {
+    "successors": [
+      {
+        "target": "一款功能强大的边缘计算设备",
+        "relation": "是什么"
+      },
+      {
+        "target": "能够在图像分类、物体检测等应用程序中并行运行多个神经网络，运行功率仅为5瓦",
+        "relation": "特点"
+      },
+      {
+        "target": "64位四核ARM Cortex-A57 CPU、128核NVIDIA Maxwell架构GPU、4GB内存",
+        "relation": "组成部分"
+      },
+      {
+        "target": "图像识别、对象检测和定位、姿势估计、语义分割、视频增强和智能分析等",
+        "relation": "用途"
+      },
+      {
+        "target": "NVIDIA Jetson Nano 开发板",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": []
+  },
+  "一款功能强大的边缘计算设备": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano",
+        "relation": "是什么"
+      },
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "能够在图像分类、物体检测等应用程序中并行运行多个神经网络，运行功率仅为5瓦": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano",
+        "relation": "特点"
+      }
+    ]
+  },
+  "64位四核ARM Cortex-A57 CPU、128核NVIDIA Maxwell架构GPU、4GB内存": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "图像识别、对象检测和定位、姿势估计、语义分割、视频增强和智能分析等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano",
+        "relation": "用途"
+      }
+    ]
+  },
+  "一组工具，帮助开发者在移动设备、嵌入式设备和IoT设备上运行TensorFlow模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "解释器、转换器、算子库和硬件加速代理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "设备端机器学习推断，延迟较低，二进制文件很小": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite",
+        "relation": "用途"
+      }
+    ]
+  },
+  "计算机视觉应用，如物体检测、人脸识别、图像分割等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "OpenCV",
+        "relation": "用途"
+      }
+    ]
+  },
+  "face_recognition": {
+    "successors": [
+      {
+        "target": "一个强大、简单、易上手的人脸识别开源项目",
+        "relation": "是什么"
+      },
+      {
+        "target": "人脸检测、检测面部特征点、给脸部编码、从编码中找出人的名字",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Face Recognition",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "一种有效的物品检测方法，通过许多正负样例中训练得到cascade方程": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Haar特征的cascade分类器",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "检测面部、眼睛、微笑等": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Haar特征的cascade分类器",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TFLite模型": {
+    "successors": [
+      {
+        "target": "interpreter",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "加载和运行TFLite模型": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "用途"
+      }
+    ]
+  },
+  "allocate_tensors": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "get_input_details": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "get_output_details": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "set_tensor": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "invoke": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "模型推理": {
+    "successors": [
+      {
+        "target": "获取分类结果的概率",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取分类结果的概率": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "模型推理",
+        "relation": "用途"
+      }
+    ]
+  },
+  "TensorFlow Lite API": {
+    "successors": [
+      {
+        "target": "执行模型推理",
+        "relation": "用途"
+      },
+      {
+        "target": "创建解释器、分配张量等功能",
+        "relation": "包含"
+      },
+      {
+        "target": "多种编程语言",
+        "relation": "支持"
+      },
+      {
+        "target": "Android、iOS和Linux等移动/嵌入式平台",
+        "relation": "支持"
+      }
+    ],
+    "predecessors": []
+  },
+  "执行模型推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite API",
+        "relation": "用途"
+      }
+    ]
+  },
+  "创建解释器、分配张量等功能": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite API",
+        "relation": "包含"
+      }
+    ]
+  },
+  "多种编程语言": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite API",
+        "relation": "支持"
+      }
+    ]
+  },
+  "Android、iOS和Linux等移动/嵌入式平台": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite API",
+        "relation": "支持"
+      }
+    ]
+  },
+  "TensorFlow Lite 推理": {
+    "successors": [
+      {
+        "target": "将模型加载到内存中",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "基于现有模型构建Interpreter",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "设置输入张量值",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "执行推理",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "读取输出张量值",
+        "relation": "执行步骤"
+      }
+    ],
+    "predecessors": []
+  },
+  "将模型加载到内存中": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 推理",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "基于现有模型构建Interpreter": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 推理",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "设置输入张量值": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 推理",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "执行推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 推理",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "读取输出张量值": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow Lite 推理",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "Android": {
+    "successors": [
+      {
+        "target": "使用Java或C++ API执行TensorFlow Lite推理",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "使用Java或C++ API执行TensorFlow Lite推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Android",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "iOS": {
+    "successors": [
+      {
+        "target": "使用Swift和Objective-C编写的原生iOS库执行TensorFlow Lite推理",
+        "relation": "使用方法"
+      },
+      {
+        "target": "直接在Objective-C代码中使用C API执行TensorFlow Lite推理",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": []
+  },
+  "使用Swift和Objective-C编写的原生iOS库执行TensorFlow Lite推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "iOS",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "直接在Objective-C代码中使用C API执行TensorFlow Lite推理": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "iOS",
+        "relation": "使用方法"
+      }
+    ]
+  },
+  "Linux平台": {
+    "successors": [
+      {
+        "target": "使用C++和Python提供的TensorFlow Lite API运行推断",
+        "relation": "使用方法"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "Raspberry Pi",
+        "relation": "属于"
+      }
+    ]
+  },
+  "使用C++和Python提供的TensorFlow Lite API运行推断": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Linux平台",
+        "relation": "使用方法"
+      },
+      {
+        "source": "Raspberry Pi",
+        "relation": "可能用途"
+      }
+    ]
+  },
+  "Raspberry Pi": {
+    "successors": [
+      {
+        "target": "Linux平台",
+        "relation": "属于"
+      },
+      {
+        "target": "使用C++和Python提供的TensorFlow Lite API运行推断",
+        "relation": "可能用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "移动和嵌入式设备": {
+    "successors": [
+      {
+        "target": "资源限制严重",
+        "relation": "特点"
+      },
+      {
+        "target": "功耗要求苛刻",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": []
+  },
+  "资源限制严重": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "移动和嵌入式设备",
+        "relation": "特点"
+      }
+    ]
+  },
+  "功耗要求苛刻": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "移动和嵌入式设备",
+        "relation": "特点"
+      }
+    ]
+  },
+  "print(\"button pressed!\")": {
+    "successors": [
+      {
+        "target": "观测开关去抖效果",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "观测开关去抖效果": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "print(\"button pressed!\")",
+        "relation": "用途"
+      }
+    ]
+  },
+  "RPI.GPIO 库": {
+    "successors": [
+      {
+        "target": "wait_for_edge()函数",
+        "relation": "包含"
+      },
+      {
+        "target": "add_event_detect()函数",
+        "relation": "包含"
+      }
+    ],
+    "predecessors": []
+  },
+  "wait_for_edge()函数": {
+    "successors": [
+      {
+        "target": "阻塞函数，会阻塞程序执行，直到检测到一个边沿",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "RPI.GPIO 库",
+        "relation": "包含"
+      }
+    ]
+  },
+  "add_event_detect()函数": {
+    "successors": [
+      {
+        "target": "增加一个事件的检测函数",
+        "relation": "特点"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "RPI.GPIO 库",
+        "relation": "包含"
+      }
+    ]
+  },
+  "阻塞函数，会阻塞程序执行，直到检测到一个边沿": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "wait_for_edge()函数",
+        "relation": "特点"
+      }
+    ]
+  },
+  "增加一个事件的检测函数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "add_event_detect()函数",
+        "relation": "特点"
+      }
+    ]
+  },
+  "边缘": {
+    "successors": [
+      {
+        "target": "电信号从低电平到高电平，或从高电平到低电平状态的改变",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "电信号从低电平到高电平，或从高电平到低电平状态的改变": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "边缘",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "get_tensor()": {
+    "successors": [
+      {
+        "target": "返回张量数据的副本",
+        "relation": "用途"
+      },
+      {
+        "target": "一个函数",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "返回张量数据的副本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "get_tensor()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "一个函数": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "get_tensor()",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "tensor()": {
+    "successors": [
+      {
+        "target": "获取张量的指针",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取张量的指针": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tensor()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "interpreter.get_tensor()": {
+    "successors": [
+      {
+        "target": "获取张量的数据",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "获取张量的数据": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "interpreter.get_tensor()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "tf.nn.softmax()": {
+    "successors": [
+      {
+        "target": "计算预测结果的概率分布",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "计算预测结果的概率分布": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "tf.nn.softmax()",
+        "relation": "用途"
+      }
+    ]
+  },
+  "daisy, dandelion, roses, sunflowers, tulips": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "class_names",
+        "relation": "包含"
+      }
+    ]
+  },
+  "版本变化后API函数会改变": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "TensorFlow",
+        "relation": "特点"
+      }
+    ]
+  },
+  "树莓派系统": {
+    "successors": [
+      {
+        "target": "直接更新树莓派系统",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "更新系统需要 root 权限",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "跟换源",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "修改软件源的配置文件/etc/apt/sources.list",
+        "relation": "执行步骤"
+      },
+      {
+        "target": "安装其它版本的 Python",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": []
+  },
+  "直接更新树莓派系统": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派系统",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "更新系统需要 root 权限": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派系统",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "跟换源": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派系统",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "修改软件源的配置文件/etc/apt/sources.list": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派系统",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "安装其它版本的 Python": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "树莓派系统",
+        "relation": "用途"
+      }
+    ]
+  },
+  "下载时选择特定版本": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Python",
+        "relation": "执行步骤"
+      }
+    ]
+  },
+  "清华源": {
+    "successors": [
+      {
+        "target": "Raspbian 软件仓库镜像",
+        "relation": "是什么"
+      }
+    ],
+    "predecessors": []
+  },
+  "Raspbian 软件仓库镜像": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "清华源",
+        "relation": "是什么"
+      }
+    ]
+  },
+  "nano": {
+    "successors": [
+      {
+        "target": "编辑工具",
+        "relation": "用途"
+      },
+      {
+        "target": "vi",
+        "relation": "可能与...相关"
+      }
+    ],
+    "predecessors": []
+  },
+  "编辑工具": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "nano",
+        "relation": "用途"
+      },
+      {
+        "source": "vi",
+        "relation": "用途"
+      }
+    ]
+  },
+  "vi": {
+    "successors": [
+      {
+        "target": "编辑工具",
+        "relation": "用途"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "nano",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "软件源的配置文件": {
+    "successors": [
+      {
+        "target": "/etc/apt/sources.list",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "/etc/apt/sources.list": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "软件源的配置文件",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "NVIDIA Jetson Nano 开发板": {
+    "successors": [
+      {
+        "target": "一款功能强大的边缘计算设备",
+        "relation": "是什么"
+      },
+      {
+        "target": "在图像分类、物体检测、分割和语音处理等应用程序中并行运行多个神经网络",
+        "relation": "用途"
+      },
+      {
+        "target": "运行功率仅为 5 瓦",
+        "relation": "特点"
+      },
+      {
+        "target": "边做边学的理想工具",
+        "relation": "特点"
+      },
+      {
+        "target": "Linux 开发环境",
+        "relation": "组成部分"
+      },
+      {
+        "target": "大量易于学习的教程",
+        "relation": "组成部分"
+      },
+      {
+        "target": "大量的由活跃开发者社区打造的开源项目",
+        "relation": "组成部分"
+      },
+      {
+        "target": "Raspberry Pi 4",
+        "relation": "比较"
+      },
+      {
+        "target": "Intel Neural Compute Stick 2",
+        "relation": "比较"
+      },
+      {
+        "target": "Google Edge TPU Coral Dev Board",
+        "relation": "比较"
+      },
+      {
+        "target": "4GB 的内存并不能完全使用，其中有一部分（1GB 左右）是和显存共享的",
+        "relation": "特点"
+      },
+      {
+        "target": "体积小，采用核心板可拆的设计，核心板的大小只有70 x 45 mm，可以很方便的集成在各种嵌入式应用中",
+        "relation": "优点"
+      },
+      {
+        "target": "128核 NVIDIA Maxwell 架构的 GPU",
+        "relation": "组成部分"
+      },
+      {
+        "target": "计算能力不高，勉强可以使用一些小规模、并且优化过的网络进行推理，训练的话还是不够用的",
+        "relation": "特点"
+      },
+      {
+        "target": "功耗非常低",
+        "relation": "特点"
+      },
+      {
+        "target": "两种模式：5W（低功耗模式；可以使用 USB 口供电）和10W（必须使用 Power Jack 外接5V 电源供电）",
+        "relation": "组成部分"
+      },
+      {
+        "target": "microSD 卡插槽，可以进行系统镜像烧写",
+        "relation": "组成部分"
+      },
+      {
+        "target": "40 针 GPIO 扩展接口",
+        "relation": "组成部分"
+      },
+      {
+        "target": "Micro USB 接口，用来传输数据或使用电源供电",
+        "relation": "组成部分"
+      },
+      {
+        "target": "千兆以太网端口",
+        "relation": "组成部分"
+      },
+      {
+        "target": "USB",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano",
+        "relation": "可能与...相关"
+      }
+    ]
+  },
+  "在图像分类、物体检测、分割和语音处理等应用程序中并行运行多个神经网络": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "用途"
+      }
+    ]
+  },
+  "运行功率仅为 5 瓦": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "边做边学的理想工具": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "Linux 开发环境": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "大量易于学习的教程": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "大量的由活跃开发者社区打造的开源项目": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Raspberry Pi 4": {
+    "successors": [
+      {
+        "target": "ARM Cortex-A72",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "比较"
+      }
+    ]
+  },
+  "Intel Neural Compute Stick 2": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "比较"
+      }
+    ]
+  },
+  "Google Edge TPU Coral Dev Board": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "比较"
+      }
+    ]
+  },
+  "Jetson Nano CPU": {
+    "successors": [
+      {
+        "target": "64位四核的 ARM Cortex-A57",
+        "relation": "组成部分"
+      }
+    ],
+    "predecessors": []
+  },
+  "64位四核的 ARM Cortex-A57": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Jetson Nano CPU",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "ARM Cortex-A72": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "Raspberry Pi 4",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "4GB 的内存并不能完全使用，其中有一部分（1GB 左右）是和显存共享的": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "体积小，采用核心板可拆的设计，核心板的大小只有70 x 45 mm，可以很方便的集成在各种嵌入式应用中": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "优点"
+      }
+    ]
+  },
+  "128核 NVIDIA Maxwell 架构的 GPU": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "计算能力不高，勉强可以使用一些小规模、并且优化过的网络进行推理，训练的话还是不够用的": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "功耗非常低": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "特点"
+      }
+    ]
+  },
+  "两种模式：5W（低功耗模式；可以使用 USB 口供电）和10W（必须使用 Power Jack 外接5V 电源供电）": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "microSD 卡插槽，可以进行系统镜像烧写": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "40 针 GPIO 扩展接口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "Micro USB 接口，用来传输数据或使用电源供电": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "千兆以太网端口": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  },
+  "USB": {
+    "successors": [],
+    "predecessors": [
+      {
+        "source": "NVIDIA Jetson Nano 开发板",
+        "relation": "组成部分"
+      }
+    ]
+  }
+}
