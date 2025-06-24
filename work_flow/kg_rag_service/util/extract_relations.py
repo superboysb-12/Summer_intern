@@ -13,12 +13,15 @@ class RelationExtractor:
         self.output_dir = Path(config["output_dir"])
         self.output_dir.mkdir(exist_ok=True)
         self.max_concurrency = config.get("max_concurrency", 5)
+        # 添加默认超时设置，如果配置文件中未提供则使用30秒
+        self.timeout = config.get("request_timeout", 30)
         
     async def create_client(self):
         """创建异步OpenAI客户端"""
         return AsyncOpenAI(
             api_key=self.config["api_key"], 
-            base_url="https://api.deepseek.com"
+            base_url="https://api.deepseek.com",
+            timeout=self.timeout  # 设置请求超时时间
         )
         
     async def extract_relations_from_text(self, client, text_chunk):
@@ -68,7 +71,8 @@ class RelationExtractor:
                             {"role": "user", "content": f"请从以下文本中提取实体关系:\n\n{text_chunk}"}
                         ],
                         temperature=self.config["temperature"],
-                        stream=False
+                        stream=False,
+                        timeout=self.timeout  # 设置每个请求的超时时间
                     )
                     
                     result = response.choices[0].message.content

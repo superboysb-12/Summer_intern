@@ -13,6 +13,7 @@ import fitz  # PyMuPDF
 import chardet
 import pptx  # python-pptx
 
+
 class TextSegmenter:
     def __init__(self, text_dir="source_article", output_dir="segmented_output"):
 

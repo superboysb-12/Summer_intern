@@ -10,8 +10,8 @@ import torch
 from sentence_transformers import SentenceTransformer
 import networkx as nx
 
-from kg_embedding import KGEmbedder
-from kg_processor import KnowledgeGraphProcessor
+from util.kg_embedding import KGEmbedder
+from util.kg_processor import KnowledgeGraphProcessor
 
 class KGRAGGenerator:
     """知识图谱增强的RAG系统生成器，负责将知识图谱处理为RAG格式"""

@@ -7,7 +7,7 @@ from pathlib import Path
 import faiss
 from tqdm import tqdm
 
-from kg_embedding import KGEmbedder
+from util.kg_embedding import KGEmbedder
 
 class KnowledgeGraphProcessor:
     """知识图谱处理器，负责将知识图谱转化为RAG系统可用的格式"""

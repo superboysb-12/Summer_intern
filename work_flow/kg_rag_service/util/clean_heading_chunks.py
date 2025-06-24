@@ -100,13 +100,4 @@ class HeadingChunksCleaner:
         print(f"\n清洗完成，总共处理了 {total_files} 个文件，保留了 {total_cleaned} 个文本块。")
         print(f"结果保存在 {self.output_dir} 目录中。")
 
-def main():
-    wash_dir = "wash_dir"
-    os.makedirs(wash_dir, exist_ok=True)
-    input_dir = "segmented_output"
 
-    cleaner = HeadingChunksCleaner(input_dir, wash_dir)
-    cleaner.process_directory()
-
-if __name__ == "__main__":
-    main() 
