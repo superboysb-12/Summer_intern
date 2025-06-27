@@ -215,16 +215,3 @@ class RelationExtractor:
             
         print(f"已保存可视化数据到 {vis_file}，包含 {len(nodes_list)} 个节点和 {len(links)} 个关系")
 
-async def main_async():
-    print("开始提取知识图谱关系...")
-    extractor = RelationExtractor(CONFIG)
-    all_relations = await extractor.process_directory_async()
-    if all_relations:
-        extractor.convert_to_visualization_format(all_relations)
-    print("关系提取完成！")
-
-def main():
-    asyncio.run(main_async())
-
-if __name__ == "__main__":
-    main() 

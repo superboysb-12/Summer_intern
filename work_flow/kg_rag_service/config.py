@@ -2,22 +2,25 @@
 
 import os
 from pathlib import Path
+import time
 
 # 获取当前文件的绝对路径
 current_file = Path(__file__).resolve()
 
 # 获取项目根目录（假设是当前文件的上三级目录）
 project_root = current_file.parent
-print(project_root)
+
+# 移除这里的时间戳生成
+# mid_path = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 
 # 配置字典
 CONFIG = {
     # 目录配置
     "source_dir": os.path.join(project_root, "source_article"),  # 源文档目录
-    "segmented_dir": os.path.join(project_root, "doc","segmented"),    # 分段后文本存储目录
-    "cleaned_dir": os.path.join(project_root, "doc","cleaned"),        # 清洗后文本存储目录
-    "kg_dir": os.path.join(project_root, "doc","knowledge_graph"),     # 知识图谱存储目录
-    "rag_dir": os.path.join(project_root, "doc","rag_data"),           # RAG数据存储目录
+    "segmented_dir": None,    # 分段后文本存储目录，将在ensure_directories_exist中设置
+    "cleaned_dir": None,        # 清洗后文本存储目录，将在ensure_directories_exist中设置
+    "kg_dir": None,     # 知识图谱存储目录，将在ensure_directories_exist中设置
+    "rag_dir": None,           # RAG数据存储目录，将在ensure_directories_exist中设置
     
     # 文本分割配置
     "chunk_size": 500,       # 文本块大小
@@ -73,6 +76,20 @@ CONFIG = {
 
 def ensure_directories_exist():
     """确保所有配置的目录都存在，在需要时调用此函数"""
+    # 生成时间戳目录名，只在函数调用时生成一次
+    mid_path = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    
+    # 只有当这些目录为None时才更新它们（避免重复设置）
+    if CONFIG["segmented_dir"] is None:
+        CONFIG["segmented_dir"] = os.path.join(project_root, "doc", mid_path, "segmented")
+    if CONFIG["cleaned_dir"] is None:
+        CONFIG["cleaned_dir"] = os.path.join(project_root, "doc", mid_path, "cleaned")
+    if CONFIG["kg_dir"] is None:
+        CONFIG["kg_dir"] = os.path.join(project_root, "doc", mid_path, "knowledge_graph")
+    if CONFIG["rag_dir"] is None:
+        CONFIG["rag_dir"] = os.path.join(project_root, "doc", mid_path, "rag_data")
+    
+    # 创建所有目录
     for dir_path in [CONFIG["source_dir"], CONFIG["segmented_dir"], CONFIG["cleaned_dir"], CONFIG["kg_dir"], CONFIG["rag_dir"]]:
         os.makedirs(dir_path, exist_ok=True)
 

@@ -227,11 +227,17 @@ class KnowledgeGraphPipeline:
         print(f"知识图谱RAG处理完成，结果保存在 {rag_output_dir}")
         return True
     
-    async def run_pipeline_async(self):
+    async def run_pipeline_async(self, source_dir=None):
         """异步运行完整的知识图谱处理流水线"""
         print("\n" + "*"*70)
         print("  启动知识图谱处理流水线")
         print("*"*70)
+        
+        # 如果提供了source_dir，更新CONFIG
+        if source_dir:
+            CONFIG["source_dir"] = source_dir
+            # 确保目录存在
+            ensure_directories_exist()
         
         start_time = time.time()
         
@@ -276,11 +282,15 @@ class KnowledgeGraphPipeline:
             print(f"- 知识图谱RAG处理结果: {CONFIG['rag_dir']}/processed/*")
         
         # 返回成功标志
-        return True
+        return True,CONFIG["rag_dir"]
     
-    def run_pipeline(self):
+    def run_pipeline(self, source_dir=None):
         """运行完整的知识图谱处理流水线（同步包装异步函数）"""
-        return asyncio.run(self.run_pipeline_async())
+        if source_dir:
+            CONFIG["source_dir"] = source_dir
+            # 确保目录存在
+            ensure_directories_exist()
+        return asyncio.run(self.run_pipeline_async(source_dir=source_dir))
 
 
 def main():
@@ -288,7 +298,7 @@ def main():
     
     # 创建并运行流水线
     pipeline = KnowledgeGraphPipeline()
-    success = pipeline.run_pipeline()
+    success,rag_dir = pipeline.run_pipeline()
     
     if success:
         print("\n知识图谱处理流水线执行成功")
