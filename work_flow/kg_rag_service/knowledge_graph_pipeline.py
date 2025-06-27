@@ -227,8 +227,13 @@ class KnowledgeGraphPipeline:
         print(f"知识图谱RAG处理完成，结果保存在 {rag_output_dir}")
         return True
     
-    async def run_pipeline_async(self, source_dir=None):
-        """异步运行完整的知识图谱处理流水线"""
+    async def run_pipeline_async(self, source_dir=None, force_rebuild=False):
+        """异步运行完整的知识图谱处理流水线
+        
+        Args:
+            source_dir: 可选的源文档目录路径
+            force_rebuild: 是否强制重新构建知识图谱，即使已存在处理结果
+        """
         print("\n" + "*"*70)
         print("  启动知识图谱处理流水线")
         print("*"*70)
@@ -238,6 +243,25 @@ class KnowledgeGraphPipeline:
             CONFIG["source_dir"] = source_dir
             # 确保目录存在
             ensure_directories_exist()
+        
+        # 检查是否已存在处理结果，如果不强制重建则跳过处理
+        rag_output_dir = os.path.join(CONFIG["rag_dir"], "processed")
+        if not force_rebuild and os.path.exists(rag_output_dir):
+            # 检查是否存在所有必要的RAG文件
+            required_files = [
+                "entity_embeddings.json", 
+                "entity_mapping.json", 
+                "graph_structure.json",
+                "relation_embeddings.json", 
+                "relation_mapping.json", 
+                "triple_embeddings.json"
+            ]
+            all_files_exist = all(os.path.exists(os.path.join(rag_output_dir, f)) for f in required_files)
+            
+            if all_files_exist:
+                print(f"检测到已存在的RAG处理结果，且force_rebuild=False，跳过处理流程")
+                print(f"如需重新处理，请设置force_rebuild=True")
+                return True, CONFIG["rag_dir"]
         
         start_time = time.time()
         
@@ -282,15 +306,20 @@ class KnowledgeGraphPipeline:
             print(f"- 知识图谱RAG处理结果: {CONFIG['rag_dir']}/processed/*")
         
         # 返回成功标志
-        return True,CONFIG["rag_dir"]
+        return True, CONFIG["rag_dir"]
     
-    def run_pipeline(self, source_dir=None):
-        """运行完整的知识图谱处理流水线（同步包装异步函数）"""
+    def run_pipeline(self, source_dir=None, force_rebuild=False):
+        """运行完整的知识图谱处理流水线（同步包装异步函数）
+        
+        Args:
+            source_dir: 可选的源文档目录路径
+            force_rebuild: 是否强制重新构建知识图谱，即使已存在处理结果
+        """
         if source_dir:
             CONFIG["source_dir"] = source_dir
             # 确保目录存在
             ensure_directories_exist()
-        return asyncio.run(self.run_pipeline_async(source_dir=source_dir))
+        return asyncio.run(self.run_pipeline_async(source_dir=source_dir, force_rebuild=force_rebuild))
 
 
 def main():

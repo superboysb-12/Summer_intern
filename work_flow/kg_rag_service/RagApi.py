@@ -10,6 +10,7 @@ from pydantic import BaseModel
 import numpy as np
 
 from util.kg_rag import KGRAGService
+from knowledge_graph_pipeline import KnowledgeGraphPipeline
 from config import CONFIG
 
 # 默认数据路径
@@ -34,6 +35,7 @@ app.add_middleware(
 # 初始化RAG服务
 rag_service = KGRAGService()
 is_service_initialized = False
+pipeline = KnowledgeGraphPipeline()
 
 # 响应模型
 class RagResponse(BaseModel):
@@ -42,6 +44,13 @@ class RagResponse(BaseModel):
     data_path: str
     success: bool
     message: str
+
+# 添加RAG生成响应模型
+class RagGenerationResponse(BaseModel):
+    success: bool
+    message: str
+    rag_dir: Optional[str] = None
+    error_details: Optional[str] = None
 
 def convert_numpy_types(obj):
     """递归转换numpy类型为Python标准类型"""
@@ -57,11 +66,6 @@ def convert_numpy_types(obj):
         return [convert_numpy_types(i) for i in obj]
     else:
         return obj
-
-@app.get("/", response_model=Dict[str, str])
-async def root():
-    """API根路径，返回简单的欢迎信息"""
-    return {"message": "欢迎使用知识图谱增强检索系统API"}
 
 @app.get("/rag", response_model=RagResponse)
 async def retrieve(
@@ -147,6 +151,59 @@ async def retrieve(
             data_path=data_path,
             success=False,
             message=f"检索过程中发生错误: {str(e)}"
+        )
+
+@app.get("/generate_rag", response_model=RagGenerationResponse)
+async def generate_rag(
+    source_dir: Optional[str] = Query(None, description="源文档目录路径，默认使用系统配置路径"),
+    force_rebuild: bool = Query(False, description="是否强制重新构建知识图谱")
+):
+    """
+    生成知识图谱增强检索数据
+    
+    - **source_dir**: 可选的源文档目录路径
+    - **force_rebuild**: 是否强制重新构建知识图谱
+    """
+    try:
+        # 使用提供的路径或默认路径
+        src_dir = source_dir if source_dir else CONFIG.get("source_dir")
+        
+        # 检查源目录是否存在
+        if not os.path.exists(src_dir):
+            return RagGenerationResponse(
+                success=False,
+                message=f"源文档目录不存在: {src_dir}",
+                error_details="请提供有效的源文档目录路径"
+            )
+        
+        # 直接调用异步方法，而不是通过run_pipeline
+        success, rag_dir = await pipeline.run_pipeline_async(source_dir=src_dir, force_rebuild=force_rebuild)
+        
+        if success:
+            # 重新初始化RAG服务
+            global is_service_initialized
+            is_service_initialized = False
+            
+            return RagGenerationResponse(
+                success=True,
+                message="RAG数据生成成功",
+                rag_dir=rag_dir
+            )
+        else:
+            return RagGenerationResponse(
+                success=False,
+                message="RAG数据生成失败",
+                error_details="知识图谱生成流程执行失败，请检查日志获取详细信息"
+            )
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"生成RAG数据时发生错误: {error_trace}")
+        
+        return RagGenerationResponse(
+            success=False,
+            message=f"生成RAG数据时发生错误: {str(e)}",
+            error_details=error_trace
         )
 
 if __name__ == "__main__":
