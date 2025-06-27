@@ -1,16 +1,37 @@
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
+import { useCounterStore } from './stores/counter'
 
-const loginForm = reactive({
+const loginForm = ref({
   username: '',
   password: ''
 })
 
+const rules = ref({
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' }
+  ]
+})
+
+const store = useCounterStore()
+
 const loading = ref(false)
 
-const handleLogin = () => {
+const handleLogin = async () => {
+  loading.value = true
+  const result = await store.login(loginForm.value.username, loginForm.value.password)
+  if (result) {
+    ElMessage.success('登录成功')
+    loading.value = false
+  } else {
+    ElMessage.error('登录失败')
+    loading.value = false
+  }
 }
 </script>
 

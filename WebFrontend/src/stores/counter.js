@@ -1,12 +1,29 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import axios from 'axios'
 
 export const useCounterStore = defineStore('counter', () => {
-  const count = ref(0)
-  const doubleCount = computed(() => count.value * 2)
-  function increment() {
-    count.value++
+
+  const token = ref('')
+
+  const BaseUrl = 'http://localhost:8080/'
+
+  const setToken = (newToken) => {
+    token.value = newToken
+    localStorage.setItem('token', newToken)
   }
 
-  return { count, doubleCount, increment }
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post(BaseUrl + 'users/login', { username, password })
+      setToken(response.data.token)
+      return true
+    } catch (error) {
+      console.error('登录失败:', error)
+      return false
+    }
+    
+  }
+
+  return { login }
 })
