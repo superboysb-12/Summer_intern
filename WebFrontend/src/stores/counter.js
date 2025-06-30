@@ -22,8 +22,23 @@ export const useCounterStore = defineStore('counter', () => {
       console.error('登录失败:', error)
       return false
     }
-    
   }
 
-  return { login }
+  const register = async (username, password, email, phone) => {
+    try {
+      const response = await axios.post(BaseUrl + 'users/register', { 
+        username, 
+        password,
+        email: email || undefined,
+        phone: phone || undefined,
+        userRole: 'ADMIN',
+      })
+      return true
+    } catch (error) {
+      console.error('注册失败:', error)
+      return false
+    }
+  }
+
+  return { login, register }
 })
