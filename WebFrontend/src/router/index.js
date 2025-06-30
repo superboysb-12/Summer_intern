@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const Login = () => import('../views/login.vue')
 const Register = () => import('../views/register.vue')
+const Manage = () => import('../views/manage.vue')
 
 const routes=[
     {
@@ -17,6 +18,14 @@ const routes=[
     {
         path:'/register',
         component:Register
+    },
+    {
+        path:'/manage',
+        component:Manage,
+        meta: {
+            requiresAuth: true,
+            title: '系统管理'
+        }
     }
 ]
 
@@ -42,7 +51,7 @@ if (to.meta.requiresAuth) {
 } else {
 
     if (to.path === '/login' && localStorage.getItem('token')) {
-    next({ path: '/home' })
+    next({ path: '/manage' })
     } else {
     next()
     }
