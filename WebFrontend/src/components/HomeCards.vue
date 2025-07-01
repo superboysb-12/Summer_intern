@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, reactive } from 'vue'
 import { 
   User, 
   Document, 
@@ -7,88 +7,91 @@ import {
   School
 } from '@element-plus/icons-vue'
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
 import * as echarts from 'echarts'
 
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
 
-// 统计数据
-const totalUsers = ref('--')
-const teacherVisits = ref('--')
-const studentVisits = ref('--')
-const documentCount = ref('--')
-const teacherGrowth = ref('--')
-const studentGrowth = ref('--')
+// 图表实例引用
+const userChartRef = ref(null)
+let userChart = null
 
-// 卡片数据
 const cards = ref([
   { 
     title: '用户总数', 
-    value: totalUsers,
+    value: '加载中...', 
     icon: User, 
-    color: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%)',
-    growth: '+12%'
+    color: 'linear-gradient(135deg, #a5b4fc 0%, #818cf8 100%)'
   },
   { 
     title: '今日教师访问', 
-    value: teacherVisits,
+    value: '加载中...', 
     icon: Promotion, 
-    color: 'linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%)',
-    growth: teacherGrowth
+    color: 'linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%)'
   },
   { 
     title: '今日学生访问', 
-    value: studentVisits,
+    value: '加载中...', 
     icon: School, 
-    color: 'linear-gradient(135deg, #fdba74 0%, #fb923c 100%)',
-    growth: studentGrowth
+    color: 'linear-gradient(135deg, #fdba74 0%, #fb923c 100%)'
   },
   { 
     title: '文档数量', 
-    value: documentCount,
+    value: '89', 
     icon: Document, 
-    color: 'linear-gradient(135deg, #6ee7b7 0%, #34d399 100%)',
-    growth: '+8%'
+    color: 'linear-gradient(135deg, #6ee7b7 0%, #34d399 100%)'
   }
 ])
 
-// 图表实例
-let userGrowthChart = null
-const chartLoading = ref(true)
+// 用户增长数据
+const userGrowthData = reactive({
+  dates: [],
+  counts: []
+})
 
 // 获取用户总数
 const getUserCount = async () => {
   try {
-    const response = await axios.get(BaseUrl + 'users', {
+    const response = await axios.get(`${BaseUrl}users`, {
       headers: {
         'Authorization': `Bearer ${getToken()}`
       }
     })
     
-    if (Array.isArray(response.data)) {
-      totalUsers.value = response.data.length.toString()
-    } else if (response.data.totalElements) {
-      totalUsers.value = response.data.totalElements.toString()
+    // 根据API返回的数据结构处理
+    let totalUsers = 0
+    if (response.data.content && Array.isArray(response.data.content)) {
+      totalUsers = response.data.totalElements || response.data.content.length
+    } else if (Array.isArray(response.data)) {
+      totalUsers = response.data.length
     }
+    
+    // 更新用户总数卡片
+    cards.value[0].value = totalUsers.toLocaleString()
   } catch (error) {
     console.error('获取用户总数失败:', error)
+    cards.value[0].value = '获取失败'
   }
 }
 
-// 获取今日访问统计
-const getTodayVisits = async () => {
+// 获取今日登录记录
+const getLoginRecords = async () => {
   try {
-    // 获取今天的开始和结束时间
+    // 获取今天的开始时间和结束时间
     const today = new Date()
-    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0).toISOString()
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59).toISOString()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
     
-    // 获取今日所有登录记录
-    const response = await axios.get(BaseUrl + 'login-records/time', {
+    // 格式化为ISO字符串
+    const startTime = today.toISOString()
+    const endTime = tomorrow.toISOString()
+    
+    // 获取今日登录记录
+    const response = await axios.get(`${BaseUrl}login-records/time`, {
       params: {
-        startTime: startOfDay,
-        endTime: endOfDay
+        startTime: startTime,
+        endTime: endTime
       },
       headers: {
         'Authorization': `Bearer ${getToken()}`
@@ -96,227 +99,112 @@ const getTodayVisits = async () => {
     })
     
     if (Array.isArray(response.data)) {
-      // 按角色分组统计
-      const teacherLogins = response.data.filter(record => 
-        record.user && record.user.userRole === 'TEACHER'
-      ).length
+      // 统计教师和学生的登录次数
+      let teacherLogins = 0
+      let studentLogins = 0
       
-      const studentLogins = response.data.filter(record => 
-        record.user && record.user.userRole === 'STUDENT'
-      ).length
-      
-      teacherVisits.value = teacherLogins.toString()
-      studentVisits.value = studentLogins.toString()
-      
-      // 获取昨天的数据进行对比
-      const yesterday = new Date(today)
-      yesterday.setDate(yesterday.getDate() - 1)
-      const startOfYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 0, 0, 0).toISOString()
-      const endOfYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59).toISOString()
-      
-      const yesterdayResponse = await axios.get(BaseUrl + 'login-records/time', {
-        params: {
-          startTime: startOfYesterday,
-          endTime: endOfYesterday
-        },
-        headers: {
-          'Authorization': `Bearer ${getToken()}`
-        }
-      })
-      
-      if (Array.isArray(yesterdayResponse.data)) {
-        const yesterdayTeacherLogins = yesterdayResponse.data.filter(record => 
-          record.user && record.user.userRole === 'TEACHER'
-        ).length
-        
-        const yesterdayStudentLogins = yesterdayResponse.data.filter(record => 
-          record.user && record.user.userRole === 'STUDENT'
-        ).length
-        
-        // 计算增长率
-        if (yesterdayTeacherLogins > 0) {
-          const teacherGrowthRate = ((teacherLogins - yesterdayTeacherLogins) / yesterdayTeacherLogins * 100).toFixed(0)
-          teacherGrowth.value = (teacherGrowthRate >= 0 ? '+' : '') + teacherGrowthRate + '%'
-        } else {
-          teacherGrowth.value = '+100%'
-        }
-        
-        if (yesterdayStudentLogins > 0) {
-          const studentGrowthRate = ((studentLogins - yesterdayStudentLogins) / yesterdayStudentLogins * 100).toFixed(0)
-          studentGrowth.value = (studentGrowthRate >= 0 ? '+' : '') + studentGrowthRate + '%'
-        } else {
-          studentGrowth.value = '+100%'
-        }
-      }
-    }
-  } catch (error) {
-    console.error('获取今日访问统计失败:', error)
-  }
-}
-
-// 获取文档数量
-const getDocumentCount = async () => {
-  try {
-    // 这里假设有一个获取文档数量的接口
-    // 如果没有，可以暂时使用静态数据
-    documentCount.value = '89'
-  } catch (error) {
-    console.error('获取文档数量失败:', error)
-  }
-}
-
-// 获取最近活动
-const recentActivities = ref([])
-const getRecentActivities = async () => {
-  try {
-    // 获取最近的登录记录
-    const response = await axios.get(BaseUrl + 'login-records', {
-      params: {
-        pageSize: 4,  // 只获取最近的4条记录
-        sort: 'time,desc'
-      },
-      headers: {
-        'Authorization': `Bearer ${getToken()}`
-      }
-    })
-    
-    if (Array.isArray(response.data)) {
-      recentActivities.value = response.data.map(record => {
-        const time = new Date(record.time)
-        const now = new Date()
-        let timeDisplay
-        
-        // 格式化时间显示
-        if (time.toDateString() === now.toDateString()) {
-          // 今天的记录显示时间
-          timeDisplay = time.getHours().toString().padStart(2, '0') + ':' + 
-                        time.getMinutes().toString().padStart(2, '0')
-        } else {
-          // 非今天的记录显示"昨天"或日期
-          const yesterday = new Date(now)
-          yesterday.setDate(yesterday.getDate() - 1)
-          
-          if (time.toDateString() === yesterday.toDateString()) {
-            timeDisplay = '昨天'
-          } else {
-            timeDisplay = (time.getMonth() + 1) + '/' + time.getDate()
+      // 遍历登录记录，根据用户角色统计
+      for (const record of response.data) {
+        if (record.user && record.user.userRole) {
+          if (record.user.userRole === 'TEACHER') {
+            teacherLogins++
+          } else if (record.user.userRole === 'STUDENT') {
+            studentLogins++
           }
         }
-        
-        return {
-          time: timeDisplay,
-          content: `用户 ${record.user?.username || 'unknown'} 登录了系统`
-        }
-      })
+      }
+      
+      // 更新教师访问卡片
+      cards.value[1].value = teacherLogins.toString()
+      
+      // 更新学生访问卡片
+      cards.value[2].value = studentLogins.toString()
     }
   } catch (error) {
-    console.error('获取最近活动失败:', error)
+    console.error('获取登录记录失败:', error)
+    cards.value[1].value = '获取失败'
+    cards.value[2].value = '获取失败'
   }
 }
 
-// 获取用户增长数据
+// 获取最近一个月的用户注册数据
 const getUserGrowthData = async () => {
   try {
-    chartLoading.value = true
+    // 计算一个月前的日期
+    const endDate = new Date()
+    const startDate = new Date()
+    startDate.setMonth(startDate.getMonth() - 1)
     
-    // 获取过去30天的日期
-    const dates = []
-    const today = new Date()
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      dates.push(date.toISOString().split('T')[0])
-    }
+    // 格式化为ISO字符串
+    const startTime = startDate.toISOString()
+    const endTime = endDate.toISOString()
     
     // 获取所有用户数据
-    const response = await axios.get(BaseUrl + 'users', {
+    const response = await axios.get(`${BaseUrl}users`, {
       headers: {
         'Authorization': `Bearer ${getToken()}`
       }
     })
     
     let users = []
-    if (Array.isArray(response.data)) {
-      users = response.data
-    } else if (response.data.content && Array.isArray(response.data.content)) {
+    // 处理不同的响应格式
+    if (response.data.content && Array.isArray(response.data.content)) {
       users = response.data.content
+    } else if (Array.isArray(response.data)) {
+      users = response.data
     }
     
-    // 初始化每天的教师和学生注册数据
-    const teacherData = Array(30).fill(0)
-    const studentData = Array(30).fill(0)
+    // 过滤出最近一个月注册的用户
+    const recentUsers = users.filter(user => {
+      if (!user.createdAt) return false
+      const createdDate = new Date(user.createdAt)
+      return createdDate >= startDate && createdDate <= endDate
+    })
     
-    // 按创建日期和角色分组统计
-    users.forEach(user => {
+    // 按日期分组统计
+    const dailyCounts = {}
+    
+    // 初始化日期范围内的每一天
+    let currentDate = new Date(startDate)
+    while (currentDate <= endDate) {
+      const dateStr = currentDate.toISOString().split('T')[0]
+      dailyCounts[dateStr] = 0
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    
+    // 统计每天的注册用户数
+    recentUsers.forEach(user => {
       if (user.createdAt) {
-        const createdAt = new Date(user.createdAt)
-        const createdDate = createdAt.toISOString().split('T')[0]
-        
-        // 检查是否在过去30天内
-        const dateIndex = dates.indexOf(createdDate)
-        if (dateIndex !== -1) {
-          if (user.userRole === 'TEACHER') {
-            teacherData[dateIndex]++
-          } else if (user.userRole === 'STUDENT') {
-            studentData[dateIndex]++
-          }
+        const dateStr = new Date(user.createdAt).toISOString().split('T')[0]
+        if (dailyCounts[dateStr] !== undefined) {
+          dailyCounts[dateStr]++
         }
       }
     })
     
-    // 初始化图表
-    await nextTick()
-    initUserGrowthChart(dates, teacherData, studentData)
+    // 转换为图表所需的数据格式
+    userGrowthData.dates = Object.keys(dailyCounts).map(date => {
+      // 转换为更友好的日期格式 (MM-DD)
+      const [year, month, day] = date.split('-')
+      return `${month}-${day}`
+    })
+    userGrowthData.counts = Object.values(dailyCounts)
     
-    chartLoading.value = false
+    // 渲染图表
+    renderUserGrowthChart()
   } catch (error) {
     console.error('获取用户增长数据失败:', error)
-    chartLoading.value = false
-    
-    // 如果获取真实数据失败，使用模拟数据作为备份
-    const dates = []
-    const today = new Date()
-    
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date(today)
-      date.setDate(date.getDate() - i)
-      dates.push(date.toISOString().split('T')[0])
-    }
-    
-    // 生成模拟数据
-    const teacherData = []
-    const studentData = []
-    
-    // 生成30天的数据
-    for (let i = 0; i < 30; i++) {
-      // 教师数据 - 每天1-5人
-      teacherData.push(Math.floor(Math.random() * 5) + 1)
-      
-      // 学生数据 - 每天3-10人
-      studentData.push(Math.floor(Math.random() * 8) + 3)
-    }
-    
-    // 初始化图表
-    await nextTick()
-    initUserGrowthChart(dates, teacherData, studentData)
-    
-    chartLoading.value = false
   }
 }
 
-// 初始化用户增长图表
-const initUserGrowthChart = (dates, teacherData, studentData) => {
-  const chartDom = document.getElementById('userGrowthChart')
-  if (!chartDom) return
+// 渲染用户增长趋势图表
+const renderUserGrowthChart = () => {
+  if (!userChartRef.value) return
   
-  // 如果图表实例已存在，销毁它
-  if (userGrowthChart) {
-    userGrowthChart.dispose()
+  // 初始化图表
+  if (!userChart) {
+    userChart = echarts.init(userChartRef.value)
   }
-  
-  // 创建新的图表实例
-  userGrowthChart = echarts.init(chartDom)
   
   // 图表配置
   const option = {
@@ -326,10 +214,6 @@ const initUserGrowthChart = (dates, teacherData, studentData) => {
         type: 'shadow'
       }
     },
-    legend: {
-      data: ['教师', '学生'],
-      top: '10px'
-    },
     grid: {
       left: '3%',
       right: '4%',
@@ -338,92 +222,107 @@ const initUserGrowthChart = (dates, teacherData, studentData) => {
     },
     xAxis: {
       type: 'category',
-      data: dates.map(date => {
-        // 格式化日期为 MM-DD
-        const parts = date.split('-')
-        return `${parts[1]}-${parts[2]}`
-      }),
+      data: userGrowthData.dates,
       axisLabel: {
-        interval: 'auto',
-        rotate: 45
+        rotate: 45,
+        interval: Math.floor(userGrowthData.dates.length / 10)
       }
     },
     yAxis: {
       type: 'value',
-      name: '新增用户数',
       minInterval: 1
     },
     series: [
       {
-        name: '教师',
-        type: 'bar',
-        stack: 'total',
-        emphasis: {
-          focus: 'series'
-        },
+        name: '新注册用户',
+        type: 'line',
+        smooth: true,
+        data: userGrowthData.counts,
         itemStyle: {
           color: '#60a5fa'
         },
-        data: teacherData
-      },
-      {
-        name: '学生',
-        type: 'bar',
-        stack: 'total',
-        emphasis: {
-          focus: 'series'
-        },
-        itemStyle: {
-          color: '#fb923c'
-        },
-        data: studentData
+        areaStyle: {
+          color: {
+            type: 'linear',
+            x: 0,
+            y: 0,
+            x2: 0,
+            y2: 1,
+            colorStops: [
+              { offset: 0, color: 'rgba(96, 165, 250, 0.5)' },
+              { offset: 1, color: 'rgba(96, 165, 250, 0.05)' }
+            ]
+          }
+        }
       }
     ]
   }
   
   // 设置图表选项
-  userGrowthChart.setOption(option)
+  userChart.setOption(option)
   
   // 响应窗口大小变化
   window.addEventListener('resize', () => {
-    userGrowthChart && userGrowthChart.resize()
+    userChart && userChart.resize()
   })
 }
 
-// 初始化数据
-const initData = async () => {
+// 获取最近的活动记录
+const getRecentActivities = async () => {
   try {
-    await Promise.all([
-      getUserCount(),
-      getTodayVisits(),
-      getDocumentCount(),
-      getRecentActivities()
-    ])
+    // 获取最近的5条登录记录
+    const response = await axios.get(`${BaseUrl}login-records/recent/5`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
     
-    // 获取用户增长数据
-    await getUserGrowthData()
+    if (Array.isArray(response.data)) {
+      recentActivities.value = response.data.map(record => {
+        // 格式化时间
+        const time = new Date(record.time)
+        const now = new Date()
+        let timeStr = ''
+        
+        // 如果是今天的记录，显示时间
+        if (time.toDateString() === now.toDateString()) {
+          timeStr = time.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+        } else {
+          // 否则显示"昨天"或日期
+          const yesterday = new Date(now)
+          yesterday.setDate(yesterday.getDate() - 1)
+          if (time.toDateString() === yesterday.toDateString()) {
+            timeStr = '昨天'
+          } else {
+            timeStr = time.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' })
+          }
+        }
+        
+        return {
+          time: timeStr,
+          content: `用户 ${record.user?.username || '未知'} 登录了系统`
+        }
+      })
+    }
   } catch (error) {
-    console.error('初始化数据失败:', error)
-    ElMessage.error('获取数据失败，请刷新页面重试')
+    console.error('获取最近活动失败:', error)
   }
 }
 
-// 组件挂载时初始化数据
-onMounted(() => {
-  initData()
-})
+// 最近活动列表
+const recentActivities = ref([
+  { time: '10:30', content: '用户 admin 登录了系统' },
+  { time: '09:45', content: '新增文档 "系统使用手册.pdf"' },
+  { time: '09:12', content: '用户 manager 更新了系统设置' },
+  { time: '昨天', content: '系统完成了数据备份' }
+])
 
-// 组件卸载时清理图表实例
-onUnmounted(() => {
-  if (userGrowthChart) {
-    userGrowthChart.dispose()
-    userGrowthChart = null
-  }
-  
-  // 移除事件监听器
-  window.removeEventListener('resize', () => {
-    userGrowthChart && userGrowthChart.resize()
-  })
+// 页面加载时获取数据
+onMounted(() => {
+  getUserCount()
+  getLoginRecords()
+  getRecentActivities()
+  getUserGrowthData()
 })
 </script>
 
@@ -439,7 +338,6 @@ onUnmounted(() => {
         <div class="card-content">
           <div class="card-value">{{ card.value }}</div>
           <div class="card-title">{{ card.title }}</div>
-          <div class="card-growth">{{ card.growth }}</div>
         </div>
         <div class="card-icon">
           <el-icon :size="40"><component :is="card.icon" /></el-icon>
@@ -455,9 +353,7 @@ onUnmounted(() => {
             <el-button text>更多</el-button>
           </div>
         </template>
-        <div v-loading="chartLoading" class="chart-container">
-          <div id="userGrowthChart" class="chart-inner"></div>
-        </div>
+        <div class="chart-container" ref="userChartRef"></div>
       </el-card>
       
       <el-card class="table-card">
@@ -468,12 +364,9 @@ onUnmounted(() => {
           </div>
         </template>
         <div class="activity-list">
-          <div class="activity-item" v-for="(activity, index) in recentActivities" :key="index">
+          <div v-for="(activity, index) in recentActivities" :key="index" class="activity-item">
             <div class="activity-time">{{ activity.time }}</div>
             <div class="activity-content">{{ activity.content }}</div>
-          </div>
-          <div v-if="recentActivities.length === 0" class="empty-activity">
-            <p>暂无活动记录</p>
           </div>
         </div>
       </el-card>
@@ -546,14 +439,6 @@ onUnmounted(() => {
   margin-bottom: 8px;
 }
 
-.card-growth {
-  font-size: 12px;
-  background-color: rgba(255, 255, 255, 0.25);
-  padding: 2px 8px;
-  border-radius: 12px;
-  display: inline-block;
-}
-
 .card-icon {
   display: flex;
   align-items: center;
@@ -592,12 +477,6 @@ onUnmounted(() => {
 .chart-container {
   height: 280px;
   width: 100%;
-  position: relative;
-}
-
-.chart-inner {
-  width: 100%;
-  height: 100%;
 }
 
 .activity-list {
@@ -622,15 +501,6 @@ onUnmounted(() => {
 
 .activity-content {
   flex: 1;
-  font-size: 14px;
-}
-
-.empty-activity {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px;
-  color: #909399;
   font-size: 14px;
 }
 
