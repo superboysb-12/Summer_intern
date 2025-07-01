@@ -13,7 +13,7 @@ public class LearningJournalAnalysis {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "question_finishing_id", nullable = false)
     private Question question;
 

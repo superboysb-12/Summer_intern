@@ -1,0 +1,17 @@
+package com.XuebaoMaster.backend.FileStorage;
+
+import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Path;
+import java.util.stream.Stream;
+
+public interface FileStorageService {
+    String storeFile(MultipartFile file);
+    
+    Resource loadFileAsResource(String fileName);
+    
+    Stream<Path> loadAll();
+    
+    void deleteFile(String fileName);
+} 
