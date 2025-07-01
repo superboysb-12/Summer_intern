@@ -3,6 +3,10 @@ import { ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const loginForm = ref({
   username: '',
@@ -28,6 +32,10 @@ const handleLogin = async () => {
   if (result) {
     ElMessage.success('登录成功')
     loading.value = false
+    
+    // 获取重定向地址或默认跳转到管理页面
+    const redirectPath = route.query.redirect || '/manage'
+    router.push(redirectPath)
   } else {
     ElMessage.error('登录失败')
     loading.value = false

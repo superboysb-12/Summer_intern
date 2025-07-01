@@ -12,22 +12,19 @@ import {
   Bell
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
+import { useRouter } from 'vue-router'
 import HomeCards from '../components/HomeCards.vue'
 
-// 菜单收起状态
+const router = useRouter()
+
 const isCollapse = ref(false)
 
-// 当前选中的菜单项
 const activeMenu = ref('home')
 
-// 用户信息
-const userInfo = ref({
-  username: 'Admin',
-  avatar: null
-})
 
 // 初始化数据
 const store = useCounterStore()
+const userInfo = ref(store.getUserInfo() || {})
 
 // 当前显示的组件
 const currentComponent = shallowRef('HomeCards')
@@ -40,7 +37,8 @@ const switchComponent = (component) => {
   }
 }
 
-// 处理菜单点击
+
+// 处理菜单点击222222
 const handleMenuSelect = (key) => {
   activeMenu.value = key
   switch(key) {
@@ -59,6 +57,13 @@ const handleMenuSelect = (key) => {
     default:
       switchComponent('HomeCards')
   }
+}
+
+// 处理登出
+const handleLogout = () => {
+  store.logout()
+  router.push('/login')
+  ElMessage.success('退出登录成功')
 }
 </script>
 
@@ -95,9 +100,7 @@ const handleMenuSelect = (key) => {
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item>个人资料</el-dropdown-item>
-              <el-dropdown-item>修改密码</el-dropdown-item>
-              <el-dropdown-item divided>退出登录</el-dropdown-item>
+              <el-dropdown-item divided @click="handleLogout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
