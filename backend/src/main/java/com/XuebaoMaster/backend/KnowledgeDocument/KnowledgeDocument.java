@@ -1,4 +1,4 @@
-package com.XuebaoMaster.backend.KnowledgeDocument;
+Gpackage com.XuebaoMaster.backend.KnowledgeDocument;
 
 import com.XuebaoMaster.backend.LessonNode.LessonNode;
 import jakarta.persistence.*;
@@ -13,7 +13,7 @@ public class KnowledgeDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "lesson_node_id", nullable = false)
     private LessonNode lessonNode;
 
