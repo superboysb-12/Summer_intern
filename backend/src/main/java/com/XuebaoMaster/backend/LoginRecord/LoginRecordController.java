@@ -25,7 +25,7 @@ public class LoginRecordController {
     public ResponseEntity<LoginRecord> createLoginRecord(@RequestBody LoginRecord loginRecord) {
         return ResponseEntity.ok(loginRecordService.createLoginRecord(loginRecord));
     }
-    
+
     /**
      * 根据用户ID创建登录记录
      * 
@@ -68,12 +68,12 @@ public class LoginRecordController {
     public ResponseEntity<List<LoginRecord>> getLoginRecordsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(loginRecordService.getLoginRecordsByUserId(userId));
     }
-    
+
     /**
      * 根据时间范围获取登录记录
      * 
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 登录记录列表
      */
     @GetMapping("/time")
@@ -82,13 +82,13 @@ public class LoginRecordController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return ResponseEntity.ok(loginRecordService.getLoginRecordsByTimeBetween(startTime, endTime));
     }
-    
+
     /**
      * 根据用户ID和时间范围获取登录记录
      * 
-     * @param userId 用户ID
+     * @param userId    用户ID
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 登录记录列表
      */
     @GetMapping("/user/{userId}/time")
@@ -110,7 +110,7 @@ public class LoginRecordController {
         loginRecordService.deleteLoginRecord(id);
         return ResponseEntity.ok().build();
     }
-    
+
     /**
      * 获取用户登录统计信息
      * 
@@ -121,12 +121,12 @@ public class LoginRecordController {
     public ResponseEntity<Map<String, Long>> getLoginStatistics(@PathVariable Long userId) {
         return ResponseEntity.ok(loginRecordService.getLoginStatistics(userId));
     }
-    
+
     /**
      * 获取时间范围内的登录统计信息
      * 
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 统计信息
      */
     @GetMapping("/statistics/time")
@@ -135,4 +135,22 @@ public class LoginRecordController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return ResponseEntity.ok(loginRecordService.getLoginStatistics(startTime, endTime));
     }
-} 
+
+    /**
+     * 获取最近的登录记录
+     * 
+     * @param count 记录数量
+     * @return 登录记录列表
+     */
+    @GetMapping("/recent/{count}")
+    public ResponseEntity<List<LoginRecord>> getRecentLoginRecords(@PathVariable int count) {
+        List<LoginRecord> allRecords = loginRecordService.getAllLoginRecords();
+        // 按时间降序排序
+        allRecords.sort((a, b) -> b.getTime().compareTo(a.getTime()));
+        // 获取前count条记录
+        List<LoginRecord> recentRecords = allRecords.stream()
+                .limit(count)
+                .toList();
+        return ResponseEntity.ok(recentRecords);
+    }
+}
