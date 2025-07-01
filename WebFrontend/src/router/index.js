@@ -5,6 +5,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const Login = () => import('../views/login.vue')
 const Register = () => import('../views/register.vue')
 const Manage = () => import('../views/manage.vue')
+const DataOverview = () => import('../components/DataOverview.vue')
 
 const routes=[
     {
@@ -25,6 +26,14 @@ const routes=[
         meta: {
             requiresAuth: true,
             title: '系统管理'
+        }
+    },
+    {
+        path:'/data-overview',
+        component:DataOverview,
+        meta: {
+            requiresAuth: true,
+            title: '数据概览'
         }
     }
 ]

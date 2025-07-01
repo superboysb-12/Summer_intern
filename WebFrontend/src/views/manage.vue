@@ -9,11 +9,18 @@ import {
   DataAnalysis, 
   Promotion,
   Tools,
-  Bell
+  Bell,
+  School,
+  Reading
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
 import HomeCards from '../components/HomeCards.vue'
+import UserManage from '../components/UserManage.vue'
+import ClassManage from '../components/ClassManage.vue'
+import CourseManage from '../components/CourseManage.vue'
+import DataOverview from '../components/DataOverview.vue'
+import DataCharts from '../components/DataCharts.vue'
 
 const router = useRouter()
 
@@ -34,11 +41,21 @@ const switchComponent = (component) => {
   currentComponent.value = component
   if (component === 'HomeCards') {
     activeMenu.value = 'home'
+  } else if (component === 'UserManage') {
+    activeMenu.value = 'users'
+  } else if (component === 'ClassManage') {
+    activeMenu.value = 'classes'
+  } else if (component === 'CourseManage') {
+    activeMenu.value = 'courses'
+  } else if (component === 'DataOverview') {
+    activeMenu.value = 'data-overview'
+  } else if (component === 'DataCharts') {
+    activeMenu.value = 'data-charts'
   }
 }
 
 
-// 处理菜单点击222222
+// 处理菜单点击
 const handleMenuSelect = (key) => {
   activeMenu.value = key
   switch(key) {
@@ -46,10 +63,19 @@ const handleMenuSelect = (key) => {
       switchComponent('HomeCards')
       break
     case 'users':
-      switchComponent('UserManagement')
+      switchComponent('UserManage')
       break
-    case 'data':
-      switchComponent('DataAnalysis')
+    case 'classes':
+      switchComponent('ClassManage')
+      break
+    case 'courses':
+      switchComponent('CourseManage')
+      break
+    case 'data-overview':
+      switchComponent('DataOverview')
+      break
+    case 'data-charts':
+      switchComponent('DataCharts')
       break
     case 'settings':
       switchComponent('Settings')
@@ -138,6 +164,16 @@ const handleLogout = () => {
             <template #title>用户管理</template>
           </el-menu-item>
           
+          <el-menu-item index="classes">
+            <el-icon><School /></el-icon>
+            <template #title>班级管理</template>
+          </el-menu-item>
+          
+          <el-menu-item index="courses">
+            <el-icon><Reading /></el-icon>
+            <template #title>课程管理</template>
+          </el-menu-item>
+          
           <el-menu-item index="documents">
             <el-icon><Document /></el-icon>
             <template #title>文档管理</template>
@@ -159,6 +195,21 @@ const handleLogout = () => {
       <el-main class="main">
         <!-- 卡片式布局组件 -->
         <home-cards v-if="currentComponent === 'HomeCards'" />
+        
+        <!-- 用户管理组件 -->
+        <user-manage v-if="currentComponent === 'UserManage'" />
+        
+        <!-- 班级管理组件 -->
+        <class-manage v-if="currentComponent === 'ClassManage'" />
+        
+        <!-- 课程管理组件 -->
+        <course-manage v-if="currentComponent === 'CourseManage'" />
+        
+        <!-- 数据概览组件 -->
+        <data-overview v-if="currentComponent === 'DataOverview'" />
+        
+        <!-- 图表分析组件 -->
+        <data-charts v-if="currentComponent === 'DataCharts'" />
         
         <!-- 其他组件可以按需添加 -->
       </el-main>
