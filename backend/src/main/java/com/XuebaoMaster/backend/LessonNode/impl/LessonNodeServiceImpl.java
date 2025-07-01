@@ -27,6 +27,7 @@ public class LessonNodeServiceImpl implements LessonNodeService {
         existingNode.setCourse(lessonNode.getCourse());
         existingNode.setNodeOrder(lessonNode.getNodeOrder());
         existingNode.setTitle(lessonNode.getTitle());
+        existingNode.setPathToNodes(lessonNode.getPathToNodes());
 
         return lessonNodeRepository.save(existingNode);
     }

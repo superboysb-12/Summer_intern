@@ -23,6 +23,9 @@ public class LessonNode {
     @Column(nullable = false, length = 100)
     private String title;
 
+    @Column(name = "path_to_nodes", length = 500)
+    private String pathToNodes;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
