@@ -1,4 +1,4 @@
-package com.XuebaoMaster.backend.StudentEmotion;
+Gpackage com.XuebaoMaster.backend.StudentEmotion;
 
 import com.XuebaoMaster.backend.User.User;
 import jakarta.persistence.*;
@@ -13,7 +13,7 @@ public class StudentEmotion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
