@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.XuebaoMaster.backend.util.JwtUtil;
+import com.XuebaoMaster.backend.LoginRecord.LoginRecordService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,9 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
+    
+    @Autowired
+    private LoginRecordService loginRecordService;
 
     /**
      * 
@@ -39,7 +43,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         User authenticatedUser = userService.login(user);
-
+        
         // JWT
         final String token = jwtUtil.generateToken(new org.springframework.security.core.userdetails.User(
                 authenticatedUser.getUsername(),

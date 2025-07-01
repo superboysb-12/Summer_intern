@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.XuebaoMaster.backend.User.User;
 import com.XuebaoMaster.backend.User.UserRepository;
 import com.XuebaoMaster.backend.User.UserService;
+import com.XuebaoMaster.backend.LoginRecord.LoginRecordService;
 
 import java.util.List;
 
@@ -17,6 +18,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private LoginRecordService loginRecordService;
 
     @Override
     public User createUser(User user) {
@@ -84,6 +88,10 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
+        
+        // 创建登录记录
+        loginRecordService.createLoginRecord(existingUser.getId());
+        
         return existingUser;
     }
 
