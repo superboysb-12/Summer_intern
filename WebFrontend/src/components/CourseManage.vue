@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const store = useCounterStore()
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
@@ -128,6 +130,11 @@ const handleDelete = (id) => {
       ElMessage.error('删除课程失败')
     }
   }).catch(() => {})
+}
+
+// 查看课程数据
+const viewCourseData = (courseId) => {
+  router.push(`/course-data/${courseId}`)
 }
 
 // 提交表单
@@ -278,10 +285,11 @@ onMounted(() => {
             {{ formatDate(scope.row.updatedAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="scope">
             <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.courseId)">删除</el-button>
+            <el-button type="success" link :icon="DataAnalysis" @click="viewCourseData(scope.row.courseId)">数据查看</el-button>
           </template>
         </el-table-column>
       </el-table>

@@ -6,6 +6,7 @@ const Login = () => import('../views/login.vue')
 const Register = () => import('../views/register.vue')
 const Manage = () => import('../views/manage.vue')
 const DataOverview = () => import('../components/DataOverview.vue')
+const DataCharts = () => import('../components/DataCharts.vue')
 
 const routes=[
     {
@@ -34,6 +35,22 @@ const routes=[
         meta: {
             requiresAuth: true,
             title: '数据概览'
+        }
+    },
+    {
+        path:'/course-data/:courseId',
+        component:DataCharts,
+        meta: {
+            requiresAuth: true,
+            title: '课程数据分析'
+        }
+    },
+    {
+        path:'/class-data/:classId',
+        component:DataCharts,
+        meta: {
+            requiresAuth: true,
+            title: '班级数据分析'
         }
     }
 ]
