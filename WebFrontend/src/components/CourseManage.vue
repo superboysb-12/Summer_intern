@@ -134,7 +134,7 @@ const handleDelete = (id) => {
 
 // 查看课程数据
 const viewCourseData = (courseId) => {
-  router.push(`/course-data/${courseId}`)
+  router.push(`/course-manage-data/${courseId}`)
 }
 
 // 提交表单

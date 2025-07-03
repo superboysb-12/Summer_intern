@@ -25,19 +25,24 @@ public class StudyDurationController {
     public ResponseEntity<StudyDuration> createStudyDuration(@RequestBody StudyDuration studyDuration) {
         return ResponseEntity.ok(studyDurationService.createStudyDuration(studyDuration));
     }
-    
+
     /**
      * 创建学习时长记录（简化版）
      * 
      * @param lessonStartTimeStamp 课程开始时间戳
-     * @param length 学习时长（分钟）
+     * @param length               学习时长（分钟）
+     * @param userId               用户ID
+     * @param courseId             课程ID
      * @return 创建的学习时长记录
      */
     @PostMapping("/simple")
     public ResponseEntity<StudyDuration> createSimpleStudyDuration(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime lessonStartTimeStamp,
-            @RequestParam Integer length) {
-        return ResponseEntity.ok(studyDurationService.createStudyDuration(lessonStartTimeStamp, length));
+            @RequestParam Integer length,
+            @RequestParam Long userId,
+            @RequestParam Long courseId) {
+        return ResponseEntity
+                .ok(studyDurationService.createStudyDuration(lessonStartTimeStamp, length, userId, courseId));
     }
 
     /**
@@ -62,10 +67,57 @@ public class StudyDurationController {
     }
 
     /**
+     * 根据用户ID获取学习时长记录
+     * 
+     * @param userId 用户ID
+     * @return 学习时长记录列表
+     */
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<StudyDuration>> getStudyDurationsByUserId(@PathVariable Long userId) {
+        return ResponseEntity.ok(studyDurationService.getStudyDurationsByUserId(userId));
+    }
+
+    /**
+     * 根据课程ID获取学习时长记录
+     * 
+     * @param courseId 课程ID
+     * @return 学习时长记录列表
+     */
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<List<StudyDuration>> getStudyDurationsByCourseId(@PathVariable Long courseId) {
+        return ResponseEntity.ok(studyDurationService.getStudyDurationsByCourseId(courseId));
+    }
+
+    /**
+     * 根据班级ID获取学习时长记录
+     * 
+     * @param classId 班级ID
+     * @return 学习时长记录列表
+     */
+    @GetMapping("/class/{classId}")
+    public ResponseEntity<List<StudyDuration>> getStudyDurationsByClassId(@PathVariable Long classId) {
+        return ResponseEntity.ok(studyDurationService.getStudyDurationsByClassId(classId));
+    }
+
+    /**
+     * 根据班级ID和课程ID获取学习时长记录
+     * 
+     * @param classId  班级ID
+     * @param courseId 课程ID
+     * @return 学习时长记录列表
+     */
+    @GetMapping("/class/{classId}/course/{courseId}")
+    public ResponseEntity<List<StudyDuration>> getStudyDurationsByClassIdAndCourseId(
+            @PathVariable Long classId,
+            @PathVariable Long courseId) {
+        return ResponseEntity.ok(studyDurationService.getStudyDurationsByClassIdAndCourseId(classId, courseId));
+    }
+
+    /**
      * 根据当前时间戳范围获取学习时长记录
      * 
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 学习时长记录列表
      */
     @GetMapping("/current-time")
@@ -74,21 +126,22 @@ public class StudyDurationController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return ResponseEntity.ok(studyDurationService.getStudyDurationsByCurrentTimeStampBetween(startTime, endTime));
     }
-    
+
     /**
      * 根据课程开始时间戳范围获取学习时长记录
      * 
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 学习时长记录列表
      */
     @GetMapping("/lesson-start-time")
     public ResponseEntity<List<StudyDuration>> getStudyDurationsByLessonStartTimeStampBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
-        return ResponseEntity.ok(studyDurationService.getStudyDurationsByLessonStartTimeStampBetween(startTime, endTime));
+        return ResponseEntity
+                .ok(studyDurationService.getStudyDurationsByLessonStartTimeStampBetween(startTime, endTime));
     }
-    
+
     /**
      * 获取大于等于指定时长的学习记录
      * 
@@ -96,10 +149,11 @@ public class StudyDurationController {
      * @return 学习时长记录列表
      */
     @GetMapping("/min-length/{minLength}")
-    public ResponseEntity<List<StudyDuration>> getStudyDurationsByLengthGreaterThanEqual(@PathVariable Integer minLength) {
+    public ResponseEntity<List<StudyDuration>> getStudyDurationsByLengthGreaterThanEqual(
+            @PathVariable Integer minLength) {
         return ResponseEntity.ok(studyDurationService.getStudyDurationsByLengthGreaterThanEqual(minLength));
     }
-    
+
     /**
      * 获取小于等于指定时长的学习记录
      * 
@@ -110,7 +164,7 @@ public class StudyDurationController {
     public ResponseEntity<List<StudyDuration>> getStudyDurationsByLengthLessThanEqual(@PathVariable Integer maxLength) {
         return ResponseEntity.ok(studyDurationService.getStudyDurationsByLengthLessThanEqual(maxLength));
     }
-    
+
     /**
      * 获取指定时长范围内的学习记录
      * 
@@ -128,12 +182,13 @@ public class StudyDurationController {
     /**
      * 更新学习时长记录
      * 
-     * @param id 学习时长记录ID
+     * @param id            学习时长记录ID
      * @param studyDuration 学习时长信息
      * @return 更新后的学习时长记录
      */
     @PutMapping("/{id}")
-    public ResponseEntity<StudyDuration> updateStudyDuration(@PathVariable Long id, @RequestBody StudyDuration studyDuration) {
+    public ResponseEntity<StudyDuration> updateStudyDuration(@PathVariable Long id,
+            @RequestBody StudyDuration studyDuration) {
         studyDuration.setId(id);
         return ResponseEntity.ok(studyDurationService.updateStudyDuration(studyDuration));
     }
@@ -149,7 +204,7 @@ public class StudyDurationController {
         studyDurationService.deleteStudyDuration(id);
         return ResponseEntity.ok().build();
     }
-    
+
     /**
      * 获取学习统计信息
      * 
@@ -159,12 +214,12 @@ public class StudyDurationController {
     public ResponseEntity<Map<String, Object>> getStudyStatistics() {
         return ResponseEntity.ok(studyDurationService.getStudyStatistics());
     }
-    
+
     /**
      * 获取指定时间范围内的学习统计信息
      * 
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 统计信息
      */
     @GetMapping("/statistics/time-range")
@@ -173,6 +228,7 @@ public class StudyDurationController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
         return ResponseEntity.ok(studyDurationService.getStudyStatisticsBetween(startTime, endTime));
     }
+<<<<<<< HEAD
     
     /**
      * 根据用户ID获取学习时长记录
@@ -222,11 +278,17 @@ public class StudyDurationController {
     
     /**
      * 获取特定用户的学习统计信息
+=======
+
+    /**
+     * 获取指定用户的学习统计信息
+>>>>>>> 2fc5eadc03377134f52c7bfb671dfcce6baa7fe0
      * 
      * @param userId 用户ID
      * @return 统计信息
      */
     @GetMapping("/statistics/user/{userId}")
+<<<<<<< HEAD
     public ResponseEntity<Map<String, Object>> getStudyStatisticsByUserId(@PathVariable Long userId) {
         return ResponseEntity.ok(studyDurationService.getStudyStatisticsByUserId(userId));
     }
@@ -242,3 +304,45 @@ public class StudyDurationController {
         return ResponseEntity.ok(studyDurationService.getStudyStatisticsByCourseName(courseName));
     }
 } 
+=======
+    public ResponseEntity<Map<String, Object>> getUserStudyStatistics(@PathVariable Long userId) {
+        return ResponseEntity.ok(studyDurationService.getUserStudyStatistics(userId));
+    }
+
+    /**
+     * 获取指定课程的学习统计信息
+     * 
+     * @param courseId 课程ID
+     * @return 统计信息
+     */
+    @GetMapping("/statistics/course/{courseId}")
+    public ResponseEntity<Map<String, Object>> getCourseStudyStatistics(@PathVariable Long courseId) {
+        return ResponseEntity.ok(studyDurationService.getCourseStudyStatistics(courseId));
+    }
+
+    /**
+     * 获取指定班级的学习统计信息
+     * 
+     * @param classId 班级ID
+     * @return 统计信息
+     */
+    @GetMapping("/statistics/class/{classId}")
+    public ResponseEntity<Map<String, Object>> getClassStudyStatistics(@PathVariable Long classId) {
+        return ResponseEntity.ok(studyDurationService.getClassStudyStatistics(classId));
+    }
+
+    /**
+     * 获取指定班级和课程的学习统计信息
+     * 
+     * @param classId  班级ID
+     * @param courseId 课程ID
+     * @return 统计信息
+     */
+    @GetMapping("/statistics/class/{classId}/course/{courseId}")
+    public ResponseEntity<Map<String, Object>> getClassCourseStudyStatistics(
+            @PathVariable Long classId,
+            @PathVariable Long courseId) {
+        return ResponseEntity.ok(studyDurationService.getClassCourseStudyStatistics(classId, courseId));
+    }
+}
+>>>>>>> 2fc5eadc03377134f52c7bfb671dfcce6baa7fe0

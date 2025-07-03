@@ -1,12 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-
-
 const Login = () => import('../views/login.vue')
 const Register = () => import('../views/register.vue')
 const Manage = () => import('../views/manage.vue')
 const DataOverview = () => import('../components/DataOverview.vue')
 const DataCharts = () => import('../components/DataCharts.vue')
+const UserDataChart = () => import('../components/UserDataChart.vue')
+const UserManageDataChart = () => import('../components/UserManageDataChart.vue')
+const CourseManageDataChart = () => import('../components/CourseManageDataChart.vue')
+const ClassManageDataChart = () => import('../components/ClassManageDataChart.vue')
+
+// 管理页面子组件
+const HomeCards = () => import('../components/HomeCards.vue')
+const UserManage = () => import('../components/UserManage.vue')
+const ClassManage = () => import('../components/ClassManage.vue')
+const CourseManage = () => import('../components/CourseManage.vue')
 
 const routes=[
     {
@@ -27,7 +35,34 @@ const routes=[
         meta: {
             requiresAuth: true,
             title: '系统管理'
-        }
+        },
+        children: [
+            {
+                path: '',
+                component: HomeCards,
+                meta: { title: '系统管理 - 首页' }
+            },
+            {
+                path: 'users',
+                component: UserManage,
+                meta: { title: '系统管理 - 用户管理' }
+            },
+            {
+                path: 'classes',
+                component: ClassManage,
+                meta: { title: '系统管理 - 班级管理' }
+            },
+            {
+                path: 'courses',
+                component: CourseManage,
+                meta: { title: '系统管理 - 课程管理' }
+            },
+            {
+                path: 'data',
+                component: DataOverview,
+                meta: { title: '系统管理 - 数据概览' }
+            }
+        ]
     },
     {
         path:'/data-overview',
@@ -47,10 +82,42 @@ const routes=[
     },
     {
         path:'/class-data/:classId',
-        component:DataCharts,
+        component:ClassManageDataChart,
         meta: {
             requiresAuth: true,
             title: '班级数据分析'
+        }
+    },
+    {
+        path:'/user-data/:id',
+        component:UserDataChart,
+        meta: {
+            requiresAuth: true,
+            title: '用户数据分析'
+        }
+    },
+    {
+        path:'/user-analytics/:userId',
+        component:UserDataChart,
+        meta: {
+            requiresAuth: true,
+            title: '用户学习分析'
+        }
+    },
+    {
+        path:'/user-manage-data/:userId',
+        component:UserManageDataChart,
+        meta: {
+            requiresAuth: true,
+            title: '用户管理数据分析'
+        }
+    },
+    {
+        path:'/course-manage-data/:courseId',
+        component:CourseManageDataChart,
+        meta: {
+            requiresAuth: true,
+            title: '课程管理数据分析'
         }
     }
 ]

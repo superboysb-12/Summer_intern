@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/student-emotions")
+@RequestMapping("/student-emotions")
 public class StudentEmotionController {
 
     @Autowired
@@ -29,12 +29,12 @@ public class StudentEmotionController {
         try {
             Long userId = Long.valueOf(request.get("userId").toString());
             Integer mark = Integer.valueOf(request.get("mark").toString());
-            
+
             // 验证情绪评分在0-100范围内
             if (mark < 0 || mark > 100) {
                 return ResponseEntity.badRequest().build();
             }
-            
+
             StudentEmotion createdEmotion = studentEmotionService.createStudentEmotion(userId, mark);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdEmotion);
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class StudentEmotionController {
     /**
      * 更新学生情感记录
      * 
-     * @param id 学生情感记录ID
+     * @param id             学生情感记录ID
      * @param studentEmotion 学生情感信息
      * @return 更新后的学生情感记录
      */
@@ -93,7 +93,7 @@ public class StudentEmotionController {
             return ResponseEntity.notFound().build();
         }
     }
-    
+
     /**
      * 根据用户ID获取学生情感记录
      * 
@@ -109,13 +109,13 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 根据用户ID和时间范围获取学生情感记录
      * 
-     * @param userId 用户ID
+     * @param userId    用户ID
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 学生情感记录列表
      */
     @GetMapping("/user/{userId}/period")
@@ -131,7 +131,7 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取大于等于指定评分的情感记录
      * 
@@ -139,7 +139,8 @@ public class StudentEmotionController {
      * @return 学生情感记录列表
      */
     @GetMapping("/mark/min/{minMark}")
-    public ResponseEntity<List<StudentEmotion>> getStudentEmotionsByMarkGreaterThanEqual(@PathVariable Integer minMark) {
+    public ResponseEntity<List<StudentEmotion>> getStudentEmotionsByMarkGreaterThanEqual(
+            @PathVariable Integer minMark) {
         try {
             List<StudentEmotion> emotions = studentEmotionService.getStudentEmotionsByMarkGreaterThanEqual(minMark);
             return ResponseEntity.ok(emotions);
@@ -147,7 +148,7 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取小于等于指定评分的情感记录
      * 
@@ -163,7 +164,7 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取指定评分范围内的情感记录
      * 
@@ -197,7 +198,7 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取用户情感统计信息
      * 
@@ -213,13 +214,13 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取指定用户和时间范围内的情感统计信息
      * 
-     * @param userId 用户ID
+     * @param userId    用户ID
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 情感统计信息
      */
     @GetMapping("/statistics/user/{userId}/period")
@@ -235,7 +236,7 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     /**
      * 获取整体情感统计信息
      * 
@@ -250,4 +251,4 @@ public class StudentEmotionController {
             return ResponseEntity.badRequest().build();
         }
     }
-} 
+}

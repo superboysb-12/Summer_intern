@@ -1,5 +1,5 @@
 <script setup>
-import { ref, shallowRef } from 'vue'
+import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
   HomeFilled, 
@@ -14,68 +14,54 @@ import {
   Reading
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
-import { useRouter } from 'vue-router'
-import HomeCards from '../components/HomeCards.vue'
-import UserManage from '../components/UserManage.vue'
-import ClassManage from '../components/ClassManage.vue'
-import CourseManage from '../components/CourseManage.vue'
-import DataOverview from '../components/DataOverview.vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
 const isCollapse = ref(false)
 
-const activeMenu = ref('home')
+// 根据当前路径设置激活的菜单项
+const getActiveMenu = () => {
+  const path = route.path
+  if (path.includes('/manage/users')) return 'users'
+  if (path.includes('/manage/classes')) return 'classes'
+  if (path.includes('/manage/courses')) return 'courses'
+  if (path.includes('/manage/data')) return 'data-overview'
+  if (path.includes('/manage/settings')) return 'settings'
+  return 'home'
+}
 
+const activeMenu = ref(getActiveMenu())
 
 // 初始化数据
 const store = useCounterStore()
 const userInfo = ref(store.getUserInfo() || {})
-
-// 当前显示的组件
-const currentComponent = shallowRef('HomeCards')
-
-// 切换组件
-const switchComponent = (component) => {
-  currentComponent.value = component
-  if (component === 'HomeCards') {
-    activeMenu.value = 'home'
-  } else if (component === 'UserManage') {
-    activeMenu.value = 'users'
-  } else if (component === 'ClassManage') {
-    activeMenu.value = 'classes'
-  } else if (component === 'CourseManage') {
-    activeMenu.value = 'courses'
-  } else if (component === 'DataOverview') {
-    activeMenu.value = 'data-overview'
-  }
-}
-
 
 // 处理菜单点击
 const handleMenuSelect = (key) => {
   activeMenu.value = key
   switch(key) {
     case 'home':
-      switchComponent('HomeCards')
+      router.push('/manage')
       break
     case 'users':
-      switchComponent('UserManage')
+      router.push('/manage/users')
       break
     case 'classes':
-      switchComponent('ClassManage')
+      router.push('/manage/classes')
       break
     case 'courses':
-      switchComponent('CourseManage')
+      router.push('/manage/courses')
       break
     case 'data-overview':
-      switchComponent('DataOverview')
+      router.push('/manage/data')
       break
     case 'settings':
-      switchComponent('Settings')
+      router.push('/manage/settings')
       break
     default:
-      switchComponent('HomeCards')
+      router.push('/manage')
   }
 }
 
@@ -85,6 +71,11 @@ const handleLogout = () => {
   router.push('/login')
   ElMessage.success('退出登录成功')
 }
+
+// 在路由变化时更新激活的菜单项
+onMounted(() => {
+  activeMenu.value = getActiveMenu()
+})
 </script>
 
 <template>
@@ -115,7 +106,7 @@ const handleLogout = () => {
             <el-avatar 
               size="small" 
               v-else
-            >{{ userInfo.username.substring(0, 1) }}</el-avatar>
+            >{{ userInfo.username?.substring(0, 1) }}</el-avatar>
             <span class="username">{{ userInfo.username }}</span>
           </div>
           <template #dropdown>
@@ -186,22 +177,7 @@ const handleLogout = () => {
       
       <!-- 右侧内容区 -->
       <el-main class="main">
-        <!-- 卡片式布局组件 -->
-        <home-cards v-if="currentComponent === 'HomeCards'" />
-        
-        <!-- 用户管理组件 -->
-        <user-manage v-if="currentComponent === 'UserManage'" />
-        
-        <!-- 班级管理组件 -->
-        <class-manage v-if="currentComponent === 'ClassManage'" />
-        
-        <!-- 课程管理组件 -->
-        <course-manage v-if="currentComponent === 'CourseManage'" />
-        
-        <!-- 数据概览组件 -->
-        <data-overview v-if="currentComponent === 'DataOverview'" />
-        
-        <!-- 其他组件可以按需添加 -->
+        <router-view></router-view>
       </el-main>
     </div>
   </div>

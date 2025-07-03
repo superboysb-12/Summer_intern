@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const store = useCounterStore()
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
@@ -204,6 +206,13 @@ const handleDelete = (id) => {
   }).catch(() => {})
 }
 
+// 查看用户数据
+const viewUserData = (userId) => {
+  router.push(`/user-manage-data/${userId}`)
+}
+
+
+
 // 提交表单
 const submitForm = async (formEl) => {
   if (!formEl) return
@@ -365,10 +374,11 @@ onMounted(() => {
         <el-table-column prop="phone" label="手机号" min-width="120" show-overflow-tooltip />
         <el-table-column prop="schoolClass.className" label="班级" min-width="120" show-overflow-tooltip />
         <el-table-column prop="createdAt" label="创建时间" min-width="180" show-overflow-tooltip />
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="260" fixed="right">
           <template #default="scope">
             <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
+            <el-button type="success" link :icon="DataAnalysis" @click="viewUserData(scope.row.id)">数据查看</el-button>
           </template>
         </el-table-column>
       </el-table>
