@@ -40,27 +40,6 @@ public interface StudyDurationService {
     Map<String, Object> getStudyStatistics();
 
     Map<String, Object> getStudyStatisticsBetween(LocalDateTime startTime, LocalDateTime endTime);
-<<<<<<< HEAD
-    
-    // 按用户ID查询
-    List<StudyDuration> getStudyDurationsByUserId(Long userId);
-    
-    // 按用户名查询
-    List<StudyDuration> getStudyDurationsByUserName(String userName);
-    
-    // 按课程名查询
-    List<StudyDuration> getStudyDurationsByCourseName(String courseName);
-    
-    // 按用户ID和课程名查询
-    List<StudyDuration> getStudyDurationsByUserIdAndCourseName(Long userId, String courseName);
-    
-    // 获取特定用户的学习统计
-    Map<String, Object> getStudyStatisticsByUserId(Long userId);
-    
-    // 获取特定课程的学习统计
-    Map<String, Object> getStudyStatisticsByCourseName(String courseName);
-} 
-=======
 
     Map<String, Object> getUserStudyStatistics(Long userId);
 
@@ -70,4 +49,3 @@ public interface StudyDurationService {
 
     Map<String, Object> getClassCourseStudyStatistics(Long classId, Long courseId);
 }
->>>>>>> 2fc5eadc03377134f52c7bfb671dfcce6baa7fe0

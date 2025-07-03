@@ -61,8 +61,6 @@ public class StudyDurationServiceImpl implements StudyDurationService {
         existingDuration.setCurrentTimeStamp(studyDuration.getCurrentTimeStamp());
         existingDuration.setLessonStartTimeStamp(studyDuration.getLessonStartTimeStamp());
         existingDuration.setLength(studyDuration.getLength());
-        existingDuration.setUser(studyDuration.getUser());
-        existingDuration.setCourse(studyDuration.getCourse());
 
         if (studyDuration.getUser() != null) {
             existingDuration.setUser(studyDuration.getUser());
@@ -172,73 +170,6 @@ public class StudyDurationServiceImpl implements StudyDurationService {
 
         return statistics;
     }
-<<<<<<< HEAD
-    
-    @Override
-    public List<StudyDuration> getStudyDurationsByUserId(Long userId) {
-        return studyDurationRepository.findByUserId(userId);
-    }
-    
-    @Override
-    public List<StudyDuration> getStudyDurationsByUserName(String userName) {
-        return studyDurationRepository.findByUserName(userName);
-    }
-    
-    @Override
-    public List<StudyDuration> getStudyDurationsByCourseName(String courseName) {
-        return studyDurationRepository.findByCourseName(courseName);
-    }
-    
-    @Override
-    public List<StudyDuration> getStudyDurationsByUserIdAndCourseName(Long userId, String courseName) {
-        return studyDurationRepository.findByUserIdAndCourseName(userId, courseName);
-    }
-    
-    @Override
-    public Map<String, Object> getStudyStatisticsByUserId(Long userId) {
-        Map<String, Object> statistics = new HashMap<>();
-        
-        Integer totalDuration = studyDurationRepository.getTotalStudyDurationByUserId(userId);
-        List<StudyDuration> durations = studyDurationRepository.findByUserId(userId);
-        
-        statistics.put("userId", userId);
-        statistics.put("totalDuration", totalDuration != null ? totalDuration : 0);
-        statistics.put("recordCount", durations.size());
-        
-        // 计算平均时长
-        if (!durations.isEmpty()) {
-            double sum = durations.stream().mapToInt(StudyDuration::getLength).sum();
-            statistics.put("averageDuration", sum / durations.size());
-        } else {
-            statistics.put("averageDuration", 0.0);
-        }
-        
-        return statistics;
-    }
-    
-    @Override
-    public Map<String, Object> getStudyStatisticsByCourseName(String courseName) {
-        Map<String, Object> statistics = new HashMap<>();
-        
-        Integer totalDuration = studyDurationRepository.getTotalStudyDurationByCourseName(courseName);
-        List<StudyDuration> durations = studyDurationRepository.findByCourseName(courseName);
-        
-        statistics.put("courseName", courseName);
-        statistics.put("totalDuration", totalDuration != null ? totalDuration : 0);
-        statistics.put("recordCount", durations.size());
-        
-        // 计算平均时长
-        if (!durations.isEmpty()) {
-            double sum = durations.stream().mapToInt(StudyDuration::getLength).sum();
-            statistics.put("averageDuration", sum / durations.size());
-        } else {
-            statistics.put("averageDuration", 0.0);
-        }
-        
-        return statistics;
-    }
-} 
-=======
 
     @Override
     public Map<String, Object> getUserStudyStatistics(Long userId) {
@@ -309,4 +240,3 @@ public class StudyDurationServiceImpl implements StudyDurationService {
         return statistics;
     }
 }
->>>>>>> 2fc5eadc03377134f52c7bfb671dfcce6baa7fe0
