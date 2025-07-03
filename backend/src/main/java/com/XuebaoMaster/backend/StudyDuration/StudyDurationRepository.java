@@ -28,4 +28,27 @@ public interface StudyDurationRepository extends JpaRepository<StudyDuration, Lo
     
     @Query("SELECT AVG(s.length) FROM StudyDuration s")
     Double getAverageStudyDuration();
+    
+    // 按用户ID查询
+    List<StudyDuration> findByUserId(Long userId);
+    
+    // 按用户名查询
+    @Query("SELECT s FROM StudyDuration s WHERE s.user.name = :userName")
+    List<StudyDuration> findByUserName(@Param("userName") String userName);
+    
+    // 按课程名查询
+    @Query("SELECT s FROM StudyDuration s WHERE s.course.name = :courseName")
+    List<StudyDuration> findByCourseName(@Param("courseName") String courseName);
+    
+    // 按用户ID和课程名查询
+    @Query("SELECT s FROM StudyDuration s WHERE s.user.id = :userId AND s.course.name = :courseName")
+    List<StudyDuration> findByUserIdAndCourseName(@Param("userId") Long userId, @Param("courseName") String courseName);
+    
+    // 获取特定用户的总学习时长
+    @Query("SELECT SUM(s.length) FROM StudyDuration s WHERE s.user.id = :userId")
+    Integer getTotalStudyDurationByUserId(@Param("userId") Long userId);
+    
+    // 获取特定课程的总学习时长
+    @Query("SELECT SUM(s.length) FROM StudyDuration s WHERE s.course.name = :courseName")
+    Integer getTotalStudyDurationByCourseName(@Param("courseName") String courseName);
 } 
