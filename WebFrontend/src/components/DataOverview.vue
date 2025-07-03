@@ -18,8 +18,6 @@ const totalCourses = ref('--')
 const totalClasses = ref('--')
 const completionRate = ref('--')
 const averageScore = ref('--')
-const courseGrowth = ref('+5%')
-const classGrowth = ref('+8%')
 
 // 卡片数据
 const cards = ref([
@@ -27,29 +25,25 @@ const cards = ref([
     title: '课程总数', 
     value: totalCourses,
     icon: Reading, 
-    color: 'linear-gradient(135deg, #c084fc 0%, #a855f7 100%)',
-    growth: courseGrowth
+    color: 'linear-gradient(135deg, #c084fc 0%, #a855f7 100%)'
   },
   { 
     title: '班级总数', 
     value: totalClasses,
     icon: DataAnalysis, 
-    color: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)',
-    growth: classGrowth
+    color: 'linear-gradient(135deg, #f472b6 0%, #ec4899 100%)'
   },
   { 
     title: '课程完成率', 
     value: completionRate,
     icon: PieChart, 
-    color: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)',
-    growth: '+3%'
+    color: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)'
   },
   { 
     title: '平均成绩', 
     value: averageScore,
     icon: Histogram, 
-    color: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
-    growth: '+2%'
+    color: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)'
   }
 ])
 
@@ -61,20 +55,40 @@ const chartLoading = ref(true)
 // 获取课程总数
 const getCourseCount = async () => {
   try {
-    // 模拟数据，实际应从API获取
-    totalCourses.value = '42'
+    const response = await axios.get(`${BaseUrl}courses`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (Array.isArray(response.data)) {
+      totalCourses.value = response.data.length.toString()
+    } else {
+      totalCourses.value = '0'
+    }
   } catch (error) {
     console.error('获取课程总数失败:', error)
+    totalCourses.value = '0'
   }
 }
 
 // 获取班级总数
 const getClassCount = async () => {
   try {
-    // 模拟数据，实际应从API获取
-    totalClasses.value = '18'
+    const response = await axios.get(`${BaseUrl}classes`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (Array.isArray(response.data)) {
+      totalClasses.value = response.data.length.toString()
+    } else {
+      totalClasses.value = '0'
+    }
   } catch (error) {
     console.error('获取班级总数失败:', error)
+    totalClasses.value = '0'
   }
 }
 
@@ -339,7 +353,6 @@ onUnmounted(() => {
         <div class="card-content">
           <div class="card-value">{{ card.value }}</div>
           <div class="card-title">{{ card.title }}</div>
-          <div class="card-growth">{{ card.growth }}</div>
         </div>
         <div class="card-icon">
           <el-icon :size="40"><component :is="card.icon" /></el-icon>
@@ -480,14 +493,6 @@ onUnmounted(() => {
   font-size: 14px;
   opacity: 0.9;
   margin-bottom: 8px;
-}
-
-.card-growth {
-  font-size: 12px;
-  background-color: rgba(255, 255, 255, 0.25);
-  padding: 2px 8px;
-  border-radius: 12px;
-  display: inline-block;
 }
 
 .card-icon {
