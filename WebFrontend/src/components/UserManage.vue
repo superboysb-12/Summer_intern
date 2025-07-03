@@ -34,7 +34,8 @@ const userForm = reactive({
   phone: '',
   studentNumber: '',
   userRole: 'STUDENT',
-  schoolClass: null
+  schoolClass: null,
+  schoolClassId: null
 })
 
 // 班级列表
@@ -158,22 +159,20 @@ const handleEdit = (row) => {
   
   // 填充表单数据
   Object.keys(userForm).forEach(key => {
-    if (key in row) {
+    if (key in row && key !== 'schoolClass' && key !== 'schoolClassId') {
       userForm[key] = row[key]
     }
   })
   
   // 特殊处理班级ID
   if (row.schoolClass) {
-    // 如果班级数据是完整对象，直接使用
+    // 如果班级数据是完整对象，设置ID
     if (typeof row.schoolClass === 'object' && row.schoolClass !== null) {
-      userForm.schoolClass = row.schoolClass
+      userForm.schoolClassId = row.schoolClass.id
     } 
-    // 如果只有ID，需要从班级列表中找到完整对象
+    // 如果只有ID，直接使用
     else if (typeof row.schoolClass === 'number' || typeof row.schoolClass === 'string') {
-      const classId = Number(row.schoolClass)
-      const foundClass = classList.value.find(c => c.id === classId)
-      userForm.schoolClass = foundClass || null
+      userForm.schoolClassId = Number(row.schoolClass)
     }
   }
   
@@ -221,19 +220,14 @@ const submitForm = async (formEl) => {
         }
         
         // 处理班级数据，确保传递正确的格式
-        if (data.schoolClass) {
-          // 如果班级是对象，只传递ID
-          if (typeof data.schoolClass === 'object' && data.schoolClass !== null) {
-            data.schoolClass = { id: data.schoolClass.id }
-          }
-          // 如果班级是ID，转换为对象
-          else if (typeof data.schoolClass === 'number' || typeof data.schoolClass === 'string') {
-            data.schoolClass = { id: Number(data.schoolClass) }
-          }
+        if (data.schoolClassId) {
+          data.schoolClass = { id: data.schoolClassId }
         } else {
-          // 如果没有选择班级，设置为null
           data.schoolClass = null
         }
+        
+        // 删除辅助字段
+        delete data.schoolClassId
         
         if (formMode.value === 'add') {
           await axios.post(BaseUrl + 'users/register', data, {
@@ -272,8 +266,9 @@ const resetForm = () => {
     }
   })
   
-  // 确保schoolClass为null
+  // 确保schoolClass和schoolClassId为null
   userForm.schoolClass = null
+  userForm.schoolClassId = null
   
   // 如果表单引用存在，重置校验状态
   if (userFormRef.value) {
@@ -435,7 +430,7 @@ onMounted(() => {
         </el-form-item>
         <el-form-item label="班级" prop="schoolClass">
           <el-select
-            v-model="userForm.schoolClass"
+            v-model="userForm.schoolClassId"
             placeholder="请选择班级"
             filterable
             clearable
@@ -444,7 +439,7 @@ onMounted(() => {
               v-for="item in classList"
               :key="item.id"
               :label="item.className"
-              :value="item"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>

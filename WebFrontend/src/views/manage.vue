@@ -20,7 +20,6 @@ import UserManage from '../components/UserManage.vue'
 import ClassManage from '../components/ClassManage.vue'
 import CourseManage from '../components/CourseManage.vue'
 import DataOverview from '../components/DataOverview.vue'
-import DataCharts from '../components/DataCharts.vue'
 
 const router = useRouter()
 
@@ -49,8 +48,6 @@ const switchComponent = (component) => {
     activeMenu.value = 'courses'
   } else if (component === 'DataOverview') {
     activeMenu.value = 'data-overview'
-  } else if (component === 'DataCharts') {
-    activeMenu.value = 'data-charts'
   }
 }
 
@@ -73,9 +70,6 @@ const handleMenuSelect = (key) => {
       break
     case 'data-overview':
       switchComponent('DataOverview')
-      break
-    case 'data-charts':
-      switchComponent('DataCharts')
       break
     case 'settings':
       switchComponent('Settings')
@@ -156,7 +150,6 @@ const handleLogout = () => {
               <span>数据分析</span>
             </template>
             <el-menu-item index="data-overview">数据概览</el-menu-item>
-            <el-menu-item index="data-charts">图表分析</el-menu-item>
           </el-sub-menu>
           
           <el-menu-item index="users">
@@ -207,9 +200,6 @@ const handleLogout = () => {
         
         <!-- 数据概览组件 -->
         <data-overview v-if="currentComponent === 'DataOverview'" />
-        
-        <!-- 图表分析组件 -->
-        <data-charts v-if="currentComponent === 'DataCharts'" />
         
         <!-- 其他组件可以按需添加 -->
       </el-main>

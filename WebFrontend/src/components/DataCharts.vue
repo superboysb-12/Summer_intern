@@ -1,8 +1,17 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { ElMessage, ElDatePicker } from 'element-plus'
+import { ArrowLeft } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import axios from 'axios'
+import { useRoute, useRouter } from 'vue-router'
+
+const route = useRoute()
+const router = useRouter()
+const courseId = ref(route.params.courseId)
+const classId = ref(route.params.classId)
+const dataType = computed(() => courseId.value ? 'course' : 'class')
+const itemName = ref('')
 
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
@@ -21,6 +30,36 @@ const dateRange = ref([
   new Date(new Date().setMonth(new Date().getMonth() - 1)),
   new Date()
 ])
+
+// 获取数据项信息
+const getItemInfo = async () => {
+  try {
+    if (dataType.value === 'course') {
+      const response = await axios.get(`${BaseUrl}courses/${courseId.value}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      })
+      
+      if (response.data) {
+        itemName.value = response.data.name || '未知课程'
+      }
+    } else {
+      const response = await axios.get(`${BaseUrl}classes/${classId.value}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      })
+      
+      if (response.data) {
+        itemName.value = response.data.className || '未知班级'
+      }
+    }
+  } catch (error) {
+    console.error('获取信息失败:', error)
+    ElMessage.error(`获取${dataType.value === 'course' ? '课程' : '班级'}信息失败`)
+  }
+}
 
 // 获取用户活跃度数据
 const getUserActivityData = async () => {
@@ -425,9 +464,15 @@ const handleDateRangeChange = () => {
   getUserActivityData()
 }
 
+// 返回管理页面
+const goBack = () => {
+  router.push('/manage')
+}
+
 // 初始化数据
 const initData = async () => {
   try {
+    await getItemInfo()
     await Promise.all([
       getUserActivityData(),
       getScoreComparisonData(),
@@ -479,9 +524,19 @@ onUnmounted(() => {
 
 <template>
   <div class="data-charts-container">
+    <!-- 面包屑导航 -->
+    <div class="breadcrumb-container">
+      <el-breadcrumb separator="/">
+        <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/manage' }">{{ dataType === 'course' ? '课程管理' : '班级管理' }}</el-breadcrumb-item>
+        <el-breadcrumb-item>{{ itemName }} - 数据分析</el-breadcrumb-item>
+      </el-breadcrumb>
+      <el-button @click="goBack" type="primary" plain :icon="ArrowLeft" size="small">返回{{ dataType === 'course' ? '课程' : '班级' }}列表</el-button>
+    </div>
+    
     <div class="page-header">
-      <h2>图表分析</h2>
-      <p>详细的数据图表分析</p>
+      <h2>{{ itemName }} - 图表分析</h2>
+      <p>详细的{{ dataType === 'course' ? '课程' : '班级' }}数据图表分析</p>
     </div>
     
     <div class="filter-bar">
@@ -527,7 +582,7 @@ onUnmounted(() => {
       <el-card class="chart-card">
         <template #header>
           <div class="card-header">
-            <span>课程完成进度</span>
+            <span>{{ dataType === 'course' ? '课程' : '学习' }}完成进度</span>
             <el-button text>导出</el-button>
           </div>
         </template>
@@ -554,7 +609,18 @@ onUnmounted(() => {
 <style scoped>
 /* 图表分析页面样式 */
 .data-charts-container {
-  padding: 20px 0;
+  padding: 20px;
+}
+
+.breadcrumb-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .page-header {

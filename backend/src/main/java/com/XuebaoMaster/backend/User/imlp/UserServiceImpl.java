@@ -50,6 +50,10 @@ public class UserServiceImpl implements UserService {
         if (user.getUserRole() != null) {
             existingUser.setUserRole(user.getUserRole());
         }
+        existingUser.setSchoolClass(user.getSchoolClass());
+        if (user.getStudentNumber() != null) {
+            existingUser.setStudentNumber(user.getStudentNumber());
+        }
 
         return userRepository.save(existingUser);
     }
@@ -88,10 +92,10 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
             throw new RuntimeException("Invalid password");
         }
-        
+
         // 创建登录记录
         loginRecordService.createLoginRecord(existingUser.getId());
-        
+
         return existingUser;
     }
 
