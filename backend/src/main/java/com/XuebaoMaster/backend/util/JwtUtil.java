@@ -7,6 +7,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 import java.util.Date;
@@ -16,6 +18,7 @@ import java.util.function.Function;
 
 @Component
 public class JwtUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @Value("${jwt.secret:defaultSecretKeyWhichShouldBeAtLeast256BitsLongForHS256Algorithm}")
     private String secret;
@@ -29,11 +32,25 @@ public class JwtUtil {
     }
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            String username = extractClaim(token, Claims::getSubject);
+            logger.debug("Extracted username from token: {}", username);
+            return username;
+        } catch (Exception e) {
+            logger.error("Error extracting username from token", e);
+            throw e;
+        }
     }
 
     public Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        try {
+            Date expiration = extractClaim(token, Claims::getExpiration);
+            logger.debug("Token expiration date: {}", expiration);
+            return expiration;
+        } catch (Exception e) {
+            logger.error("Error extracting expiration from token", e);
+            throw e;
+        }
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
@@ -42,34 +59,62 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            logger.debug("Attempting to parse JWT token");
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            logger.debug("Successfully parsed JWT token");
+            return claims;
+        } catch (Exception e) {
+            logger.error("Failed to parse JWT token: {}", e.getMessage());
+            throw e;
+        }
     }
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        try {
+            boolean isExpired = extractExpiration(token).before(new Date());
+            logger.debug("Token expired: {}", isExpired);
+            return isExpired;
+        } catch (Exception e) {
+            logger.error("Error checking if token is expired", e);
+            return true; // 如果出现异常，认为token已过期
+        }
     }
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
+        String token = createToken(claims, userDetails.getUsername());
+        logger.debug("Generated new token for user: {}", userDetails.getUsername());
+        return token;
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expiration);
+        logger.debug("Creating token for subject: {} with expiry: {}", subject, expiryDate);
+        
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            final String username = extractUsername(token);
+            boolean isValid = (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+            logger.debug("Token validation for user {}: {}", userDetails.getUsername(), isValid);
+            return isValid;
+        } catch (Exception e) {
+            logger.error("Token validation error for user {}: {}", userDetails.getUsername(), e.getMessage());
+            return false;
+        }
     }
 }

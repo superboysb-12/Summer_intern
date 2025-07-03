@@ -38,11 +38,9 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/register", "/users/login").permitAll()
-                        .requestMatchers("/api/files/**").permitAll()
-                        .requestMatchers("/lesson-nodes/generate-rag", "/lesson-nodes/generate-rag-with-path").permitAll()
-                        .requestMatchers("/lesson-nodes/query-rag", "/lesson-nodes/*/query-rag").permitAll()
-                        .requestMatchers("/lesson-nodes/chat").permitAll()
+                        .requestMatchers("/users/register", "/users/login", "/api/files/**").permitAll()
+                        // 确保所有LessonNode相关的端点都需要认证
+                        .requestMatchers("/lesson-nodes/**").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
