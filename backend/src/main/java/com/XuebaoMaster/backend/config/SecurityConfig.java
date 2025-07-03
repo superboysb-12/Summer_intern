@@ -40,6 +40,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/users/register", "/users/login").permitAll()
                         .requestMatchers("/api/files/**").permitAll()
+                        .requestMatchers("/lesson-nodes/generate-rag", "/lesson-nodes/generate-rag-with-path").permitAll()
+                        .requestMatchers("/lesson-nodes/query-rag", "/lesson-nodes/*/query-rag").permitAll()
+                        .requestMatchers("/lesson-nodes/chat").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
