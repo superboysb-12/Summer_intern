@@ -10,7 +10,15 @@ const route = useRoute()
 const router = useRouter()
 const courseId = ref(route.params.courseId)
 const classId = ref(route.params.classId)
-const dataType = computed(() => courseId.value ? 'course' : 'class')
+const userId = ref(route.params.userId)
+
+const dataType = computed(() => {
+  if (courseId.value) return 'course'
+  if (classId.value) return 'class'
+  if (userId.value) return 'user'
+  return ''
+})
+
 const itemName = ref('')
 
 const BaseUrl = 'http://localhost:8080/'
@@ -44,7 +52,7 @@ const getItemInfo = async () => {
       if (response.data) {
         itemName.value = response.data.name || '未知课程'
       }
-    } else {
+    } else if (dataType.value === 'class') {
       const response = await axios.get(`${BaseUrl}classes/${classId.value}`, {
         headers: {
           'Authorization': `Bearer ${getToken()}`
@@ -54,10 +62,30 @@ const getItemInfo = async () => {
       if (response.data) {
         itemName.value = response.data.className || '未知班级'
       }
+    } else if (dataType.value === 'user') {
+      const response = await axios.get(`${BaseUrl}users/${userId.value}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      })
+      
+      if (response.data) {
+        itemName.value = response.data.name || response.data.username || '未知用户'
+      }
     }
   } catch (error) {
     console.error('获取信息失败:', error)
-    ElMessage.error(`获取${dataType.value === 'course' ? '课程' : '班级'}信息失败`)
+    ElMessage.error(`获取${getDataTypeText()}信息失败`)
+  }
+}
+
+// 获取数据类型文本
+const getDataTypeText = () => {
+  switch (dataType.value) {
+    case 'course': return '课程'
+    case 'class': return '班级'
+    case 'user': return '用户'
+    default: return ''
   }
 }
 
@@ -528,15 +556,19 @@ onUnmounted(() => {
     <div class="breadcrumb-container">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
-        <el-breadcrumb-item :to="{ path: '/manage' }">{{ dataType === 'course' ? '课程管理' : '班级管理' }}</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/manage' }">
+          {{ dataType === 'course' ? '课程管理' : dataType === 'class' ? '班级管理' : '用户管理' }}
+        </el-breadcrumb-item>
         <el-breadcrumb-item>{{ itemName }} - 数据分析</el-breadcrumb-item>
       </el-breadcrumb>
-      <el-button @click="goBack" type="primary" plain :icon="ArrowLeft" size="small">返回{{ dataType === 'course' ? '课程' : '班级' }}列表</el-button>
+      <el-button @click="goBack" type="primary" plain :icon="ArrowLeft" size="small">
+        返回{{ dataType === 'course' ? '课程' : dataType === 'class' ? '班级' : '用户' }}列表
+      </el-button>
     </div>
     
     <div class="page-header">
       <h2>{{ itemName }} - 图表分析</h2>
-      <p>详细的{{ dataType === 'course' ? '课程' : '班级' }}数据图表分析</p>
+      <p>详细的{{ getDataTypeText() }}数据图表分析</p>
     </div>
     
     <div class="filter-bar">
@@ -558,7 +590,7 @@ onUnmounted(() => {
       <el-card class="chart-card">
         <template #header>
           <div class="card-header">
-            <span>用户活跃度趋势</span>
+            <span>{{ dataType === 'user' ? '活跃度趋势' : '用户活跃度趋势' }}</span>
             <el-button text>导出</el-button>
           </div>
         </template>
@@ -582,7 +614,13 @@ onUnmounted(() => {
       <el-card class="chart-card">
         <template #header>
           <div class="card-header">
-            <span>{{ dataType === 'course' ? '课程' : '学习' }}完成进度</span>
+            <span>
+              {{ 
+                dataType === 'course' ? '课程完成进度' : 
+                dataType === 'class' ? '学习完成进度' : 
+                '课程完成情况' 
+              }}
+            </span>
             <el-button text>导出</el-button>
           </div>
         </template>

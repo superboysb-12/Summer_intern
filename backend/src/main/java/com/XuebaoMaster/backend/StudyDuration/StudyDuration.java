@@ -1,5 +1,7 @@
 package com.XuebaoMaster.backend.StudyDuration;
 
+import com.XuebaoMaster.backend.User.User;
+import com.XuebaoMaster.backend.Course.Course;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -19,5 +21,13 @@ public class StudyDuration {
     private LocalDateTime lessonStartTimeStamp;
 
     @Column(nullable = false)
-    private Integer length; // 学习时长（单位：分钟）
-} 
+    private Integer length;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
+}
