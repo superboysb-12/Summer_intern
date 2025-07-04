@@ -132,22 +132,54 @@ public class LessonNodeController {
         try {
             // 获取课时节点
             LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
-            System.out.println("获取到课时节点: " + lessonNode.getId() + ", 标题: " + lessonNode.getTitle());
+            System.out.println("获取到课时节点: " + lessonNode.getId() + ", 标题: " + lessonNode.getTitle() + ", 当前pathToNodes: " + lessonNode.getPathToNodes());
             
             // 调用服务生成RAG
             String ragDir = lessonNodeService.generateRag(lessonNode.getPathToNodes());
             System.out.println("生成的RAG路径: " + ragDir);
             
-            // 更新课时节点的pathToNodes字段
-            lessonNode.setPathToNodes(ragDir);
-            lessonNodeService.updateLessonNode(lessonNode);
-            
-            // 构建响应
-            Map<String, Object> response = new HashMap<>();
-            response.put("status", "success");
-            response.put("rag_dir", ragDir);
-            
-            return ResponseEntity.ok(response);
+            try {
+                // 更新课时节点的pathToNodes字段
+                System.out.println("准备设置pathToNodes为: " + ragDir);
+                lessonNode.setPathToNodes(ragDir);
+                
+                // 打印更新前的节点信息
+                System.out.println("更新前的课时节点: ID=" + lessonNode.getId() 
+                    + ", 标题=" + lessonNode.getTitle() 
+                    + ", pathToNodes=" + lessonNode.getPathToNodes());
+                
+                LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
+                
+                // 打印更新后的节点信息
+                System.out.println("更新后的课时节点: ID=" + updatedNode.getId() 
+                    + ", 标题=" + updatedNode.getTitle() 
+                    + ", pathToNodes=" + updatedNode.getPathToNodes());
+                
+                // 再次从数据库获取节点，确认更新是否持久化
+                LessonNode verifiedNode = lessonNodeService.getLessonNodeById(id);
+                System.out.println("从数据库重新获取的节点: ID=" + verifiedNode.getId() 
+                    + ", 标题=" + verifiedNode.getTitle() 
+                    + ", pathToNodes=" + verifiedNode.getPathToNodes());
+                
+                // 构建响应
+                Map<String, Object> response = new HashMap<>();
+                response.put("status", "success");
+                response.put("rag_dir", ragDir);
+                response.put("data", verifiedNode);
+                
+                return ResponseEntity.ok(response);
+            } catch (Exception e) {
+                System.out.println("更新课时节点时出错: " + e.getMessage());
+                e.printStackTrace();
+                
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "partial_success");
+                errorResponse.put("rag_dir", ragDir);
+                errorResponse.put("message", "RAG生成成功，但更新课时节点失败: " + e.getMessage());
+                errorResponse.put("error_details", e.getMessage());
+                
+                return ResponseEntity.ok(errorResponse);
+            }
         } catch (Exception e) {
             System.out.println("生成RAG出错: " + e.getMessage());
             e.printStackTrace();
@@ -185,16 +217,41 @@ public class LessonNodeController {
             
             // 如果提供了ID，则更新对应的课时节点
             if (id != null) {
-                LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
-                System.out.println("获取到课时节点: " + lessonNode.getId() + ", 标题: " + lessonNode.getTitle());
-                
-                // 更新课时节点的pathToNodes字段
-                lessonNode.setPathToNodes(ragDir);
-                LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
-                System.out.println("更新后的课时节点pathToNodes: " + updatedNode.getPathToNodes());
-                
-                response.put("message", "RAG生成成功并已更新课时节点");
-                response.put("data", updatedNode);
+                try {
+                    LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
+                    System.out.println("获取到课时节点: " + lessonNode.getId() + ", 标题: " + lessonNode.getTitle() + ", 当前pathToNodes: " + lessonNode.getPathToNodes());
+                    
+                    // 更新课时节点的pathToNodes字段
+                    System.out.println("准备设置pathToNodes为: " + ragDir);
+                    lessonNode.setPathToNodes(ragDir);
+                    
+                    // 打印更新前的节点信息
+                    System.out.println("更新前的课时节点: ID=" + lessonNode.getId() 
+                        + ", 标题=" + lessonNode.getTitle() 
+                        + ", pathToNodes=" + lessonNode.getPathToNodes());
+                    
+                    LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
+                    
+                    // 打印更新后的节点信息
+                    System.out.println("更新后的课时节点: ID=" + updatedNode.getId() 
+                        + ", 标题=" + updatedNode.getTitle() 
+                        + ", pathToNodes=" + updatedNode.getPathToNodes());
+                    
+                    // 再次从数据库获取节点，确认更新是否持久化
+                    LessonNode verifiedNode = lessonNodeService.getLessonNodeById(id);
+                    System.out.println("从数据库重新获取的节点: ID=" + verifiedNode.getId() 
+                        + ", 标题=" + verifiedNode.getTitle() 
+                        + ", pathToNodes=" + verifiedNode.getPathToNodes());
+                    
+                    response.put("message", "RAG生成成功并已更新课时节点");
+                    response.put("data", verifiedNode);
+                } catch (Exception e) {
+                    System.out.println("更新课时节点时出错: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                    response.put("message", "RAG生成成功，但更新课时节点失败: " + e.getMessage());
+                    response.put("error_details", e.getMessage());
+                }
             } else {
                 response.put("message", "RAG生成成功");
             }
@@ -342,6 +399,243 @@ public class LessonNodeController {
             }
         } catch (Exception e) {
             System.out.println("发送聊天消息出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 创建带有RAG路径的课时节点
+     * 
+     * @param courseId 课程ID
+     * @param nodeOrder 节点顺序
+     * @param title 节点标题
+     * @param ragPath RAG路径
+     * @return 创建的课时节点
+     */
+    @PostMapping("/create-with-rag")
+    public ResponseEntity<Map<String, Object>> createLessonNodeWithRag(
+            @RequestParam Long courseId,
+            @RequestParam Integer nodeOrder,
+            @RequestParam String title,
+            @RequestParam String ragPath) {
+        try {
+            System.out.println("创建带有RAG路径的课时节点: 课程ID=" + courseId + ", 顺序=" + nodeOrder + ", 标题=" + title + ", RAG路径=" + ragPath);
+            
+            // 创建新的课时节点
+            LessonNode lessonNode = new LessonNode();
+            
+            // 设置课程
+            com.XuebaoMaster.backend.Course.Course course = new com.XuebaoMaster.backend.Course.Course();
+            course.setCourseId(courseId);
+            lessonNode.setCourse(course);
+            
+            // 设置其他属性
+            lessonNode.setNodeOrder(nodeOrder);
+            lessonNode.setTitle(title);
+            lessonNode.setPathToNodes(ragPath);
+            
+            // 保存节点
+            LessonNode createdNode = lessonNodeService.createLessonNode(lessonNode);
+            System.out.println("创建的课时节点: ID=" + createdNode.getId() 
+                + ", 标题=" + createdNode.getTitle() 
+                + ", pathToNodes=" + createdNode.getPathToNodes());
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "课时节点创建成功");
+            response.put("data", createdNode);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("创建课时节点出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 生成RAG并创建新节点
+     * 
+     * @param courseId 课程ID
+     * @param nodeOrder 节点顺序
+     * @param title 节点标题
+     * @param sourcePath 源文件路径
+     * @return 创建的课时节点
+     */
+    @PostMapping("/generate-and-create")
+    public ResponseEntity<Map<String, Object>> generateRagAndCreateNode(
+            @RequestParam Long courseId,
+            @RequestParam Integer nodeOrder,
+            @RequestParam String title,
+            @RequestParam String sourcePath) {
+        try {
+            System.out.println("生成RAG并创建节点: 课程ID=" + courseId + ", 顺序=" + nodeOrder + ", 标题=" + title + ", 源路径=" + sourcePath);
+            
+            // 调用服务生成RAG
+            String ragDir = lessonNodeService.generateRag(sourcePath);
+            System.out.println("生成的RAG路径: " + ragDir);
+            
+            // 创建新的课时节点
+            LessonNode lessonNode = new LessonNode();
+            
+            // 设置课程
+            com.XuebaoMaster.backend.Course.Course course = new com.XuebaoMaster.backend.Course.Course();
+            course.setCourseId(courseId);
+            lessonNode.setCourse(course);
+            
+            // 设置其他属性
+            lessonNode.setNodeOrder(nodeOrder);
+            lessonNode.setTitle(title);
+            lessonNode.setPathToNodes(ragDir);
+            
+            // 保存节点
+            LessonNode createdNode = lessonNodeService.createLessonNode(lessonNode);
+            System.out.println("创建的课时节点: ID=" + createdNode.getId() 
+                + ", 标题=" + createdNode.getTitle() 
+                + ", pathToNodes=" + createdNode.getPathToNodes());
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "RAG生成成功并创建了课时节点");
+            response.put("rag_dir", ragDir);
+            response.put("data", createdNode);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("生成RAG并创建节点出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 更新课时节点的知识图谱路径
+     * 
+     * @param id 课时节点ID
+     * @param graphPath 知识图谱路径
+     * @return 更新后的课时节点
+     */
+    @PutMapping("/{id}/update-graph-path")
+    public ResponseEntity<Map<String, Object>> updateGraphPath(
+            @PathVariable Long id,
+            @RequestParam String graphPath) {
+        try {
+            // 处理路径中的反斜杠问题
+            graphPath = graphPath.replace('\\', '/');
+            System.out.println("更新课时节点的知识图谱路径: ID=" + id + ", 图谱路径=" + graphPath);
+            
+            // 获取课时节点
+            LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
+            System.out.println("获取到课时节点: ID=" + lessonNode.getId() 
+                + ", 标题=" + lessonNode.getTitle()
+                + ", 当前pathToGraph=" + lessonNode.getPathToGraph());
+            
+            // 更新知识图谱路径
+            lessonNode.setPathToGraph(graphPath);
+            
+            // 保存更新
+            LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
+            System.out.println("更新后的课时节点: ID=" + updatedNode.getId() 
+                + ", 标题=" + updatedNode.getTitle() 
+                + ", pathToGraph=" + updatedNode.getPathToGraph());
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "知识图谱路径更新成功");
+            response.put("data", updatedNode);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("更新知识图谱路径出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 创建带有知识图谱路径的课时节点
+     * 
+     * @param courseId 课程ID
+     * @param nodeOrder 节点顺序
+     * @param title 节点标题
+     * @param ragPath RAG路径
+     * @param graphPath 知识图谱路径
+     * @return 创建的课时节点
+     */
+    @PostMapping("/create-with-graph")
+    public ResponseEntity<Map<String, Object>> createLessonNodeWithGraph(
+            @RequestParam Long courseId,
+            @RequestParam Integer nodeOrder,
+            @RequestParam String title,
+            @RequestParam(required = false) String ragPath,
+            @RequestParam String graphPath) {
+        try {
+            // 处理路径中的反斜杠问题
+            if (ragPath != null) {
+                ragPath = ragPath.replace('\\', '/');
+            }
+            graphPath = graphPath.replace('\\', '/');
+            
+            System.out.println("创建带有知识图谱路径的课时节点: 课程ID=" + courseId 
+                + ", 顺序=" + nodeOrder 
+                + ", 标题=" + title 
+                + ", RAG路径=" + ragPath
+                + ", 图谱路径=" + graphPath);
+            
+            // 创建新的课时节点
+            LessonNode lessonNode = new LessonNode();
+            
+            // 设置课程
+            com.XuebaoMaster.backend.Course.Course course = new com.XuebaoMaster.backend.Course.Course();
+            course.setCourseId(courseId);
+            lessonNode.setCourse(course);
+            
+            // 设置其他属性
+            lessonNode.setNodeOrder(nodeOrder);
+            lessonNode.setTitle(title);
+            lessonNode.setPathToNodes(ragPath);
+            lessonNode.setPathToGraph(graphPath);
+            
+            // 保存节点
+            LessonNode createdNode = lessonNodeService.createLessonNode(lessonNode);
+            System.out.println("创建的课时节点: ID=" + createdNode.getId() 
+                + ", 标题=" + createdNode.getTitle() 
+                + ", pathToNodes=" + createdNode.getPathToNodes()
+                + ", pathToGraph=" + createdNode.getPathToGraph());
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "课时节点创建成功");
+            response.put("data", createdNode);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("创建课时节点出错: " + e.getMessage());
             e.printStackTrace();
             
             Map<String, Object> errorResponse = new HashMap<>();

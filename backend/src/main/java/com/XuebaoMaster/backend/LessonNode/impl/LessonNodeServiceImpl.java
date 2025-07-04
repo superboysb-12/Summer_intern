@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.transaction.annotation.Transactional;
 import com.XuebaoMaster.backend.LessonNode.LessonNode;
 import com.XuebaoMaster.backend.LessonNode.LessonNodeRepository;
 import com.XuebaoMaster.backend.LessonNode.LessonNodeService;
@@ -48,11 +49,26 @@ public class LessonNodeServiceImpl implements LessonNodeService {
     }
 
     @Override
+    @Transactional
     public LessonNode createLessonNode(LessonNode lessonNode) {
-        return lessonNodeRepository.save(lessonNode);
+        System.out.println("创建课时节点: 标题=" + lessonNode.getTitle() 
+            + ", 节点顺序=" + lessonNode.getNodeOrder()
+            + ", 课程ID=" + (lessonNode.getCourse() != null ? lessonNode.getCourse().getCourseId() : "null")
+            + ", RAG路径=" + lessonNode.getPathToNodes()
+            + ", 知识图谱路径=" + lessonNode.getPathToGraph());
+        
+        LessonNode savedNode = lessonNodeRepository.save(lessonNode);
+        
+        System.out.println("保存后的课时节点: ID=" + savedNode.getId() 
+            + ", 标题=" + savedNode.getTitle() 
+            + ", pathToNodes=" + savedNode.getPathToNodes()
+            + ", pathToGraph=" + savedNode.getPathToGraph());
+            
+        return savedNode;
     }
 
     @Override
+    @Transactional
     public LessonNode updateLessonNode(LessonNode lessonNode) {
         LessonNode existingNode = lessonNodeRepository.findById(lessonNode.getId())
                 .orElseThrow(() -> new RuntimeException("Lesson node not found"));
@@ -61,8 +77,20 @@ public class LessonNodeServiceImpl implements LessonNodeService {
         existingNode.setNodeOrder(lessonNode.getNodeOrder());
         existingNode.setTitle(lessonNode.getTitle());
         existingNode.setPathToNodes(lessonNode.getPathToNodes());
+        
+        // 更新知识图谱路径
+        if (lessonNode.getPathToGraph() != null) {
+            existingNode.setPathToGraph(lessonNode.getPathToGraph());
+        }
+        
+        System.out.println("更新课时节点，ID: " + existingNode.getId() 
+            + ", 设置pathToNodes为: " + existingNode.getPathToNodes()
+            + ", 设置pathToGraph为: " + existingNode.getPathToGraph());
 
-        return lessonNodeRepository.save(existingNode);
+        LessonNode savedNode = lessonNodeRepository.save(existingNode);
+        System.out.println("保存后的课时节点pathToNodes: " + savedNode.getPathToNodes());
+        System.out.println("保存后的课时节点pathToGraph: " + savedNode.getPathToGraph());
+        return savedNode;
     }
 
     @Override
@@ -150,10 +178,9 @@ public class LessonNodeServiceImpl implements LessonNodeService {
                     System.out.println("从JSON中提取的RAG路径(processed_dir): " + ragDir);
                 }
                 
-                // 确保路径格式一致（使用反斜杠，因为这是Windows系统）
+                // 不进行路径格式转换，直接使用API返回的格式
                 if (ragDir != null) {
-                    ragDir = ragDir.replace('/', '\\');
-                    System.out.println("格式化后的RAG路径: " + ragDir);
+                    System.out.println("使用API返回的RAG路径: " + ragDir);
                 }
             } catch (Exception e) {
                 System.out.println("JSON解析失败: " + e.getMessage());
@@ -175,8 +202,8 @@ public class LessonNodeServiceImpl implements LessonNodeService {
     @Override
     public String queryRag(String query, String ragPath) {
         try {
-            // 将反斜杠替换为正斜杠
-            ragPath = ragPath.replace('\\', '/');
+            // 不再进行路径格式转换，直接使用传入的路径
+            System.out.println("使用RAG路径: " + ragPath);
             
             // 使用UriComponentsBuilder构建URL，它会自动处理编码
             String url = UriComponentsBuilder.fromHttpUrl("http://localhost:8000/rag")
