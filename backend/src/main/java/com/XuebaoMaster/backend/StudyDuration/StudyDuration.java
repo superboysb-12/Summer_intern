@@ -5,8 +5,6 @@ import com.XuebaoMaster.backend.Course.Course;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
-import com.XuebaoMaster.backend.User.User;
-import com.XuebaoMaster.backend.Course.Course;
 
 @Entity
 @Table(name = "study_durations")

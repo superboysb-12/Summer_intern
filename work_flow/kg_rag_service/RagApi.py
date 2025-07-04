@@ -14,7 +14,7 @@ from knowledge_graph_pipeline import KnowledgeGraphPipeline
 from config import CONFIG
 
 # 默认数据路径
-DEFAULT_RAG_DATA_PATH = r"D:\summer_intern\Summer_intern\work_flow\kg_rag_service\doc\rag_data\processed"
+DEFAULT_RAG_DATA_PATH = r"D:\summer_intern\Summer_intern\work_flow\kg_rag_service\doc\2025-07-04_08-39-37\rag_data\processed"
 
 # 创建FastAPI应用
 app = FastAPI(
