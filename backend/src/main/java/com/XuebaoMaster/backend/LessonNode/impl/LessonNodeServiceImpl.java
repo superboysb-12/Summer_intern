@@ -1,6 +1,7 @@
 package com.XuebaoMaster.backend.LessonNode.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,12 @@ public class LessonNodeServiceImpl implements LessonNodeService {
     private RestTemplate restTemplate;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    @Value("${chat.api.url:}")
+    private String chatApiUrl;
+    
+    @Value("${chat.api.key:}")
+    private String chatApiKey;
     
     // 如果RestTemplate没有被定义为Bean，需要在构造函数中初始化
     public LessonNodeServiceImpl() {
@@ -207,59 +214,105 @@ public class LessonNodeServiceImpl implements LessonNodeService {
     }
 
     @Override
-    public String sendChatMessage(String message, Map<String, Object> additionalParams) {
+    public String sendChatMessage(String query, Map<String, Object> additionalParams) {
         try {
-            System.out.println("发送聊天消息: " + message);
+            System.out.println("发送聊天消息: " + query);
             
             // 创建请求体
             Map<String, Object> requestBody = new HashMap<>();
-            requestBody.put("message", message);
+            
+            // 添加必要参数
+            requestBody.put("query", query);
             
             // 添加附加参数（如果有）
             if (additionalParams != null) {
-                requestBody.putAll(additionalParams);
+                // 从additionalParams中获取参数并添加到requestBody
+                if (additionalParams.containsKey("inputs")) {
+                    requestBody.put("inputs", additionalParams.get("inputs"));
+                } else {
+                    requestBody.put("inputs", new HashMap<>());
+                }
+                
+                if (additionalParams.containsKey("response_mode")) {
+                    requestBody.put("response_mode", additionalParams.get("response_mode"));
+                } else {
+                    requestBody.put("response_mode", "streaming");
+                }
+                
+                if (additionalParams.containsKey("conversation_id")) {
+                    requestBody.put("conversation_id", additionalParams.get("conversation_id"));
+                } else {
+                    requestBody.put("conversation_id", "");
+                }
+                
+                if (additionalParams.containsKey("user")) {
+                    requestBody.put("user", additionalParams.get("user"));
+                }
+                
+                if (additionalParams.containsKey("files")) {
+                    requestBody.put("files", additionalParams.get("files"));
+                }
             }
+            
+            System.out.println("聊天API URL: " + chatApiUrl);
+            
+            // 打印请求体，便于调试
+            System.out.println("请求体: " + objectMapper.writeValueAsString(requestBody));
             
             // 设置请求头
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             
+            // 使用API密钥
+            if (chatApiKey != null && !chatApiKey.isEmpty()) {
+                headers.set("Authorization", "Bearer " + chatApiKey);
+                System.out.println("已设置Authorization头部");
+            } else {
+                System.out.println("警告：未配置API密钥，将尝试不使用认证发送请求");
+            }
+            
             // 创建HTTP实体
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
             
-            // 使用正确的URL，确保聊天服务在运行
-            String url = "http://localhost:8000/v1/chat-messages";
-            System.out.println("发送请求到: " + url);
+            // 使用API URL
+            System.out.println("发送请求到: " + chatApiUrl);
             
             try {
                 // 发送POST请求
                 ResponseEntity<String> response = restTemplate.postForEntity(
-                    url,
+                    chatApiUrl,
                     entity,
                     String.class
                 );
+                
+                // 打印响应状态和头部
+                System.out.println("响应状态: " + response.getStatusCode());
+                System.out.println("响应头部: " + response.getHeaders());
+                System.out.println("响应体: " + response.getBody());
                 
                 // 返回响应体
                 return response.getBody();
             } catch (HttpClientErrorException e) {
                 System.out.println("HTTP错误: " + e.getStatusCode() + " - " + e.getResponseBodyAsString());
+                System.out.println("请求头部: " + headers);
                 
                 // 创建错误响应
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("status", "error");
                 errorResponse.put("message", "聊天服务暂时不可用，请稍后再试。错误: " + e.getMessage());
-                errorResponse.put("original_query", message);
+                errorResponse.put("original_query", query);
                 
                 return objectMapper.writeValueAsString(errorResponse);
             }
         } catch (Exception e) {
             System.out.println("发送聊天消息出错: " + e.getMessage());
+            e.printStackTrace();
             try {
                 // 创建错误响应
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("status", "error");
                 errorResponse.put("message", "处理聊天消息时发生错误: " + e.getMessage());
-                errorResponse.put("original_query", message);
+                errorResponse.put("original_query", query);
                 
                 return objectMapper.writeValueAsString(errorResponse);
             } catch (Exception jsonEx) {

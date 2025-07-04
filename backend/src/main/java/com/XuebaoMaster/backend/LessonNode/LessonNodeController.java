@@ -302,30 +302,30 @@ public class LessonNodeController {
     /**
      * 发送聊天消息
      * 
-     * @param request 请求体，包含消息内容和附加参数
+     * @param request 请求体，符合Dify API格式
      * @return 聊天响应
      */
     @PostMapping("/chat")
-    public ResponseEntity<Object> chatMessage(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<Object> chatMessage(@RequestBody ChatMessageRequest request) {
         try {
-            // 从请求体中提取消息内容
-            String message = (String) request.get("message");
-            if (message == null || message.isEmpty()) {
-                throw new IllegalArgumentException("消息内容不能为空");
+            // 从请求体中提取查询内容
+            String query = request.getQuery();
+            if (query == null || query.isEmpty()) {
+                throw new IllegalArgumentException("查询内容不能为空");
             }
             
-            System.out.println("发送聊天消息: " + message);
+            System.out.println("发送聊天消息: " + query);
             
-            // 提取附加参数（如果有）
+            // 创建附加参数
             Map<String, Object> additionalParams = new HashMap<>();
-            for (Map.Entry<String, Object> entry : request.entrySet()) {
-                if (!entry.getKey().equals("message")) {
-                    additionalParams.put(entry.getKey(), entry.getValue());
-                }
-            }
+            additionalParams.put("response_mode", request.getResponse_mode());
+            additionalParams.put("conversation_id", request.getConversation_id());
+            additionalParams.put("user", request.getUser());
+            additionalParams.put("files", request.getFiles());
+            additionalParams.put("inputs", request.getInputs());
             
             // 调用服务发送聊天消息
-            String result = lessonNodeService.sendChatMessage(message, additionalParams);
+            String result = lessonNodeService.sendChatMessage(query, additionalParams);
             
             // 尝试解析结果为JSON
             try {

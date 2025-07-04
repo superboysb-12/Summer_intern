@@ -1,6 +1,7 @@
 package com.XuebaoMaster.backend.LessonNode;
 
 import lombok.Data;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -8,16 +9,21 @@ import java.util.Map;
  */
 @Data
 public class ChatMessageRequest {
-    private String message;
-    private Map<String, Object> additionalParams;
+    private Map<String, Object> inputs;
+    private String query;
+    private String response_mode;
+    private String conversation_id;
+    private String user;
+    private List<FileInfo> files;
+    
+    @Data
+    public static class FileInfo {
+        private String type;
+        private String transfer_method;
+        private String url;
+    }
     
     // 默认构造函数
     public ChatMessageRequest() {
-    }
-    
-    // 带参数的构造函数
-    public ChatMessageRequest(String message, Map<String, Object> additionalParams) {
-        this.message = message;
-        this.additionalParams = additionalParams;
     }
 } 
