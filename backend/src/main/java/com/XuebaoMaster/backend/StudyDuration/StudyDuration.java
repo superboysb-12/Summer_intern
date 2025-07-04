@@ -30,5 +30,4 @@ public class StudyDuration {
 
     @Column(nullable = false)
     private Integer length;
-
 }

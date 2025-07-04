@@ -14,6 +14,7 @@ const HomeCards = () => import('../components/HomeCards.vue')
 const UserManage = () => import('../components/UserManage.vue')
 const ClassManage = () => import('../components/ClassManage.vue')
 const CourseManage = () => import('../components/CourseManage.vue')
+const FileManage = () => import('../components/FileManage.vue')
 
 const routes=[
     {
@@ -55,6 +56,11 @@ const routes=[
                 path: 'courses',
                 component: CourseManage,
                 meta: { title: '系统管理 - 课程管理' }
+            },
+            {
+                path: 'files',
+                component: FileManage,
+                meta: { title: '系统管理 - 文件管理' }
             },
             {
                 path: 'data',

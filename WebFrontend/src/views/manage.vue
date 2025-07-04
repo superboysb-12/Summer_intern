@@ -27,6 +27,7 @@ const getActiveMenu = () => {
   if (path.includes('/manage/users')) return 'users'
   if (path.includes('/manage/classes')) return 'classes'
   if (path.includes('/manage/courses')) return 'courses'
+  if (path.includes('/manage/files')) return 'files'
   if (path.includes('/manage/data')) return 'data-overview'
   if (path.includes('/manage/settings')) return 'settings'
   return 'home'
@@ -53,6 +54,9 @@ const handleMenuSelect = (key) => {
       break
     case 'courses':
       router.push('/manage/courses')
+      break
+    case 'files':
+      router.push('/manage/files')
       break
     case 'data-overview':
       router.push('/manage/data')
@@ -158,9 +162,9 @@ onMounted(() => {
             <template #title>课程管理</template>
           </el-menu-item>
           
-          <el-menu-item index="documents">
+          <el-menu-item index="files">
             <el-icon><Document /></el-icon>
-            <template #title>文档管理</template>
+            <template #title>文件管理</template>
           </el-menu-item>
           
           <el-menu-item index="tools">
