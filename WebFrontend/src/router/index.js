@@ -5,7 +5,6 @@ const Register = () => import('../views/register.vue')
 const Manage = () => import('../views/manage.vue')
 const DataOverview = () => import('../components/DataOverview.vue')
 const DataCharts = () => import('../components/DataCharts.vue')
-const UserDataChart = () => import('../components/UserDataChart.vue')
 const UserManageDataChart = () => import('../components/UserManageDataChart.vue')
 const CourseManageDataChart = () => import('../components/CourseManageDataChart.vue')
 const ClassManageDataChart = () => import('../components/ClassManageDataChart.vue')
@@ -86,22 +85,6 @@ const routes=[
         meta: {
             requiresAuth: true,
             title: '班级数据分析'
-        }
-    },
-    {
-        path:'/user-data/:id',
-        component:UserDataChart,
-        meta: {
-            requiresAuth: true,
-            title: '用户数据分析'
-        }
-    },
-    {
-        path:'/user-analytics/:userId',
-        component:UserDataChart,
-        meta: {
-            requiresAuth: true,
-            title: '用户学习分析'
         }
     },
     {
