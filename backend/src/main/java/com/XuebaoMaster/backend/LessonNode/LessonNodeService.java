@@ -44,4 +44,11 @@ public interface LessonNodeService {
      * @return 聊天响应
      */
     String sendChatMessage(String message, Map<String, Object> additionalParams);
+    
+    /**
+     * 获取指定文件夹下的所有文件路径
+     * @param folderPath 文件夹路径
+     * @return 文件路径列表
+     */
+    List<String> getFilesInFolder(String folderPath);
 } 

@@ -3,12 +3,20 @@ package com.XuebaoMaster.backend.LessonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.stream.Collectors;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/lesson-nodes")
@@ -139,9 +147,9 @@ public class LessonNodeController {
             System.out.println("生成的RAG路径: " + ragDir);
             
             try {
-                // 更新课时节点的pathToNodes字段
+            // 更新课时节点的pathToNodes字段
                 System.out.println("准备设置pathToNodes为: " + ragDir);
-                lessonNode.setPathToNodes(ragDir);
+            lessonNode.setPathToNodes(ragDir);
                 
                 // 打印更新前的节点信息
                 System.out.println("更新前的课时节点: ID=" + lessonNode.getId() 
@@ -160,14 +168,14 @@ public class LessonNodeController {
                 System.out.println("从数据库重新获取的节点: ID=" + verifiedNode.getId() 
                     + ", 标题=" + verifiedNode.getTitle() 
                     + ", pathToNodes=" + verifiedNode.getPathToNodes());
-                
-                // 构建响应
-                Map<String, Object> response = new HashMap<>();
-                response.put("status", "success");
-                response.put("rag_dir", ragDir);
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("rag_dir", ragDir);
                 response.put("data", verifiedNode);
-                
-                return ResponseEntity.ok(response);
+            
+            return ResponseEntity.ok(response);
             } catch (Exception e) {
                 System.out.println("更新课时节点时出错: " + e.getMessage());
                 e.printStackTrace();
@@ -218,19 +226,19 @@ public class LessonNodeController {
             // 如果提供了ID，则更新对应的课时节点
             if (id != null) {
                 try {
-                    LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
+                LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
                     System.out.println("获取到课时节点: " + lessonNode.getId() + ", 标题: " + lessonNode.getTitle() + ", 当前pathToNodes: " + lessonNode.getPathToNodes());
-                    
-                    // 更新课时节点的pathToNodes字段
+                
+                // 更新课时节点的pathToNodes字段
                     System.out.println("准备设置pathToNodes为: " + ragDir);
-                    lessonNode.setPathToNodes(ragDir);
+                lessonNode.setPathToNodes(ragDir);
                     
                     // 打印更新前的节点信息
                     System.out.println("更新前的课时节点: ID=" + lessonNode.getId() 
                         + ", 标题=" + lessonNode.getTitle() 
                         + ", pathToNodes=" + lessonNode.getPathToNodes());
                     
-                    LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
+                LessonNode updatedNode = lessonNodeService.updateLessonNode(lessonNode);
                     
                     // 打印更新后的节点信息
                     System.out.println("更新后的课时节点: ID=" + updatedNode.getId() 
@@ -242,8 +250,8 @@ public class LessonNodeController {
                     System.out.println("从数据库重新获取的节点: ID=" + verifiedNode.getId() 
                         + ", 标题=" + verifiedNode.getTitle() 
                         + ", pathToNodes=" + verifiedNode.getPathToNodes());
-                    
-                    response.put("message", "RAG生成成功并已更新课时节点");
+                
+                response.put("message", "RAG生成成功并已更新课时节点");
                     response.put("data", verifiedNode);
                 } catch (Exception e) {
                     System.out.println("更新课时节点时出错: " + e.getMessage());
@@ -643,6 +651,362 @@ public class LessonNodeController {
             errorResponse.put("message", e.getMessage());
             
             return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 获取课时节点的知识图谱路径
+     * 
+     * @param id 课时节点ID
+     * @return 知识图谱路径信息
+     */
+    @GetMapping("/{id}/graph-path")
+    public ResponseEntity<Map<String, Object>> getGraphPath(@PathVariable Long id) {
+        try {
+            // 获取课时节点
+            LessonNode lessonNode = lessonNodeService.getLessonNodeById(id);
+            System.out.println("获取课时节点的知识图谱路径: ID=" + id);
+            
+            // 获取知识图谱路径
+            String graphPath = lessonNode.getPathToGraph();
+            System.out.println("课时节点的知识图谱路径: " + graphPath);
+            
+            // 如果路径为空，返回错误
+            if (graphPath == null || graphPath.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "该课时节点没有关联的知识图谱数据");
+                return ResponseEntity.ok(errorResponse);
+            }
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("lessonNodeId", lessonNode.getId());
+            response.put("title", lessonNode.getTitle());
+            response.put("graphPath", graphPath);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("获取知识图谱路径出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 获取课程下所有课时节点的知识图谱路径
+     * 
+     * @param courseId 课程ID
+     * @return 所有知识图谱路径信息
+     */
+    @GetMapping("/course/{courseId}/graph-paths")
+    public ResponseEntity<Map<String, Object>> getGraphPathsByCourse(@PathVariable Long courseId) {
+        try {
+            // 获取课程下的所有课时节点
+            List<LessonNode> lessonNodes = lessonNodeService.getLessonNodesByCourseIdOrdered(courseId);
+            System.out.println("获取课程的所有知识图谱路径: 课程ID=" + courseId);
+            
+            // 构建知识图谱路径列表
+            List<Map<String, Object>> graphPaths = new ArrayList<>();
+            for (LessonNode node : lessonNodes) {
+                String graphPath = node.getPathToGraph();
+                if (graphPath != null && !graphPath.isEmpty()) {
+                    Map<String, Object> nodeInfo = new HashMap<>();
+                    nodeInfo.put("lessonNodeId", node.getId());
+                    nodeInfo.put("title", node.getTitle());
+                    nodeInfo.put("nodeOrder", node.getNodeOrder());
+                    nodeInfo.put("graphPath", graphPath);
+                    graphPaths.add(nodeInfo);
+                }
+            }
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("courseId", courseId);
+            response.put("graphPaths", graphPaths);
+            response.put("count", graphPaths.size());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("获取课程知识图谱路径出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 获取output文件夹下的所有文件路径
+     * 
+     * @param basePath 基础路径（可选，默认为特定路径）
+     * @return 文件路径列表
+     */
+    @GetMapping("/output-files")
+    public ResponseEntity<Map<String, Object>> getOutputFiles(
+            @RequestParam(required = false) String basePath,
+            HttpServletRequest request) {
+        try {
+            // 如果未提供基础路径，使用默认路径
+            if (basePath == null || basePath.isEmpty()) {
+                basePath = "D:/大三下/综合实习/Summer_intern/work_flow/kg_rag_service/output";
+            } else {
+                // 处理路径中的反斜杠问题
+                basePath = basePath.replace('\\', '/');
+            }
+            
+            System.out.println("获取output文件夹下的所有文件路径: " + basePath);
+            
+            // 获取文件路径列表
+            List<String> filePaths = lessonNodeService.getFilesInFolder(basePath);
+            
+            // 将所有路径中的反斜杠转换为正斜杠，以便前端处理
+            List<String> formattedPaths = filePaths.stream()
+                .map(path -> path.replace('\\', '/'))
+                .collect(Collectors.toList());
+            
+            // 获取服务器基础URL
+            String baseUrl = getBaseUrl(request);
+            
+            // 构建文件访问URL列表
+            List<Map<String, String>> fileInfoList = new ArrayList<>();
+            for (String path : formattedPaths) {
+                Map<String, String> fileInfo = new HashMap<>();
+                fileInfo.put("path", path);
+                fileInfo.put("name", new File(path).getName());
+                // 对文件路径进行URL编码
+                String encodedPath = URLEncoder.encode(path, StandardCharsets.UTF_8.toString());
+                fileInfo.put("url", baseUrl + "/lesson-nodes/file-content?filePath=" + encodedPath);
+                fileInfoList.add(fileInfo);
+            }
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("basePath", basePath);
+            response.put("files", fileInfoList);
+            response.put("count", fileInfoList.size());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("获取output文件列表出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 获取指定文件夹下的所有文件路径
+     * 
+     * @param folderPath 文件夹路径
+     * @return 文件路径列表
+     */
+    @GetMapping("/folder-files")
+    public ResponseEntity<Map<String, Object>> getFolderFiles(
+            @RequestParam String folderPath,
+            HttpServletRequest request) {
+        try {
+            // 处理路径中的反斜杠问题
+            folderPath = folderPath.replace('\\', '/');
+            System.out.println("获取指定文件夹下的所有文件路径: " + folderPath);
+            
+            // 获取文件路径列表
+            List<String> filePaths = lessonNodeService.getFilesInFolder(folderPath);
+            
+            // 将所有路径中的反斜杠转换为正斜杠，以便前端处理
+            List<String> formattedPaths = filePaths.stream()
+                .map(path -> path.replace('\\', '/'))
+                .collect(Collectors.toList());
+            
+            // 获取服务器基础URL
+            String baseUrl = getBaseUrl(request);
+            
+            // 构建文件访问URL列表
+            List<Map<String, String>> fileInfoList = new ArrayList<>();
+            for (String path : formattedPaths) {
+                Map<String, String> fileInfo = new HashMap<>();
+                fileInfo.put("path", path);
+                fileInfo.put("name", new File(path).getName());
+                // 对文件路径进行URL编码
+                String encodedPath = URLEncoder.encode(path, StandardCharsets.UTF_8.toString());
+                fileInfo.put("url", baseUrl + "/lesson-nodes/file-content?filePath=" + encodedPath);
+                fileInfoList.add(fileInfo);
+            }
+            
+            // 构建响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("folderPath", folderPath);
+            response.put("files", fileInfoList);
+            response.put("count", fileInfoList.size());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            System.out.println("获取文件夹文件列表出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 获取服务器基础URL
+     * 
+     * @param request HTTP请求
+     * @return 基础URL
+     */
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        int serverPort = request.getServerPort();
+        String contextPath = request.getContextPath();
+        
+        // 构建基础URL
+        StringBuilder url = new StringBuilder();
+        url.append(scheme).append("://").append(serverName);
+        
+        // 如果端口不是默认端口，则添加端口号
+        if ((scheme.equals("http") && serverPort != 80) || (scheme.equals("https") && serverPort != 443)) {
+            url.append(":").append(serverPort);
+        }
+        
+        url.append(contextPath);
+        return url.toString();
+    }
+
+    /**
+     * 获取指定文件的内容
+     * 
+     * @param filePath 文件路径
+     * @return 文件内容
+     */
+    @GetMapping("/file-content")
+    public ResponseEntity<?> getFileContent(@RequestParam String filePath) {
+        try {
+            // 处理路径中的反斜杠问题
+            filePath = filePath.replace('\\', '/');
+            System.out.println("获取文件内容: " + filePath);
+            
+            // 创建文件对象
+            File file = new File(filePath);
+            
+            // 检查文件是否存在
+            if (!file.exists() || !file.isFile()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("status", "error");
+                errorResponse.put("message", "文件不存在");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+            
+            // 获取文件名
+            String fileName = file.getName();
+            
+            // 确定文件的媒体类型
+            String contentType = determineContentType(fileName);
+            
+            // 读取文件内容
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            
+            // 设置HTTP头
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(contentType));
+            headers.setContentDispositionFormData("attachment", fileName);
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            headers.setPragma("public");
+            
+            // 返回文件内容
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(fileContent);
+        } catch (Exception e) {
+            System.out.println("获取文件内容出错: " + e.getMessage());
+            e.printStackTrace();
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("status", "error");
+            errorResponse.put("message", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    /**
+     * 根据文件名确定内容类型
+     * 
+     * @param fileName 文件名
+     * @return 内容类型
+     */
+    private String determineContentType(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1).toLowerCase();
+        }
+        
+        switch (extension) {
+            case "txt":
+                return "text/plain";
+            case "html":
+            case "htm":
+                return "text/html";
+            case "json":
+                return "application/json";
+            case "xml":
+                return "application/xml";
+            case "pdf":
+                return "application/pdf";
+            case "png":
+                return "image/png";
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "gif":
+                return "image/gif";
+            case "svg":
+                return "image/svg+xml";
+            case "css":
+                return "text/css";
+            case "js":
+                return "application/javascript";
+            case "mp4":
+                return "video/mp4";
+            case "mp3":
+                return "audio/mpeg";
+            case "zip":
+                return "application/zip";
+            case "doc":
+                return "application/msword";
+            case "docx":
+                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "xls":
+                return "application/vnd.ms-excel";
+            case "xlsx":
+                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            case "ppt":
+                return "application/vnd.ms-powerpoint";
+            case "pptx":
+                return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+            default:
+                return "application/octet-stream";
         }
     }
 } 

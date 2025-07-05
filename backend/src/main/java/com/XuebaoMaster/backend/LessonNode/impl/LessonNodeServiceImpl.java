@@ -15,10 +15,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -77,7 +84,7 @@ public class LessonNodeServiceImpl implements LessonNodeService {
         existingNode.setNodeOrder(lessonNode.getNodeOrder());
         existingNode.setTitle(lessonNode.getTitle());
         existingNode.setPathToNodes(lessonNode.getPathToNodes());
-        
+
         // 更新知识图谱路径
         if (lessonNode.getPathToGraph() != null) {
             existingNode.setPathToGraph(lessonNode.getPathToGraph());
@@ -345,6 +352,27 @@ public class LessonNodeServiceImpl implements LessonNodeService {
             } catch (Exception jsonEx) {
                 return "{\"status\":\"error\",\"message\":\"处理聊天消息时发生错误\"}";
             }
+        }
+    }
+
+    @Override
+    public List<String> getFilesInFolder(String folderPath) {
+        try {
+            List<String> filePaths = new ArrayList<>();
+            Path path = Paths.get(folderPath);
+            
+            if (Files.exists(path)) {
+                try (Stream<Path> walk = Files.walk(path)) {
+                    filePaths = walk.filter(Files::isRegularFile)
+                                    .map(Path::toString)
+                                    .collect(Collectors.toList());
+                }
+            }
+            
+            return filePaths;
+        } catch (Exception e) {
+            System.out.println("获取文件夹内容失败: " + e.getMessage());
+            throw new RuntimeException("获取文件夹内容失败: " + e.getMessage(), e);
         }
     }
 } 
