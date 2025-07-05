@@ -23,12 +23,6 @@ public class LessonNode {
     @Column(nullable = false, length = 100)
     private String title;
 
-    @Column(name = "path_to_nodes", length = 1000)
-    private String pathToNodes;
-
-    @Column(name = "path_to_graph", length = 1000)
-    private String pathToGraph;
-
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -45,4 +39,4 @@ public class LessonNode {
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-} 
+}
