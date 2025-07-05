@@ -21,4 +21,4 @@ public class DeepSeekChatController {
         DeepSeekChatResponse response = deepSeekChatService.sendMessage(chatMessage.getMessages());
         return ResponseEntity.ok(response);
     }
-} 
+}

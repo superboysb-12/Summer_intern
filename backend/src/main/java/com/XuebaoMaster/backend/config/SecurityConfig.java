@@ -20,7 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers("/users/register", "/users/login", "/api/files/**").permitAll()
                         // 确保所有LessonNode相关的端点都需要认证
                         .requestMatchers("/lesson-nodes/**").authenticated()
+                        .requestMatchers("/api/deepseek/chat").authenticated()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
@@ -70,7 +71,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173")); // 前端应用的URL
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173",
+                "http://localhost:8080",
+                "http://10.0.2.2:8080")); // 允许的源
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));
