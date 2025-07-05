@@ -38,11 +38,7 @@ public class SecurityConfig {
                 .cors().configurationSource(corsConfigurationSource()).and()
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/register", "/users/login", "/api/files/**").permitAll()
-                        // 确保所有LessonNode相关的端点都需要认证
-                        .requestMatchers("/lesson-nodes/**").authenticated()
-                        .requestMatchers("/api/deepseek/chat").authenticated()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/**").permitAll())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
