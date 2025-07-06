@@ -11,27 +11,23 @@ const store = useCounterStore()
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
 
-// 文件列表数据
 const fileList = ref([])
 const loading = ref(false)
 const total = ref(0)
 
-// 当前路径
 const currentPath = ref('/')
 const pathHistory = ref(['/'])
 
-// 表单引用
 const fileFormRef = ref(null)
 const folderFormRef = ref(null)
 
-// 查询参数
 const queryParams = reactive({
   path: '/',
   includeFiles: true,
   keyword: ''
 })
 
-// 文件上传表单
+// 文件上传表单 
 const uploadForm = reactive({
   files: [],
   path: '/',

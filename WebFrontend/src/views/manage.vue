@@ -11,7 +11,10 @@ import {
   Tools,
   Bell,
   School,
-  Reading
+  Reading,
+  Collection,
+  ChatDotRound,
+  Edit
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
 import { useRouter, useRoute } from 'vue-router'
@@ -28,6 +31,9 @@ const getActiveMenu = () => {
   if (path.includes('/manage/classes')) return 'classes'
   if (path.includes('/manage/courses')) return 'courses'
   if (path.includes('/manage/files')) return 'files'
+  if (path.includes('/manage/rag')) return 'rag'
+  if (path.includes('/manage/deepseek')) return 'deepseek'
+  if (path.includes('/manage/teaching-plan')) return 'teaching-plan'
   if (path.includes('/manage/data')) return 'data-overview'
   if (path.includes('/manage/settings')) return 'settings'
   return 'home'
@@ -57,6 +63,15 @@ const handleMenuSelect = (key) => {
       break
     case 'files':
       router.push('/manage/files')
+      break
+    case 'rag':
+      router.push('/manage/rag')
+      break
+    case 'deepseek':
+      router.push('/manage/deepseek')
+      break
+    case 'teaching-plan':
+      router.push('/manage/teaching-plan')
       break
     case 'data-overview':
       router.push('/manage/data')
@@ -165,6 +180,21 @@ onMounted(() => {
           <el-menu-item index="files">
             <el-icon><Document /></el-icon>
             <template #title>文件管理</template>
+          </el-menu-item>
+          
+          <el-menu-item index="rag">
+            <el-icon><Collection /></el-icon>
+            <template #title>RAG知识库</template>
+          </el-menu-item>
+          
+          <el-menu-item index="teaching-plan">
+            <el-icon><Edit /></el-icon>
+            <template #title>教案生成</template>
+          </el-menu-item>
+          
+          <el-menu-item index="deepseek">
+            <el-icon><ChatDotRound /></el-icon>
+            <template #title>DeepSeek Chat</template>
           </el-menu-item>
           
           <el-menu-item index="tools">

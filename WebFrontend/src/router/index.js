@@ -15,6 +15,9 @@ const UserManage = () => import('../components/UserManage.vue')
 const ClassManage = () => import('../components/ClassManage.vue')
 const CourseManage = () => import('../components/CourseManage.vue')
 const FileManage = () => import('../components/FileManage.vue')
+const RAGManage = () => import('../components/RAGManage.vue')
+const DeepSeekChat = () => import('../components/DeepSeekChat.vue')
+const TeachingPlanGenerator = () => import('../components/TeachingPlanGenerator.vue')
 
 const routes=[
     {
@@ -66,6 +69,21 @@ const routes=[
                 path: 'data',
                 component: DataOverview,
                 meta: { title: '系统管理 - 数据概览' }
+            },
+            {
+                path: 'rag',
+                component: RAGManage,
+                meta: { title: '系统管理 - RAG知识库' }
+            },
+            {
+                path: 'teaching-plan',
+                component: TeachingPlanGenerator,
+                meta: { title: '系统管理 - 教案生成' }
+            },
+            {
+                path: 'deepseek',
+                component: DeepSeekChat,
+                meta: { title: '系统管理 - DeepSeek Chat' }
             }
         ]
     },

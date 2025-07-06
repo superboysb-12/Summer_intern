@@ -1392,12 +1392,4 @@ onUnmounted(() => {
   }
 }
 
-/* 确保面包屑项在悬停时显示指针和颜色变化 */
-.clickable-breadcrumb :deep(.el-breadcrumb__inner) {
-  cursor: pointer;
-}
-
-.clickable-breadcrumb :deep(.el-breadcrumb__inner):hover {
-  color: var(--el-color-primary);
-}
 </style> 
