@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">Application</string>
+    
+    <!-- Login Screen -->
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="welcome_subtitle">welcome back we missed you</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="sign_in">Sign in</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="or_continue_with">Or continue with</string>
+    <string name="dont_have_account">Don\'t have an account? Sign up</string>
+    
+    <!-- Register Screen -->
+    <string name="get_started_free">Get Started Free</string>
+    <string name="register_subtitle">Free Forever. No Credit Card Needed</string>
+    <string name="your_name">Your Name</string>
+    <string name="name_placeholder">\@yourname</string>
+    <string name="email_address">Email Address</string>
+    <string name="email_placeholder">yourname\@gmail.com</string>
+    <string name="sign_up">Sign up</string>
+    <string name="or_sign_up_with">Or sign up with</string>
+    <string name="already_have_account">Already have an account? Sign in</string>
+    <string name="password_strength_strong">Strong</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error_network">Network error occurred</string>
+    <string name="error_invalid_credentials">Invalid credentials</string>
+    <string name="error_user_exists">User already exists</string>
+    <string name="error_fields_empty">Please fill all fields</string>
+    <string name="success_login">Login successful</string>
+    <string name="success_register">Registration successful</string>
+    
+    <!-- Chat Screen -->
+    <string name="chatgpt_title">ChatGPT</string>
+    <string name="online_status">Online</string>
+    <string name="message_hint">Write your message</string>
+    <string name="voice_feature_developing">语音功能开发中...</string>
+    <string name="voice_play_developing">语音播放功能开发中...</string>
+    <string name="export_developing">导出功能开发中...</string>
+    <string name="typing_indicator">正在输入...</string>
+    <string name="chat_welcome">你好！我是你的AI学习助手，我可以帮助你解答各种学习问题。有什么我可以帮助你的吗？</string>
+    <string name="chat_error_prefix">抱歉，发生了错误：</string>
+    <string name="send_failed">发送失败：</string>
+    <string name="not_logged_in">未登录，请先登录</string>
+    <string name="no_chat_history">没有聊天记录可以导出</string>
+    <string name="chat_export_ready">聊天记录已准备好，导出功能待完善</string>
+    
+    <!-- Navigation -->
+    <string name="nav_courses">课程</string>
+    <string name="nav_chat">对话</string>
+    <string name="nav_profile">我的</string>
+</resources>

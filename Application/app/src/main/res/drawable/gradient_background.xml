@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Base background -->
+    <item>
+        <shape>
+            <solid android:color="@color/primary_background" />
+        </shape>
+    </item>
+    
+    <!-- Gradient overlay -->
+    <item>
+        <shape>
+            <gradient
+                android:angle="135"
+                android:startColor="#33B379DF"
+                android:centerColor="#19CC5854"
+                android:endColor="#33B379DF"
+                android:type="radial"
+                android:centerX="0.3"
+                android:centerY="0.2"
+                android:gradientRadius="1.0" />
+        </shape>
+    </item>
+    
+    <!-- Additional purple circles effect -->
+    <item android:top="100dp" android:left="-100dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#15B379DF"
+                android:endColor="#00360060"
+                android:type="radial"
+                android:gradientRadius="200dp" />
+            <size android:width="400dp" android:height="400dp" />
+        </shape>
+    </item>
+    
+    <!-- Orange/red circle effect -->
+    <item android:bottom="200dp" android:right="-150dp">
+        <shape android:shape="oval">
+            <gradient
+                android:startColor="#15C45647"
+                android:endColor="#00D25A63"
+                android:type="radial"
+                android:gradientRadius="200dp" />
+            <size android:width="400dp" android:height="400dp" />
+        </shape>
+    </item>
+</layer-list>
