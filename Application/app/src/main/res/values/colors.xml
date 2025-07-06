@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- App Theme Colors based on Figma Design -->
+    <color name="primary_background">#151316</color>
+    <color name="primary_text">#EFEFEF</color>
+    <color name="secondary_text">#A4A4A4</color>
+    <color name="accent_text">#B6B6B6</color>
+    
+    <!-- Gradient Colors -->
+    <color name="gradient_start">#9C3FE4</color>
+    <color name="gradient_end">#C65647</color>
+    <color name="purple_gradient_start">#B379DF</color>
+    <color name="purple_gradient_end">#360060</color>
+    
+    <!-- Input Field Colors -->
+    <color name="input_background">#FFFFFF</color>
+    <color name="input_background_alpha">#22FFFFFF</color>
+    <color name="input_border">#FFFFFF</color>
+    <color name="input_border_alpha">#00FFFFFF</color>
+    
+    <!-- Social Login Colors -->
+    <color name="google_red">#FF3D00</color>
+    <color name="google_blue">#1976D2</color>
+    <color name="google_green">#4CAF50</color>
+    <color name="google_yellow">#FFC107</color>
+    <color name="linkedin_blue">#0A66C2</color>
+    
+    <!-- Password Strength Colors -->
+    <color name="password_weak">#8F8F8F</color>
+    <color name="password_medium">#4CAF50</color>
+    <color name="password_strong">#009606</color>
+    <color name="password_strong_text">#9FDBA1</color>
+</resources>

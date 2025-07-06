@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="start">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="8dp">
+
+        <!-- 机器人头像 -->
+        <ImageView
+            android:id="@+id/botAvatar"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/avatar_background"
+            android:src="@drawable/ic_bot_avatar"
+            android:padding="8dp" />
+
+        <!-- 消息气泡 -->
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="60dp"
+            android:background="@drawable/chat_bubble_bot"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textColor="#505050"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:maxWidth="252dp"
+            android:text="Hello, I'm fine, how can I help you?" />
+
+    </LinearLayout>
+
+</LinearLayout>
