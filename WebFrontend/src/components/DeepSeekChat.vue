@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, Delete, Download, RefreshRight, Connection, ChatLineSquare } from '@element-plus/icons-vue'
 import axios from 'axios'
@@ -29,6 +29,186 @@ const chatHistory = reactive({
   title: '新的对话',
   messages: []
 })
+
+// 学习帮助助手提示词
+const learningAssistantPrompt = `# 学习帮助助手提示词
+
+## 角色定义
+你是一位经验丰富、耐心友善的学习帮助助手，专门为学生提供学习支持和答疑解惑。你的目标是帮助学生理解知识、培养思维能力，而不仅仅是提供标准答案。
+
+## 核心原则
+
+### 1. 启发式教学
+- 优先引导学生思考，而非直接给出答案
+- 通过提问帮助学生发现问题的关键点
+- 鼓励学生说出自己的思路和理解
+
+### 2. 因材施教
+- 根据学生的年级和知识水平调整解释的深度
+- 识别学生的薄弱环节，有针对性地提供帮助
+- 使用学生熟悉的例子和类比来解释概念
+
+### 3. 循序渐进
+- 将复杂问题分解为简单的小步骤
+- 确保学生理解每一步再进行下一步
+- 提供从基础到进阶的多层次解释
+
+## 回答格式
+
+### 对于学科问题：
+1. **理解确认**: 先复述问题，确保理解正确
+2. **思路引导**: 提出引导性问题，启发学生思考
+3. **概念解释**: 用简单易懂的语言解释相关概念
+4. **步骤演示**: 如果需要，提供清晰的解题步骤
+5. **举一反三**: 提供相似的例子或变式练习
+6. **总结要点**: 归纳重要知识点和解题思路
+
+### 对于学习方法问题：
+1. **问题分析**: 了解学生的具体困难
+2. **方法推荐**: 提供实用的学习策略和技巧
+3. **个性化建议**: 根据学生情况给出针对性建议
+4. **实践指导**: 说明如何具体实施这些方法
+
+## 沟通风格
+
+### 语言特点：
+- 使用鼓励性和支持性的语言
+- 避免使用过于专业或复杂的术语
+- 保持友善、耐心的语调
+- 适当使用表情符号增加亲和力
+
+### 回复要求：
+- 回答要准确、完整但不冗长
+- 结构清晰，便于学生理解和记忆
+- 多用实例和类比，少用抽象概念
+- 及时给予肯定和鼓励
+
+## 特殊情况处理
+
+### 当学生遇到困难时：
+- 保持耐心，不表现出任何不耐烦
+- 换一种解释方式或角度
+- 从更基础的概念开始讲解
+- 给予情感支持和鼓励
+
+### 当学生答错时：
+- 不直接指出错误，而是引导发现
+- 肯定其中正确的部分
+- 温和地纠正误解
+- 解释正确答案的思路
+
+### 当遇到超出能力范围的问题时：
+- 诚实承认不确定
+- 建议寻求老师或专业人士帮助
+- 提供可能的学习资源和方向
+
+## 示例互动
+
+**学生**: "我不明白二次函数的开口方向怎么判断"
+
+**助手**: "这是一个很好的问题！让我们一起来理解一下。你还记得二次函数的一般形式是什么样的吗？是 y = ax² + bx + c 对吧？
+
+你有没有注意到这里有个字母 a？这个 a 其实就是判断开口方向的关键！
+
+你可以想象一下：
+- 当 a > 0 时，就像一个笑脸 😊，开口向上
+- 当 a < 0 时，就像一个难过的脸 ☹️，开口向下
+
+你能试着判断一下 y = 2x² + 3x + 1 的开口方向吗？"
+
+## 持续改进
+- 关注学生的反馈，调整解释方式
+- 不断学习新的教学方法和技巧
+- 保持对教育心理学的理解和应用`
+
+// 保存的对话列表
+const savedChats = ref([])
+
+// 滚动锁定状态
+const lockChatScroll = ref(false)
+
+// 禁止聊天区域滚动函数
+const preventChatAreaScroll = (e) => {
+  const chatMessages = document.querySelector('.chat-messages')
+  if (!chatMessages) return
+  
+  // 只有当聊天消息区域滚动到顶部或底部时才传播滚动事件
+  const isAtTop = chatMessages.scrollTop <= 0
+  const isAtBottom = Math.abs(chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight) <= 1
+  
+  if (!isAtTop && !isAtBottom) {
+    e.stopPropagation()
+  }
+}
+
+// 加载保存的对话列表
+const loadSavedChats = () => {
+  try {
+    const savedChatsData = localStorage.getItem('deepseekChats')
+    if (savedChatsData) {
+      savedChats.value = JSON.parse(savedChatsData)
+    }
+  } catch (error) {
+    console.error('加载保存的对话失败:', error)
+  }
+}
+
+// 保存当前对话
+const saveCurrentChat = () => {
+  // 如果没有消息，则不保存
+  if (messages.value.length === 0) return
+  
+  // 创建一个唯一ID（如果没有的话）
+  if (!chatHistory.id) {
+    chatHistory.id = Date.now().toString()
+  }
+  
+  const chatToSave = {
+    id: chatHistory.id,
+    title: chatHistory.title,
+    messages: [...messages.value],
+    timestamp: new Date().toISOString()
+  }
+  
+  // 查找是否已存在相同ID的对话
+  const existingIndex = savedChats.value.findIndex(chat => chat.id === chatToSave.id)
+  
+  if (existingIndex !== -1) {
+    // 更新现有对话
+    savedChats.value[existingIndex] = chatToSave
+  } else {
+    // 添加新对话
+    savedChats.value.push(chatToSave)
+  }
+  
+  // 保存到localStorage
+  localStorage.setItem('deepseekChats', JSON.stringify(savedChats.value))
+  ElMessage.success('对话已保存')
+}
+
+// 加载指定对话
+const loadChat = (chatId) => {
+  const chat = savedChats.value.find(c => c.id === chatId)
+  if (chat) {
+    chatHistory.id = chat.id
+    chatHistory.title = chat.title
+    messages.value = [...chat.messages]
+    ElMessage.success('对话已加载')
+  }
+}
+
+// 删除保存的对话
+const deleteChat = (chatId) => {
+  savedChats.value = savedChats.value.filter(chat => chat.id !== chatId)
+  localStorage.setItem('deepseekChats', JSON.stringify(savedChats.value))
+  
+  // 如果删除的是当前对话，则清空当前对话
+  if (chatHistory.id === chatId) {
+    clearChat()
+  }
+  
+  ElMessage.success('对话已删除')
+}
 
 // 获取RAG列表
 const getRAGList = async () => {
@@ -93,6 +273,9 @@ const sendMessage = async () => {
       }))
     }
     
+    // 添加系统消息 - 学习帮助助手提示词（隐式添加，不显示在界面上）
+    let systemPrompt = learningAssistantPrompt
+    
     // 如果启用了RAG，并且选择了RAG，则添加RAG查询
     if (useRag.value && selectedRag.value) {
       // 先进行RAG查询
@@ -134,13 +317,16 @@ const sendMessage = async () => {
           ragContext += "\n"
         })
         
-        // 在消息列表的最前面添加系统消息
-        requestBody.messages.unshift({
-          role: "system",
-          content: ragContext
-        })
+        // 组合RAG上下文和学习助手提示词
+        systemPrompt = `${ragContext}\n\n${systemPrompt}`
       }
     }
+    
+    // 在消息列表的最前面添加系统消息
+    requestBody.messages.unshift({
+      role: "system",
+      content: systemPrompt
+    })
     
     // 发送请求到DeepSeek API
     const response = await axios.post(`${BaseUrl}api/deepseek/chat`, requestBody, {
@@ -167,6 +353,9 @@ const sendMessage = async () => {
       if (!chatHistory.id && messages.value.length === 2) {
         chatHistory.title = tempMessage.substring(0, 30) + (tempMessage.length > 30 ? '...' : '')
       }
+      
+      // 自动保存到localStorage
+      saveCurrentChat()
     } else {
       // 移除临时消息
       messages.value = messages.value.filter(msg => !msg.isLoading)
@@ -225,99 +414,138 @@ const scrollToBottom = () => {
   }
 }
 
-// 页面加载时获取RAG列表
+// 页面加载时获取RAG列表并加载保存的对话
 onMounted(() => {
   getRAGList()
+  loadSavedChats()
+  
+  // 添加聊天区域的滚动事件监听
+  const chatMessages = document.querySelector('.chat-messages')
+  if (chatMessages) {
+    chatMessages.addEventListener('wheel', preventChatAreaScroll, { passive: false })
+    chatMessages.addEventListener('touchmove', preventChatAreaScroll, { passive: false })
+  }
 })
+
+// 组件卸载时清理事件监听器
+onUnmounted(() => {
+  const chatMessages = document.querySelector('.chat-messages')
+  if (chatMessages) {
+    chatMessages.removeEventListener('wheel', preventChatAreaScroll)
+    chatMessages.removeEventListener('touchmove', preventChatAreaScroll)
+  }
+})
+
+// 监听消息变化，自动保存对话
+watch(messages, () => {
+  if (messages.value.length > 0 && !messages.value.some(msg => msg.isLoading)) {
+    chatHistory.messages = [...messages.value]
+    // 不在每次消息变化时都保存，避免频繁写入localStorage
+  }
+}, { deep: true })
 </script>
 
 <template>
-  <div class="deepseek-chat-container">
-    <div class="chat-sidebar">
+  <div class="deepseek-chat">
+    <!-- 左侧边栏 - 聊天历史 -->
+    <div class="sidebar">
       <div class="sidebar-header">
-        <h3>DeepSeek Chat</h3>
-        <el-button type="primary" :icon="Plus" circle @click="clearChat" />
+        <h2>对话历史</h2>
+        <el-button type="primary" size="small" @click="clearChat" :icon="Plus">新对话</el-button>
       </div>
       
-      <div class="rag-controls">
-        <div class="rag-toggle">
-          <span>启用RAG知识增强</span>
-          <el-switch v-model="useRag" />
+      <div class="chat-list">
+        <div v-for="chat in savedChats" :key="chat.id" 
+             class="chat-item" 
+             :class="{ active: chat.id === chatHistory.id }" 
+             @click="loadChat(chat.id)">
+          <div class="chat-item-content">
+            <el-icon><ChatLineSquare /></el-icon>
+            <span class="chat-title">{{ chat.title }}</span>
+          </div>
+          <div class="chat-item-actions">
+            <el-button type="text" size="small" @click.stop="deleteChat(chat.id)" :icon="Delete"></el-button>
+          </div>
         </div>
-        
-        <el-select 
-          v-model="selectedRag" 
-          placeholder="选择知识库" 
-          :disabled="!useRag"
-          class="rag-select"
-        >
-          <el-option
-            v-for="rag in ragList"
-            :key="rag.id"
-            :label="rag.name"
-            :value="rag.id"
-          >
-            <div class="rag-option">
-              <span>{{ rag.name }}</span>
-              <small>{{ rag.description }}</small>
-            </div>
-          </el-option>
-        </el-select>
-      </div>
-      
-      <div class="chat-actions">
-        <el-button :icon="RefreshRight" @click="getRAGList">刷新知识库</el-button>
-        <el-button :icon="Download" @click="downloadChat">下载对话</el-button>
-        <el-button type="danger" :icon="Delete" @click="clearChat">清空对话</el-button>
       </div>
     </div>
     
-    <div class="chat-main">
-      <div class="chat-messages" ref="chatContainer">
-        <template v-if="messages.length === 0">
-          <div class="welcome-message">
-            <h2>欢迎使用 DeepSeek Chat</h2>
-            <p>这是一个强大的AI聊天助手，可以回答您的问题、提供信息和帮助您解决问题。</p>
-            <p v-if="ragList.length > 0">您可以启用RAG知识增强功能，让AI基于您的知识库回答问题。</p>
+    <!-- 主聊天区域 -->
+    <div class="main-content">
+      <!-- 聊天头部 -->
+      <div class="chat-header">
+        <h1>{{ chatHistory.title }}</h1>
+        <div class="header-actions">
+          <el-switch
+            v-model="useRag"
+            active-text="启用知识库"
+            inactive-text="不使用知识库"
+            class="rag-switch"
+          />
+          
+          <el-select 
+            v-if="useRag" 
+            v-model="selectedRag" 
+            placeholder="选择知识库" 
+            size="small"
+            class="rag-select">
+            <el-option
+              v-for="item in ragList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+          
+          <el-button type="text" @click="getRAGList" :icon="RefreshRight"></el-button>
+          <el-button type="text" @click="downloadChat" :icon="Download"></el-button>
+          <el-button type="text" @click="clearChat" :icon="Delete"></el-button>
+        </div>
+      </div>
+      
+      <!-- 聊天消息区域 -->
+      <div class="chat-messages">
+        <div v-if="messages.length === 0" class="empty-chat">
+          <div class="empty-chat-content">
+            <el-icon :size="64"><ChatLineSquare /></el-icon>
+            <h2>开始一个新的对话</h2>
+            <p>使用DeepSeek AI作为你的学习助手</p>
           </div>
-        </template>
+        </div>
         
         <template v-else>
-          <div 
-            v-for="(message, index) in messages" 
-            :key="index"
-            :class="['message', message.role === 'user' ? 'user-message' : 'ai-message']"
-          >
+          <div v-for="(message, index) in messages" :key="index" class="message" :class="message.role">
             <div class="message-header">
-              <span class="message-role">{{ message.role === 'user' ? '用户' : 'DeepSeek AI' }}</span>
+              <span class="role-badge">{{ message.role === 'user' ? '我' : 'DeepSeek AI' }}</span>
             </div>
-            <div class="message-content" v-if="!message.isLoading">
-              <!-- 使用简单的Markdown渲染 -->
-              <div v-html="message.content.replace(/\n/g, '<br>')"></div>
-            </div>
-            <div class="message-content loading" v-else>
-              <el-skeleton :rows="3" animated />
+            <div class="message-content" :class="{ 'loading': message.isLoading }">
+              <div v-if="message.isLoading" class="loading-indicator">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+              </div>
+              <div v-else v-html="message.content.replace(/\n/g, '<br>')"></div>
             </div>
           </div>
         </template>
       </div>
       
+      <!-- 输入区域 -->
       <div class="chat-input">
         <el-input
           v-model="currentMessage"
           type="textarea"
           :rows="3"
-          placeholder="输入消息，按Enter发送..."
+          placeholder="输入您的问题..."
           resize="none"
-          @keyup.enter.exact="sendMessage"
+          @keydown.enter.exact.prevent="sendMessage"
         />
         <el-button 
           type="primary" 
-          :icon="ChatLineSquare" 
+          @click="sendMessage" 
           :loading="loading"
-          @click="sendMessage"
           :disabled="!currentMessage.trim()"
-        >
+          class="send-button">
           发送
         </el-button>
       </div>
@@ -326,153 +554,391 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.deepseek-chat-container {
+.deepseek-chat {
   display: flex;
   height: 100%;
-  overflow: hidden;
+  width: 100%;
+  color: #1c2024;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f8fafc;
 }
 
-.chat-sidebar {
+/* 左侧边栏样式 */
+.sidebar {
   width: 280px;
-  background-color: #f5f7fa;
-  border-right: 1px solid #e6e9f0;
+  background-color: #fff;
+  border-right: 1px solid #eaeef2;
   display: flex;
   flex-direction: column;
-  padding: 15px;
+  height: 100%;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.03);
+  z-index: 2;
 }
 
 .sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #eaeef2;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
-.sidebar-header h3 {
+.sidebar-header h2 {
   margin: 0;
-  font-size: 18px;
-  color: #303133;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1c2024;
+  letter-spacing: -0.02em;
 }
 
-.rag-controls {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-.rag-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
-.rag-select {
-  width: 100%;
-}
-
-.rag-option {
-  display: flex;
-  flex-direction: column;
-}
-
-.rag-option small {
-  color: #909399;
-  font-size: 12px;
-}
-
-.chat-actions {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.chat-main {
+.chat-list {
   flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+}
+
+.chat-item {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chat-item:hover {
+  background-color: #f2f5f8;
+  transform: translateY(-1px);
+}
+
+.chat-item.active {
+  background-color: #ecf4fe;
+  border-left: 3px solid #3e7bfa;
+}
+
+.chat-item-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   overflow: hidden;
 }
 
+.chat-item-content .el-icon {
+  color: #3e7bfa;
+  font-size: 18px;
+}
+
+.chat-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.chat-item-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.chat-item:hover .chat-item-actions {
+  opacity: 1;
+}
+
+/* 主内容区域样式 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #eaeef2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.chat-header h1 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1c2024;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.rag-switch {
+  margin-right: 10px;
+}
+
+.rag-select {
+  width: 180px;
+}
+
+/* 聊天消息区域 */
 .chat-messages {
   flex: 1;
-  padding: 20px;
   overflow-y: auto;
-  background-color: #ffffff;
+  padding: 30px;
+  background-color: #f8fafc;
+  background-image: radial-gradient(circle at 25px 25px, rgba(0, 0, 0, 0.02) 2%, transparent 0%), 
+                    radial-gradient(circle at 75px 75px, rgba(0, 0, 0, 0.02) 2%, transparent 0%);
+  background-size: 100px 100px;
+  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
 }
 
-.welcome-message {
+.empty-chat {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-chat-content {
   text-align: center;
-  padding: 40px 20px;
-  color: #606266;
+  color: #8c8c8c;
+  background-color: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  max-width: 400px;
+  transition: transform 0.3s ease;
 }
 
-.welcome-message h2 {
-  color: #303133;
-  margin-bottom: 20px;
+.empty-chat-content:hover {
+  transform: translateY(-5px);
+}
+
+.empty-chat-content .el-icon {
+  color: #3e7bfa;
+  margin-bottom: 8px;
+}
+
+.empty-chat-content h2 {
+  margin-top: 16px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #1c2024;
+  font-size: 20px;
+}
+
+.empty-chat-content p {
+  color: #6b7280;
+  font-size: 15px;
+  margin-top: 0;
 }
 
 .message {
-  margin-bottom: 20px;
-  padding: 15px;
-  border-radius: 8px;
+  margin-bottom: 28px;
   max-width: 85%;
+  animation: message-appear 0.3s ease-out forwards;
 }
 
-.user-message {
-  background-color: #ecf5ff;
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message.user {
   margin-left: auto;
 }
 
-.ai-message {
-  background-color: #f5f7fa;
+.message.assistant {
   margin-right: auto;
 }
 
 .message-header {
   margin-bottom: 8px;
-  font-weight: bold;
+  padding: 0 12px;
 }
 
-.message-role {
-  font-size: 14px;
+.role-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.user-message .message-role {
-  color: #409eff;
+.role-badge::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
-.ai-message .message-role {
-  color: #67c23a;
+.message.user .role-badge::before {
+  background-color: #3e7bfa;
+}
+
+.message.assistant .role-badge::before {
+  background-color: #10b981;
 }
 
 .message-content {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   font-size: 15px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-word;
+  line-height: 1.6;
+  transition: transform 0.2s ease;
+}
+
+.message-content:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.message.user .message-content {
+  background-color: #ecf4fe;
+  border: 1px solid #dae7fd;
+  border-top-right-radius: 4px;
+}
+
+.message.assistant .message-content {
+  background-color: #fff;
+  border: 1px solid #eaeef2;
+  border-top-left-radius: 4px;
 }
 
 .message-content.loading {
-  min-width: 300px;
+  background-color: #f4f5f6;
 }
 
-.chat-input {
-  padding: 15px;
-  background-color: #ffffff;
-  border-top: 1px solid #e6e9f0;
+.loading-indicator {
   display: flex;
-  gap: 10px;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3e7bfa;
+  animation: dot-pulse 1.5s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(0.7);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 输入区域 */
+.chat-input {
+  padding: 20px 24px;
+  border-top: 1px solid #eaeef2;
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  position: sticky;
+  bottom: 0;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
 }
 
 .chat-input .el-input {
   flex: 1;
 }
 
-.chat-input .el-button {
-  align-self: flex-end;
+.chat-input :deep(.el-textarea__inner) {
+  border-radius: 12px;
+  border-color: #dfe3e8;
+  padding: 12px 16px;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 15px;
 }
-</style> 
+
+.chat-input :deep(.el-textarea__inner:focus) {
+  border-color: #3e7bfa;
+  box-shadow: 0 0 0 3px rgba(62, 123, 250, 0.15);
+}
+
+.send-button {
+  height: 44px;
+  min-width: 90px;
+  border-radius: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease;
+  background-color: #3e7bfa;
+  border-color: #3e7bfa;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(62, 123, 250, 0.25);
+  background-color: #4d86fa;
+  border-color: #4d86fa;
+}
+
+.send-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 滚动条样式 */
+.chat-messages::-webkit-scrollbar, 
+.chat-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track, 
+.chat-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-messages::-webkit-scrollbar-thumb, 
+.chat-list::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover, 
+.chat-list::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+</style>
