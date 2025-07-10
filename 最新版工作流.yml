@@ -1,0 +1,2420 @@
+app:
+  description: ''
+  icon: 🔍
+  icon_background: '#D1E9FF'
+  mode: advanced-chat
+  name: 教案撰写，改造自deep research
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/json_process:0.0.2@dde6d7b676ccdcea89206d29232181a840170c19277d3d978e27cd1e3c92c707
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: seekerliu/bocha:0.0.1@7d2dbad3f9d2652300d73bb8d91337e925f3c0daf9e0a9e285e060fb9dd7aadb
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.6@dd589dc093c8084925858034ab5ec1fdf0d33819f43226c2f8c4a749a9acbbb2
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: stvlynn/doc:0.0.1@900d82963e63c505136dfc77f3e06329326e714ca66bed668224e811f73efc7b
+kind: app
+version: 0.3.0
+workflow:
+  conversation_variables:
+  - description: ''
+    id: bbad0124-db64-4d64-a9e0-3ddec5e205e6
+    name: KnowledgeSummary
+    selector:
+    - conversation
+    - KnowledgeSummary
+    value: ''
+    value_type: string
+  - description: ''
+    id: 39834b3f-ea6c-4c0e-8fec-38150368c28a
+    name: queries
+    selector:
+    - conversation
+    - queries
+    value: []
+    value_type: array[string]
+  - description: ''
+    id: 3d299d92-9f88-481a-8d14-1dd73179cc9b
+    name: nextQuery
+    selector:
+    - conversation
+    - nextQuery
+    value: ''
+    value_type: string
+  - description: ''
+    id: bfbc3ebe-2838-4b95-ac33-52260e541732
+    name: KnowledgePoint
+    selector:
+    - conversation
+    - KnowledgePoint
+    value: []
+    value_type: array[string]
+  - description: ''
+    id: 07ea9b5b-edf2-471d-8206-50e95e7ab87e
+    name: topics
+    selector:
+    - conversation
+    - topics
+    value: []
+    value_type: array[string]
+  - description: ''
+    id: a9049588-f66f-4c3a-a30e-5952a677baa9
+    name: nextSearchTopic
+    selector:
+    - conversation
+    - nextSearchTopic
+    value: ''
+    value_type: string
+  - description: ''
+    id: 2e0a2539-345c-4723-8b1b-b653e1a0caef
+    name: findings
+    selector:
+    - conversation
+    - findings
+    value: []
+    value_type: array[string]
+  - description: ''
+    id: 23d208d1-a50d-468c-8757-ad49da0886e1
+    name: shouldContinue
+    selector:
+    - conversation
+    - shouldContinue
+    value: 'true'
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: iteration-start
+        targetType: llm
+      id: 1739244888446start-source-1739245286499-target
+      selected: false
+      source: 1739244888446start
+      sourceHandle: source
+      target: '1739245286499'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: llm
+        targetType: tool
+      id: 1739245286499-source-1739245446901-target
+      selected: false
+      source: '1739245286499'
+      sourceHandle: source
+      target: '1739245446901'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: llm
+        targetType: tool
+      id: 1739245286499-source-1739245524260-target
+      selected: false
+      source: '1739245286499'
+      sourceHandle: source
+      target: '1739245524260'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: tool
+        targetType: assigner
+      id: 1739245446901-source-1739245826988-target
+      selected: false
+      source: '1739245446901'
+      sourceHandle: source
+      target: '1739245826988'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: tool
+        targetType: assigner
+      id: 1739245524260-source-1739245826988-target
+      selected: false
+      source: '1739245524260'
+      sourceHandle: source
+      target: '1739245826988'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: assigner
+        targetType: if-else
+      id: 1739245826988-source-1739245723720-target
+      selected: false
+      source: '1739245826988'
+      sourceHandle: source
+      target: '1739245723720'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: assigner
+        targetType: template-transform
+      id: 1739246085820-source-1739254060247-target
+      selected: false
+      source: '1739246085820'
+      sourceHandle: source
+      target: '1739254060247'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1739254060247-source-1739254296073-target
+      selected: false
+      source: '1739254060247'
+      sourceHandle: source
+      target: '1739254296073'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: variable-aggregator
+        targetType: answer
+      id: 1739254296073-source-1739253994297-target
+      selected: false
+      source: '1739254296073'
+      sourceHandle: source
+      target: '1739253994297'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: if-else
+        targetType: template-transform
+      id: 1739245723720-false-1739254516383-target
+      selected: false
+      source: '1739245723720'
+      sourceHandle: 'false'
+      target: '1739254516383'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1739254516383-source-1739254296073-target
+      selected: false
+      source: '1739254516383'
+      sourceHandle: source
+      target: '1739254296073'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        sourceType: if-else
+        targetType: tool
+      id: 1739245723720-true-1751350122768-target
+      selected: false
+      source: '1739245723720'
+      sourceHandle: 'true'
+      target: '1751350122768'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        sourceType: tool
+        targetType: code
+      id: 1751350122768-source-1751354657107-target
+      selected: false
+      source: '1751350122768'
+      sourceHandle: source
+      target: '1751354657107'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        sourceType: code
+        targetType: assigner
+      id: 1751354657107-source-1739246085820-target
+      selected: false
+      source: '1751354657107'
+      sourceHandle: source
+      target: '1739246085820'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: tool
+        targetType: answer
+      id: 1751360436722-source-answer-target
+      selected: false
+      source: '1751360436722'
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: tool
+      id: 1739246156652-source-1751360436722-target
+      selected: false
+      source: '1739246156652'
+      sourceHandle: source
+      target: '1751360436722'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: code
+      id: 1739229221219-source-1739245548624-target
+      selected: false
+      source: '1739229221219'
+      sourceHandle: source
+      target: '1739245548624'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: iteration-start
+        targetType: llm
+      id: 1751591398410start-source-1751591398410017515913984100-target
+      selected: false
+      source: 1751591398410start
+      sourceHandle: source
+      target: '1751591398410017515913984100'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: llm
+        targetType: tool
+      id: 1751591398410017515913984100-source-1751591398410017515913984101-target
+      selected: false
+      source: '1751591398410017515913984100'
+      sourceHandle: source
+      target: '1751591398410017515913984101'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: llm
+        targetType: tool
+      id: 1751591398410017515913984100-source-1751591398410017515913984102-target
+      selected: false
+      source: '1751591398410017515913984100'
+      sourceHandle: source
+      target: '1751591398410017515913984102'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: tool
+        targetType: assigner
+      id: 1751591398410017515913984101-source-1751591398410017515913984104-target
+      selected: false
+      source: '1751591398410017515913984101'
+      sourceHandle: source
+      target: '1751591398410017515913984104'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: tool
+        targetType: assigner
+      id: 1751591398410017515913984102-source-1751591398410017515913984104-target
+      selected: false
+      source: '1751591398410017515913984102'
+      sourceHandle: source
+      target: '1751591398410017515913984104'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: assigner
+        targetType: if-else
+      id: 1751591398410017515913984104-source-1751591398410017515913984103-target
+      selected: false
+      source: '1751591398410017515913984104'
+      sourceHandle: source
+      target: '1751591398410017515913984103'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1751591398410017515913984107-source-1751591398410017515913984108-target
+      selected: false
+      source: '1751591398410017515913984107'
+      sourceHandle: source
+      target: '1751591398410017515913984108'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: variable-aggregator
+        targetType: answer
+      id: 1751591398410017515913984108-source-1751591398410017515913984106-target
+      selected: false
+      source: '1751591398410017515913984108'
+      sourceHandle: source
+      target: '1751591398410017515913984106'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: if-else
+        targetType: template-transform
+      id: 1751591398410017515913984103-false-1751591398410017515913984109-target
+      selected: false
+      source: '1751591398410017515913984103'
+      sourceHandle: 'false'
+      target: '1751591398410017515913984109'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        iteration_id: '1739244888446'
+        sourceType: template-transform
+        targetType: variable-aggregator
+      id: 1751591398410017515913984109-source-1751591398410017515913984108-target
+      selected: false
+      source: '1751591398410017515913984109'
+      sourceHandle: source
+      target: '1751591398410017515913984108'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        sourceType: if-else
+        targetType: http-request
+      id: 1751591398410017515913984103-true-17515913984100175159139841011-target
+      selected: false
+      source: '1751591398410017515913984103'
+      sourceHandle: 'true'
+      target: '17515913984100175159139841011'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        sourceType: http-request
+        targetType: code
+      id: 17515913984100175159139841011-source-17515913984100175159139841013-target
+      selected: false
+      source: '17515913984100175159139841011'
+      sourceHandle: source
+      target: '17515913984100175159139841013'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInLoop: false
+        sourceType: code
+        targetType: iteration
+      id: 1739245548624-source-17515913984100-target
+      selected: false
+      source: '1739245548624'
+      sourceHandle: source
+      target: '17515913984100'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        sourceType: code
+        targetType: assigner
+      id: 17515913984100175159139841013-source-1751591398410017515913984105-target
+      source: '17515913984100175159139841013'
+      sourceHandle: source
+      target: '1751591398410017515913984105'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        sourceType: assigner
+        targetType: code
+      id: 1751591398410017515913984105-source-1751595285555-target
+      source: '1751591398410017515913984105'
+      sourceHandle: source
+      target: '1751595285555'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        sourceType: code
+        targetType: assigner
+      id: 1751595285555-source-1751595356813-target
+      source: '1751595285555'
+      sourceHandle: source
+      target: '1751595356813'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: iteration
+        targetType: llm
+      id: 17515913984100-source-1751595797547-target
+      source: '17515913984100'
+      sourceHandle: source
+      target: '1751595797547'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: assigner
+      id: 1751595797547-source-1751596763694-target
+      source: '1751595797547'
+      sourceHandle: source
+      target: '1751596763694'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: iteration
+      id: 1751596763694-source-1739244888446-target
+      source: '1751596763694'
+      sourceHandle: source
+      target: '1739244888446'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: iteration
+        targetType: llm
+      id: 1739244888446-source-1739246156652-target
+      source: '1739244888446'
+      sourceHandle: source
+      target: '1739246156652'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        sourceType: assigner
+        targetType: template-transform
+      id: 1751595356813-source-1751591398410017515913984107-target
+      source: '1751595356813'
+      sourceHandle: source
+      target: '1751591398410017515913984107'
+      targetHandle: target
+      type: custom
+      zIndex: 1002
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: Start
+        type: start
+        variables:
+        - label: depth
+          max_length: 48
+          options: []
+          required: false
+          type: number
+          variable: depth
+      height: 90
+      id: '1739229221219'
+      position:
+        x: -3438.122923617634
+        y: 1575.5773849284017
+      positionAbsolute:
+        x: -3438.122923617634
+        y: 1575.5773849284017
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1739246156652.text#}}
+
+          {{#1751360436722.files#}}'
+        desc: ''
+        selected: false
+        title: Answer
+        type: answer
+        variables: []
+      height: 123
+      id: answer
+      position:
+        x: 5023.634256262627
+        y: 2157.530485262788
+      positionAbsolute:
+        x: 5023.634256262627
+        y: 2157.530485262788
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        error_handle_mode: terminated
+        height: 1042
+        is_parallel: false
+        iterator_selector:
+        - '1739245548624'
+        - array
+        output_selector:
+        - '1739254296073'
+        - output
+        output_type: array[string]
+        parallel_nums: 10
+        selected: false
+        start_node_id: 1739244888446start
+        title: Iteration
+        type: iteration
+        width: 2066.5415537904464
+      height: 1042
+      id: '1739244888446'
+      position:
+        x: 1963.0641441796256
+        y: 1717.0902832381296
+      positionAbsolute:
+        x: 1963.0641441796256
+        y: 1717.0902832381296
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 2067
+      zIndex: 1
+    - data:
+        desc: ''
+        isInIteration: true
+        selected: false
+        title: ''
+        type: iteration-start
+      draggable: false
+      height: 48
+      id: 1739244888446start
+      parentId: '1739244888446'
+      position:
+        x: 24
+        y: 68
+      positionAbsolute:
+        x: 1987.0641441796256
+        y: 1785.0902832381296
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-iteration-start
+      width: 44
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        memory:
+          query_prompt_template: '## Topic
+
+            {{#sys.query#}}
+
+
+            ##RagResult
+
+            {{#conversation.KnowledgeSummary#}}
+
+
+            ## Findings
+
+            {{#conversation.findings#}}
+
+
+            ## Searched Topics
+
+            {{#conversation.topics#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: 4096
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 2acdb5a9-823a-4ce3-8dbe-401540a61bc5
+          role: system
+          text: '教育研究代理 - 教案撰写前期调研
+
+            角色定义
+
+            你是一个专业的教育研究代理，专门负责为教案撰写进行系统性的前期调研工作。你需要先分析RAG（检索增强生成）结果，然后识别当前研究状态，确定下一步最重要的调研方向。
+
+            RAG结果分析流程
+
+            第一步：RAG信息覆盖度分析
+
+            请仔细分析提供的RAG结果，评估其在以下六个核心维度的信息覆盖程度：
+
+            1. 教学内容分析 (权重：25%)
+
+            核心知识点梳理：RAG结果中是否包含完整的知识点体系？
+
+            重点难点识别：是否明确标识了教学重点和难点？
+
+            知识体系结构：知识点之间的逻辑关系是否清晰？
+
+            覆盖度评分标准：
+
+            高(80-100%)：知识点完整，重难点明确，结构清晰
+
+            中(50-79%)：基本知识点齐全，但重难点或结构有缺失
+
+            低(0-49%)：知识点不完整或缺乏系统性
+
+            2. 学习者分析 (权重：20%)
+
+            目标群体特征：是否描述了学习者的背景特征？
+
+            学习需求分析：是否分析了学习者的具体需求？
+
+            能力水平评估：是否明确了先修知识要求？
+
+            覆盖度评分标准：
+
+            高(80-100%)：学习者画像清晰，需求明确，能力水平明确
+
+            中(50-79%)：部分学习者信息明确，但有缺失
+
+            低(0-49%)：学习者信息严重不足
+
+            3. 教学方法研究 (权重：20%)
+
+            教学策略适配：是否提供了适合的教学方法建议？
+
+            教学活动设计：是否有具体的活动设计思路？
+
+            互动参与机制：是否设计了学习者参与方式？
+
+            覆盖度评分标准：
+
+            高(80-100%)：教学方法丰富，活动设计具体，互动充分
+
+            中(50-79%)：有基本教学方法，但活动设计不够详细
+
+            低(0-49%)：教学方法建议不足或缺失
+
+            4. 教学资源调研 (权重：15%)
+
+            教材参考资料：是否提供了相关的学习资源？
+
+            数字化资源：是否包含多媒体或在线资源？
+
+            实践工具平台：是否提及了实操工具？
+
+            覆盖度评分标准：
+
+            高(80-100%)：资源丰富，类型多样，实用性强
+
+            中(50-79%)：有基本资源，但类型或实用性有限
+
+            低(0-49%)：资源信息不足
+
+            5. 评估体系设计 (权重：10%)
+
+            评估方法设计：是否提供了学习成果评估方案？
+
+            过程性评价：是否设计了过程评价机制？
+
+            反馈改进策略：是否有反馈和改进建议？
+
+            覆盖度评分标准：
+
+            高(80-100%)：评估体系完整，方法科学，反馈及时
+
+            中(50-79%)：有基本评估方法，但体系不够完善
+
+            低(0-49%)：评估信息严重缺失
+
+            6. 理论支撑研究 (权重：10%)
+
+            教育理论基础：是否提供了相关的教育理论支撑？
+
+            最佳实践案例：是否包含成功案例分析？
+
+            经验借鉴参考：是否有同类教案的参考价值？
+
+            覆盖度评分标准：
+
+            高(80-100%)：理论基础扎实，案例丰富，参考价值高
+
+            中(50-79%)：有基本理论支撑，但案例或参考有限
+
+            低(0-49%)：理论支撑不足
+
+            第二步：综合评估与决策
+
+            计算综合覆盖度得分： 综合得分 = (维度1得分×25% + 维度2得分×20% + 维度3得分×20% + 维度4得分×15% + 维度5得分×10%
+            + 维度6得分×10%)
+
+            搜索决策标准
+
+            继续搜索条件（满足任一条件即继续）：
+
+            综合覆盖度 < 70%：整体信息不足以支撑高质量教案设计
+
+            核心维度缺失：维度1(教学内容)或维度2(学习者分析)得分 < 60%
+
+            关键信息空白：任一维度得分 < 30%
+
+            搜索主题优先级（按重要性排序）：
+
+            最高优先级：教学内容分析不足时
+
+            搜索主题示例："[具体主题] 教学知识点体系"、"[具体主题] 教学重点难点分析"
+
+            高优先级：学习者分析不足时
+
+            搜索主题示例："[具体主题] 学习者特征分析"、"[目标群体] 学习需求调研"
+
+            中等优先级：教学方法不足时
+
+            搜索主题示例："[具体主题] 教学方法策略"、"[具体主题] 课堂活动设计"
+
+            次要优先级：按维度4、5、6的缺失程度依次补充
+
+            停止搜索条件：
+
+            综合覆盖度 ≥ 70% 且 所有核心维度(1,2,3)得分 ≥ 60%
+
+            重要输出指令
+
+            ⚠️ 必须直接输出原始JSON对象，禁止使用任何markdown语法！⚠️ ⚠️ 不要使用json代码块包装！⚠️ ⚠️ 不要添加任何解释文字！⚠️
+            ⚠️ 只输出纯JSON内容！⚠️
+
+            输出格式必须是以下两种之一：
+
+            继续研究时输出： {"nextSearchTopic": "具体搜索主题", "shouldContinue": true}
+
+            停止研究时输出： {"nextSearchTopic": null, "shouldContinue": false}
+
+            分析方法示例
+
+            首先逐维度分析RAG结果的信息丰富度
+
+            计算各维度覆盖度得分
+
+            确定综合覆盖度
+
+            识别最需要补充的维度
+
+            生成针对性的搜索主题
+
+            再次强调：直接输出JSON对象，不要任何markdown包装或文字说明。'
+        selected: false
+        title: LLM
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1739245286499'
+      parentId: '1739244888446'
+      position:
+        x: 47.438473550032086
+        y: 113
+      positionAbsolute:
+        x: 2010.5026177296577
+        y: 1830.0902832381296
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        provider_id: json_process
+        provider_name: json_process
+        provider_type: builtin
+        selected: false
+        title: Extract nextSearchTopic
+        tool_configurations:
+          ensure_ascii: 1
+        tool_label: JSON Parse
+        tool_name: parse
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1739245286499.text#}}'
+          json_filter:
+            type: mixed
+            value: nextSearchTopic
+        type: tool
+      height: 90
+      id: '1739245446901'
+      parentId: '1739244888446'
+      position:
+        x: 313.35802530159447
+        y: 206.79745093349834
+      positionAbsolute:
+        x: 2276.42216948122
+        y: 1923.887734171628
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        provider_id: json_process
+        provider_name: json_process
+        provider_type: builtin
+        selected: false
+        title: Extract shouldContinue
+        tool_configurations:
+          ensure_ascii: 1
+        tool_label: JSON Parse
+        tool_name: parse
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1739245286499.text#}}'
+          json_filter:
+            type: mixed
+            value: shouldContinue
+        type: tool
+      height: 90
+      id: '1739245524260'
+      parentId: '1739244888446'
+      position:
+        x: 49.19865333377197
+        y: 358.53359239733356
+      positionAbsolute:
+        x: 2012.2627975133976
+        y: 2075.6238756354633
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        code: "\ndef main(depth: int) -> dict:\n    depth = depth or 3\n    array\
+          \ = list(range(depth))\n    return {\n        \"array\": array,\n      \
+          \  \"depth\": depth\n    }\n"
+        code_language: python3
+        desc: ''
+        outputs:
+          array:
+            children: null
+            type: array[number]
+          depth:
+            children: null
+            type: number
+        selected: false
+        title: Create Array
+        type: code
+        variables:
+        - value_selector:
+          - '1739229221219'
+          - depth
+          variable: depth
+      height: 54
+      id: '1739245548624'
+      position:
+        x: -2893.1191331968175
+        y: 1641.9193438717828
+      positionAbsolute:
+        x: -2893.1191331968175
+        y: 1641.9193438717828
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: b3169e80-3090-4a5b-8df4-3148d7afcb4d
+            value: 'True'
+            varType: string
+            variable_selector:
+            - '1739245524260'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        selected: false
+        title: IF/ELSE
+        type: if-else
+      height: 126
+      id: '1739245723720'
+      parentId: '1739244888446'
+      position:
+        x: 48.74608363090499
+        y: 534.403100663696
+      positionAbsolute:
+        x: 2011.8102278105307
+        y: 2251.493383901826
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1739245446901'
+          - text
+          variable_selector:
+          - conversation
+          - nextSearchTopic
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1739245524260'
+          - text
+          variable_selector:
+          - conversation
+          - shouldContinue
+          write_mode: over-write
+        - input_type: variable
+          operation: append
+          value:
+          - conversation
+          - nextSearchTopic
+          variable_selector:
+          - conversation
+          - topics
+          write_mode: over-write
+        iteration_id: '1739244888446'
+        selected: false
+        title: Assign Variables
+        type: assigner
+        version: '2'
+      height: 144
+      id: '1739245826988'
+      parentId: '1739244888446'
+      position:
+        x: 1328.3901435657858
+        y: 65
+      positionAbsolute:
+        x: 3291.4542877454114
+        y: 1782.0902832381296
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        items:
+        - input_type: variable
+          operation: extend
+          value:
+          - '1751354657107'
+          - result
+          variable_selector:
+          - conversation
+          - findings
+          write_mode: over-write
+        iteration_id: '1739244888446'
+        selected: false
+        title: Assign Variables
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1739246085820'
+      parentId: '1739244888446'
+      position:
+        x: 1337.8210761066282
+        y: 440.31651656890585
+      positionAbsolute:
+        x: 3300.8852202862536
+        y: 2157.4067998070354
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '## topic
+
+            {{#sys.query#}}
+
+
+            '
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params: {}
+          mode: chat
+          name: deepseek-reasoner
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 89c17d58-6a63-4f4f-98fe-f6534ec1ecb0
+          role: system
+          text: "教案撰写要求\n核心任务\n根据提供的教学主题和前期调研结果，撰写一份45分钟课堂教学的完整教案。必须深度整合调研数据，实现数据驱动的精准教学设计。\n\
+            信息整合原则\n主题信息利用\n核心地位：教学主题作为教案设计的核心主线，所有环节围绕主题展开\n方法匹配：根据主题特点和调研发现选择最适合的教学方法和策略\n\
+            体系完整：确保知识体系的完整性和逻辑连贯性\nRAG知识图谱结果深度利用\n知识架构基础：以RAG总结的知识结构化整理为教学内容设计的基础框架\n\
+            重难点识别：充分利用RAG结果中已识别的教学重点和教学难点\n概念关系梳理：基于RAG中的实体关系和概念分类设计知识点之间的逻辑联系\n学习路径规划：根据RAG总结的学习路径建议设计教学环节的先后顺序\n\
+            术语标准化：采用RAG结果中标注的关键术语确保教学用词的准确性和一致性\n联网调研结果深度应用（六大维度）\n教学目标设定：基于学习需求、能力现状和发展期望制定分层目标\n\
+            重难点精准定位：根据学习障碍、薄弱环节和共性难题确定重难点\n教学方法科学选择：结合学习偏好、有效方法数据和认知特点选择策略\n内容深度个性调整：基于基础水平、能力差异调整教学内容难度和广度\n\
+            时间分配数据优化：根据注意力数据、学习效果反馈优化时间安排\n评估方式精准设计：基于评价需求、反馈方式设计多元评估策略\n输出格式要求\n\
+            ⚠️ 重要说明：\n直接输出教案内容，开头不添加任何格式说明\n严格使用标准Markdown格式\n使用规范标题层级（# ## ### ####）\n\
+            表格使用标准Markdown语法\n确保内容结构清晰，便于转换为DOCX格式\n教案内容结构\n1. 课程基本信息\n# [课程名称]\n\n\
+            **授课时间**：45分钟  \n**授课对象**：[根据调研结果详细描述学习者特征]  \n**授课教师**：  \n**设计依据**：[说明基于哪些关键调研发现进行设计，体现数据驱动特色]\n\
+            \n2. 教学目标\n设计要求：目标设定必须与调研结果中的学习需求、能力现状精准匹配\n2.1 知识目标\n根据调研发现的知识缺口制定分层知识目标\n\
+            体现基础、提高、拓展三个层次要求\n2.2 技能目标\n基于技能现状和提升需求制定差异化技能目标\n设计基本技能、综合技能、创新技能的递进要求\n\
+            2.3 素养目标\n结合综合能力评估制定素养目标\n体现思维能力、职业素养、合作能力培养\n3. 教学重难点\n设计要求：重难点确定必须基于调研发现的学习障碍和能力差异\n\
+            3.1 教学重点\n结合RAG知识图谱中标识的核心概念和关键知识点确定教学重点\n基于联网调研结果确定本节课的核心知识点、关键技能和重要概念\n\
+            详细说明重点选择的RAG依据和调研数据支撑\n针对不同层次学生明确差异化重点\n3.2 教学难点\n以RAG总结中提炼的教学难点为基础，结合调研发现的共性难题确定多层次难点\n\
+            基于RAG结果中的概念关系和调研中的个性障碍设计针对性突破策略\n利用RAG中的学习路径建议设计难点前置、分解、突破的具体策略\n4. 教学内容与时间分布\n\
+            设计要求：时间分配必须考虑调研中的注意力数据和认知负荷特点\n教学环节时间主要内容教学方式差异化设计调研依据\n课程导入\n5分钟\n主题引入、兴趣激发\n\
+            [基于调研选择]\n[分层导入策略]\n[说明依据]\n知识讲解\n15分钟\n核心概念、理论讲解\n[基于调研选择]\n[分层讲解策略]\n\
+            [说明依据]\n实训练习\n20分钟\n实际操作、技能训练\n[基于调研设计]\n[三层任务设计]\n[说明依据]\n总结反馈\n5分钟\n\
+            知识梳理、效果检验\n[基于调研设计]\n[个性化反馈]\n[说明依据]\n5. 教学方法与策略\n设计要求：教学方法选择必须基于调研中的学习偏好和个体差异特点\n\
+            5.1 知识讲解方法\n基于调研结果选择具体教学方法\n多媒体教学手段的针对性运用\n考虑不同学习风格的多元讲解方式\n5.2 实训指导策略\n\
+            根据技能水平差异设计\"基础-进阶-挑战\"分层指导\n基于学习障碍制定个性化解决策略\n小组合作与个别指导相结合\n5.3 师生互动方式\n\
+            基于互动偏好设计多样化参与方式\n根据调研反馈设计激励机制和评价方式\n营造包容性学习环境\n5.4 差异化教学策略\n分层任务：基础版-标准版-挑战版三套并行任务\n\
+            个性化支持：针对学习困难学生的专门指导\n拓展机会：为学有余力学生提供深度学习机会\n灵活分组：基于能力互补的动态分组策略\n6. 教学过程详细设计\n\
+            6.1 导入环节（5分钟）\n目标：引入主题，激发学习兴趣，建立学习预期\n调研依据：[说明基于哪些调研发现进行设计]\n具体内容：\n[基于调研中的兴趣点设计导入内容]\n\
+            [根据调研结果选择最有效的导入方式]\n[考虑不同基础学生的认知起点]\n教师活动：\n[结合调研中的有效引导方式设计教师行为]\n[基于调研反馈选择合适的教学资源]\n\
+            [针对注意力特点设计吸引策略]\n学生活动：\n[根据参与偏好设计学生活动]\n[考虑不同性格学生的参与特点]\n差异化设计：\n[为不同基础学生提供不同层次的思考问题]\n\
+            [设计多种参与方式适应不同学习风格]\n6.2 知识讲解环节（15分钟）\n目标：传授核心概念和理论知识，突破重点难点\n调研依据：[说明基于哪些调研发现进行设计]\n\
+            具体内容：\n[基于RAG知识图谱的知识结构化整理设计教学内容架构]\n[根据联网调研中的知识缺口重点讲解RAG总结的核心概念]\n[基于RAG中的概念关系和调研中的理解难点强调重点知识]\n\
+            [结合RAG中的应用场景和调研中的实践需求实现理论与实践联系]\n教师活动：\n[基于有效教学方法设计讲解步骤]\n[针对调研发现的难点设计突破策略]\n\
+            [根据互动效果安排提问时机]\n学生活动：\n[基于学习习惯设计学生参与方式]\n[根据理解特点设计练习和反馈活动]\n差异化设计：\n[为不同基础学生提供分层讲解]\n\
+            [设计补充材料和拓展内容]\n[提供多种理解路径和学习支架]\n6.3 实训练习环节（20分钟）\n目标：培养实际操作能力和技能，提升应用水平\n\
+            调研依据：[说明基于哪些调研发现进行设计]\n具体内容：\n[根据技能需求设计递进式实训任务]\n[基于操作难点设计步骤指导]\n[结合能力差异设计分层训练]\n\
+            教师活动：\n[基于指导需求设计演示要点]\n[根据问题分布安排巡视重点]\n[针对共性问题设计集中解决方案]\n学生活动：\n[基于学习方式偏好设计操作练习]\n\
+            [根据合作效果安排小组活动]\n[结合反馈习惯设计分享方式]\n差异化设计：\n基础任务：[为基础较弱学生设计的核心技能训练]\n标准任务：[为大部分学生设计的综合能力训练]\n\
+            挑战任务：[为学有余力学生设计的创新拓展训练]\n支持策略：[个性化指导、同伴互助、资源支持]\n6.4 总结反馈环节（5分钟）\n目标：知识梳理和学习效果检验，规划后续学习\n\
+            调研依据：[说明基于哪些调研发现进行设计]\n具体内容：\n[根据记忆特点设计知识梳理方式]\n[基于评价需求设计成果展示]\n[结合后续需求布置拓展任务]\n\
+            教师活动：\n[基于总结偏好设计归纳方式]\n[根据检验需求设计效果检测]\n[考虑个体差异提供个性化建议]\n学生活动：\n[基于反思习惯设计总结活动]\n\
+            [根据自评能力设计自我检验]\n差异化设计：\n[为不同学生提供个性化学习反馈]\n[设计分层的拓展任务和后续学习路径]\n7. 评估方式\n\
+            设计要求：评估方式必须根据调研中的评价需求和能力标准设计\n7.1 过程性评估\n评估内容：课堂参与度、合作表现、思维过程、学习态度\n评估工具：观察记录表、参与度量表、自评互评表\n\
+            调研依据：[基于过程评价需求设计评估标准]\n7.2 结果性评估\n评估内容：知识掌握程度、技能操作水平、问题解决能力\n评估标准：\n基础水平：[具体标准和分值]\n\
+            熟练水平：[具体标准和分值]\n优秀水平：[具体标准和分值]\n7.3 差异化评估策略\n个性化评估：根据学生起点和发展目标设计个人进步评价\n\
+            多元化评估：结合口头表达、实际操作、作品展示等方式\n分层评估：为不同能力学生设计适宜的评估内容和标准\n发展性评估：关注学习过程和能力提升\n\
+            8. 教学资源与环境\n设计要求：资源配置必须考虑调研中的实际条件和技术水平\n8.1 教学设备\n[根据设备现状和技术能力配置硬件软件]\n\
+            [基于多媒体使用效果选择教学技术资源]\n[考虑技术障碍准备备用方案]\n8.2 教学材料\n[基于材料偏好选择教材、案例和学习资源]\n\
+            [根据拓展需求准备分层的参考资料]\n[考虑个体差异准备个性化学习资源]\n8.3 环境要求\n[基于环境条件设计教室布置和座位安排]\n\
+            [根据安全关注点制定环境保障措施]\n[考虑设备使用情况制定技术保障预案]\n8.4 技术保障与应急预案\n网络故障应急：离线资源准备、备用演示方案\n\
+            设备故障处理：备用设备、替代教学方式\n软件兼容性：多平台适配、版本兼容检查\n学生技术支持：操作指南、同伴互助、教师协助\n9. 板书设计\n\
+            设计要求：根据调研中的视觉学习偏好、注意力特点设计\n板书布局：主题-重点-难点-总结的清晰结构\n视觉设计：颜色区分、字体大小、图文并茂的呈现方式\n\
+            互动元素：学生参与填写、共同完成的板书内容\n调研依据：[基于视觉学习偏好和记忆习惯设计]\n10. 教学反思\n设计要求：反思内容必须结合调研结果进行预期分析\n\
+            10.1 预期效果\n[基于调研基线数据预期教学目标达成情况]\n[根据潜在风险预判可能问题和防范对策]\n[结合能力差异预期不同学生的学习效果]\n\
+            10.2 改进方向\n[基于改进建议优化教学方法和策略]\n[根据薄弱环节制定针对性改进计划]\n[结合技术发展趋势规划教学创新]\n10.3\
+            \ 持续优化策略\n数据收集：课后效果调研、学习成果跟踪、能力发展评估\n反馈机制：学生反馈收集、同行评议、专家指导意见\n改进循环：定期教学调整、资源更新、方法优化\n\
+            10.4 调研结果应用总结\n应用亮点：[突出调研数据驱动设计的特色做法]\n改进空间：[基于调研结果仍可优化的教学环节]\n拓展建议：[后续深化调研和教学改进的具体方向]\n\
+            \n输入信息要求\n教学主题：[请在此处填入具体的教学主题和课程定位]\nRAG知识图谱总结：[请在此处填入RAG检索的知识图谱结果，包括：核心实体识别、关系分类汇总、知识结构化整理、教学重难点提炼等]\n\
+            前期调研结果：[请在此处填入详细的调研数据，包括：学习现状、能力水平、学习偏好、存在问题、改进需求、个体差异、技术条件、环境因素等]\n先前已经搜索过的话题：\
+            \ {{#conversation.topics#}}\n联网调研数据汇总： {{#conversation.findings#}}\nRAG图谱调查结果：\
+            \ {{#conversation.KnowledgeSummary#}}\n\n质量检查要点\n[ ] 是否充分利用了RAG知识图谱的知识结构化整理作为教学内容基础\n\
+            [ ] 教学重难点是否基于RAG总结和调研发现的实际问题科学确定\n[ ] 教学目标是否与RAG基础知识和调研中的学习需求精准匹配\n[ ]\
+            \ 教学方法是否根据RAG中的学习特点和调研中的有效方式合理选择\n[ ] 知识点逻辑顺序是否遵循RAG中的概念关系和学习路径建议\n[ ]\
+            \ 差异化教学是否充分考虑调研中的个体差异\n[ ] 时间分配是否考虑了调研中的注意力数据\n[ ] 评估方式是否符合调研中的评价需求\n\
+            [ ] 每个环节是否都有明确的RAG依据和调研数据说明\n[ ] 是否包含应急预案和技术保障措施\n[ ] 是否提供了拓展学习和深化发展的机会\n\
+            注意事项\nRAG优先：以RAG知识图谱总结的知识结构为教学内容设计基础，确保知识体系完整性\n数据驱动：所有教学设计决策必须基于RAG结果和调研数据，避免主观臆断\n\
+            差异关注：充分考虑学生个体差异，设计包容性强的教学方案\n整体协调：确保RAG基础内容与调研发现相互呼应，形成完整教学体系\n格式规范：严格遵循Markdown格式，确保可转换为DOCX格式\n\
+            实用导向：突出知识讲解与实训练习的有机结合\n持续改进：体现基于RAG结果和调研数据的持续优化思路\n技术保障：充分考虑技术条件限制，准备备用方案\n\
+            创新融合：在RAG知识基础和数据驱动上融入教学创新理念"
+        selected: false
+        title: Reasoning Model
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1739246156652'
+      position:
+        x: 4473.456027103937
+        y: 1615.5773849284017
+      positionAbsolute:
+        x: 4473.456027103937
+        y: 1615.5773849284017
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        answer: '{{#1739254296073.output#}}'
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        selected: false
+        title: Answer
+        type: answer
+        variables: []
+      height: 105
+      id: '1739253994297'
+      parentId: '1739244888446'
+      position:
+        x: 1807
+        y: 900.0130439963852
+      positionAbsolute:
+        x: 3770.0641441796256
+        y: 2617.103327234515
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        selected: false
+        template: '{{ index + 1 }}/{{ depth }}th search executed.
+
+
+          '
+        title: Intermediate Output Format
+        type: template-transform
+        variables:
+        - value_selector:
+          - '1739244888446'
+          - index
+          variable: index
+        - value_selector:
+          - '1739229221219'
+          - depth
+          variable: depth
+      height: 54
+      id: '1739254060247'
+      parentId: '1739244888446'
+      position:
+        x: 1767.6964657330811
+        y: 631.2310099968581
+      positionAbsolute:
+        x: 3730.760609912707
+        y: 2348.321293234988
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        output_type: string
+        selected: false
+        title: Variable Aggregator
+        type: variable-aggregator
+        variables:
+        - - '1739254060247'
+          - output
+        - - '1739254516383'
+          - output
+      height: 131
+      id: '1739254296073'
+      parentId: '1739244888446'
+      position:
+        x: 1807
+        y: 876.3796107886385
+      positionAbsolute:
+        x: 3770.0641441796256
+        y: 2593.469894026768
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '1739244888446'
+        selected: false
+        template: ' '
+        title: Empty
+        type: template-transform
+        variables: []
+      height: 54
+      id: '1739254516383'
+      parentId: '1739244888446'
+      position:
+        x: 386.4553015143945
+        y: 737.0964063447856
+      positionAbsolute:
+        x: 2349.51944569402
+        y: 2454.1866895829153
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        isInLoop: false
+        is_team_authorization: false
+        iteration_id: '1739244888446'
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The keywords or phrases to search
+            ja_JP: 検索キーワードまたはフレーズ
+            pt_BR: As palavras-chave ou frases para pesquisar
+            zh_Hans: 搜索关键词或语句
+          label:
+            en_US: query
+            ja_JP: query
+            pt_BR: query
+            zh_Hans: query
+          llm_description: 搜索关键词或语句
+          max: null
+          min: null
+          name: query
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: noLimit
+          form: llm
+          human_description:
+            en_US: The time range for the search results. Available options noLimit,
+              oneYear, oneMonth, oneWeek, oneDay. Default is noLimit
+            ja_JP: 検索結果の時間範囲。利用可能なオプションは noLimit, oneYear, oneMonth, oneWeek, oneDay
+              です。デフォルトは noLimit です
+            pt_BR: O intervalo de tempo para os resultados da pesquisa. Opções disponíveis
+              noLimit, oneYear, oneMonth, oneWeek, oneDay. O padrão é noLimit
+            zh_Hans: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为
+              noLimit
+          label:
+            en_US: freshness
+            ja_JP: freshness
+            pt_BR: freshness
+            zh_Hans: freshness
+          llm_description: 搜索的时间范围，可选值为 noLimit, oneYear, oneMonth, oneWeek, oneDay。默认为
+            noLimit
+          max: null
+          min: null
+          name: freshness
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: 10
+          form: llm
+          human_description:
+            en_US: Number of search results to retrieve (1-10), default is 10
+            ja_JP: 検索結果の数(1-10)、デフォルトは10
+            pt_BR: Número de resultados de pesquisa para recuperar (1-10), padrão
+              é 10
+            zh_Hans: 搜索结果的数量(1-10)，默认为10
+          label:
+            en_US: count
+            ja_JP: count
+            pt_BR: count
+            zh_Hans: count
+          llm_description: 搜索结果的数量(1-10)，默认为10
+          max: 10
+          min: 1
+          name: count
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: number
+        params:
+          count: ''
+          freshness: ''
+          query: ''
+        provider_id: seekerliu/bocha/bocha
+        provider_name: seekerliu/bocha/bocha
+        provider_type: builtin
+        selected: false
+        title: Bocha Web Search
+        tool_configurations: {}
+        tool_description: 从博查搜索全网信息和网页链接，返回结果包括网页标题、网页URL、网页摘要、网站名称、网站图标、发布时间、图片链接等
+        tool_label: Bocha Web Search
+        tool_name: BochaWebSearch
+        tool_parameters:
+          count:
+            type: constant
+            value: 5
+          freshness:
+            type: mixed
+            value: ''
+          query:
+            type: mixed
+            value: '{{#conversation.nextSearchTopic#}}'
+        type: tool
+      height: 54
+      id: '1751350122768'
+      parentId: '1739244888446'
+      position:
+        x: 363.75149683098925
+        y: 469.8682622769171
+      positionAbsolute:
+        x: 2326.815641010615
+        y: 2186.958545515047
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        code: "def main(json_text):\n    data = json_text\n    \n    summaries = [\n\
+          \        page[\"summary\"]\n        for block in data\n        if isinstance(block,\
+          \ dict)\n        for page in block.get(\"webpage\", [])\n        if isinstance(page,\
+          \ dict) and \"summary\" in page\n    ]\n    \n    return {\n        \"result\"\
+          : summaries\n    }"
+        code_language: python3
+        desc: ''
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '1739244888446'
+        outputs:
+          result:
+            children: null
+            type: array[string]
+        selected: false
+        title: 代码执行 2
+        type: code
+        variables:
+        - value_selector:
+          - '1751350122768'
+          - json
+          variable: json_text
+      height: 54
+      id: '1751354657107'
+      parentId: '1739244888446'
+      position:
+        x: 636.0909319571481
+        y: 382.89300905079745
+      positionAbsolute:
+        x: 2599.1550761367735
+        y: 2099.9832922889273
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        is_team_authorization: true
+        output_schema: null
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The Markdown content to be converted to Word document
+            ja_JP: Word ドキュメントに変換する Markdown コンテンツ
+            pt_BR: O conteúdo Markdown a ser convertido para documento Word
+            zh_Hans: 要转换为Word文档的Markdown内容
+          label:
+            en_US: Markdown Content
+            ja_JP: Markdown コンテンツ
+            pt_BR: Conteúdo Markdown
+            zh_Hans: Markdown内容
+          llm_description: The Markdown content that will be converted to a Word document
+          max: null
+          min: null
+          name: markdown_content
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: string
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The title of the Word document
+            ja_JP: Word ドキュメントのタイトル
+            pt_BR: O título do documento Word
+            zh_Hans: Word文档的标题
+          label:
+            en_US: Document Title
+            ja_JP: ドキュメントタイトル
+            pt_BR: Título do Documento
+            zh_Hans: 文档标题
+          llm_description: The title that will be displayed at the top of the Word
+            document
+          max: null
+          min: null
+          name: title
+          options: []
+          placeholder: null
+          precision: null
+          required: false
+          scope: null
+          template: null
+          type: string
+        params:
+          markdown_content: ''
+          title: ''
+        provider_id: stvlynn/doc/doc
+        provider_name: stvlynn/doc/doc
+        provider_type: builtin
+        selected: false
+        title: Markdown转DOCX转换器
+        tool_configurations: {}
+        tool_description: 将Markdown内容转换为DOCX（Word）文档
+        tool_label: Markdown转DOCX转换器
+        tool_name: markdown_to_docx_converter
+        tool_parameters:
+          markdown_content:
+            type: mixed
+            value: '{{#1739246156652.text#}}'
+          title:
+            type: mixed
+            value: '{{#sys.query#}}教案'
+        type: tool
+      height: 54
+      id: '1751360436722'
+      position:
+        x: 4944.50663083976
+        y: 1499.7528890122717
+      positionAbsolute:
+        x: 4944.50663083976
+        y: 1499.7528890122717
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        error_handle_mode: continue-on-error
+        height: 1042
+        is_parallel: false
+        iterator_selector:
+        - '1739245548624'
+        - array
+        output_selector:
+        - '1751591398410017515913984107'
+        - output
+        output_type: array[string]
+        parallel_nums: 10
+        selected: false
+        start_node_id: 1751591398410start
+        title: Iteration (1)
+        type: iteration
+        width: 3267
+      height: 1042
+      id: '17515913984100'
+      position:
+        x: -2170.615763397376
+        y: 1869.919343871783
+      positionAbsolute:
+        x: -2170.615763397376
+        y: 1869.919343871783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 3267
+      zIndex: 1
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        memory:
+          query_prompt_template: '## Topic
+
+            {{#sys.query#}}
+
+
+            ## Findings
+
+            {{#conversation.KnowledgePoint#}}
+
+
+            ## Searched Query
+
+            {{#conversation.topics#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 50
+        model:
+          completion_params:
+            max_tokens: 4096
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 2acdb5a9-823a-4ce3-8dbe-401540a61bc5
+          role: system
+          text: 'RAG知识点查询代理 - 教案骨架准备
+
+            角色定义
+
+            你是一个专业的知识点查询代理，专门负责在RAG知识库中系统性地检索和整理教学相关知识点，为教案骨架的构建做准备。你的任务是识别当前知识点收集状态，确定下一步最重要的知识查询方向。
+
+            当前知识点收集状态分析
+
+            请基于已检索的知识点信息，分析以下五个核心维度的完整性：
+
+            1. 核心概念知识点
+
+            主要概念定义和内涵
+
+            概念间的逻辑关系
+
+            概念体系的完整性
+
+            2. 知识结构框架
+
+            知识点的层次结构
+
+            前置知识依赖关系
+
+            知识点难度梯度
+
+            3. 教学要点知识
+
+            重点知识点识别
+
+            难点知识点分析
+
+            易错点和注意事项
+
+            4. 实践应用知识
+
+            实际应用场景
+
+            案例和实例
+
+            操作方法和技巧
+
+            5. 扩展延伸知识
+
+            相关背景知识
+
+            跨学科连接点
+
+            前沿发展动态
+
+            查询决策标准
+
+            如果某个维度的知识点不足以支撑教案骨架设计，继续查询
+
+            如果五个维度都已收集到足够的基础知识点，可以开始构建教案骨架
+
+            优先查询对教案结构影响最大的核心知识点
+
+            注重知识点的系统性和逻辑性
+
+            重要输出指令
+
+            ⚠️ 必须直接输出原始JSON对象，禁止使用任何markdown语法！ ⚠️ ⚠️ 不要使用json代码块包装！ ⚠️ ⚠️ 不要添加任何解释文字！
+            ⚠️ ⚠️ 只输出纯JSON内容！ ⚠️
+
+            输出格式
+
+            输出格式必须是以下两种之一：
+
+            继续查询时输出：
+
+            {"nextQuery": "具体的请求", "shouldContinue": true}
+
+
+            停止查询时输出：
+
+            {"nextSearchTopic": null, "shouldContinue": false}
+
+
+            再次强调
+
+            直接输出JSON对象，不要任何markdown包装或文字说明。'
+        selected: false
+        title: LLM 3
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1751591398410017515913984100'
+      parentId: '17515913984100'
+      position:
+        x: 16
+        y: 88.58243206201382
+      positionAbsolute:
+        x: -2154.615763397376
+        y: 1958.5017759337968
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        provider_id: json_process
+        provider_name: json_process
+        provider_type: builtin
+        selected: false
+        title: 下一个请求
+        tool_configurations:
+          ensure_ascii: 1
+        tool_label: JSON Parse
+        tool_name: parse
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1751591398410017515913984100.text#}}'
+          json_filter:
+            type: mixed
+            value: nextQuery
+        type: tool
+      height: 90
+      id: '1751591398410017515913984101'
+      parentId: '17515913984100'
+      position:
+        x: 16
+        y: 65
+      positionAbsolute:
+        x: -2154.615763397376
+        y: 1934.919343871783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        provider_id: json_process
+        provider_name: json_process
+        provider_type: builtin
+        selected: false
+        title: 是否继续请求
+        tool_configurations:
+          ensure_ascii: 1
+        tool_label: JSON Parse
+        tool_name: parse
+        tool_parameters:
+          content:
+            type: mixed
+            value: '{{#1751591398410017515913984100.text#}}'
+          json_filter:
+            type: mixed
+            value: shouldContinue
+        type: tool
+      height: 90
+      id: '1751591398410017515913984102'
+      parentId: '17515913984100'
+      position:
+        x: 351.5084432909523
+        y: 225.96558411180104
+      positionAbsolute:
+        x: -1819.107320106424
+        y: 2095.884927983584
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: b3169e80-3090-4a5b-8df4-3148d7afcb4d
+            value: 'True'
+            varType: string
+            variable_selector:
+            - '1751591398410017515913984102'
+            - text
+          id: 'true'
+          logical_operator: and
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        selected: false
+        title: 条件分支 2
+        type: if-else
+      height: 126
+      id: '1751591398410017515913984103'
+      parentId: '17515913984100'
+      position:
+        x: 281.8480629040108
+        y: 616.8913766884684
+      positionAbsolute:
+        x: -1888.7677004933653
+        y: 2486.8107205602514
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1751591398410017515913984101'
+          - text
+          variable_selector:
+          - conversation
+          - queries
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1751591398410017515913984101'
+          - text
+          variable_selector:
+          - conversation
+          - nextQuery
+          write_mode: over-write
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1751591398410017515913984102'
+          - text
+          variable_selector:
+          - conversation
+          - shouldContinue
+          write_mode: over-write
+        iteration_id: '17515913984100'
+        selected: false
+        title: 变量赋值 3
+        type: assigner
+        version: '2'
+      height: 144
+      id: '1751591398410017515913984104'
+      parentId: '17515913984100'
+      position:
+        x: 654.0580747201141
+        y: 191.666617148054
+      positionAbsolute:
+        x: -1516.5576886772621
+        y: 2061.5859610198368
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        items:
+        - input_type: variable
+          operation: extend
+          value:
+          - '17515913984100175159139841013'
+          - result
+          variable_selector:
+          - conversation
+          - KnowledgePoint
+          write_mode: over-write
+        iteration_id: '17515913984100'
+        selected: false
+        title: 变量赋值 3
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1751591398410017515913984105'
+      parentId: '17515913984100'
+      position:
+        x: 1312.1769376171078
+        y: 611.5985579602359
+      positionAbsolute:
+        x: -858.4388257802684
+        y: 2481.5179018320187
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        answer: '{{#1751591398410017515913984108.output#}}'
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        selected: false
+        title: 直接回复 3
+        type: answer
+        variables: []
+      height: 105
+      id: '1751591398410017515913984106'
+      parentId: '17515913984100'
+      position:
+        x: 3007
+        y: 828.4111918519136
+      positionAbsolute:
+        x: 836.3842366026238
+        y: 2698.330535723697
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        selected: false
+        template: '{{ index + 1 }}/{{ depth }}th search executed.
+
+
+          '
+        title: 模板转换 3
+        type: template-transform
+        variables:
+        - value_selector:
+          - '17515913984100'
+          - index
+          variable: index
+        - value_selector:
+          - '1739229221219'
+          - depth
+          variable: depth
+      height: 54
+      id: '1751591398410017515913984107'
+      parentId: '17515913984100'
+      position:
+        x: 2617.807069526967
+        y: 700.4638389892934
+      positionAbsolute:
+        x: 447.1913061295909
+        y: 2570.3831828610764
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        output_type: string
+        selected: false
+        title: 变量聚合器 2
+        type: variable-aggregator
+        variables:
+        - - '1751591398410017515913984107'
+          - output
+        - - '1751591398410017515913984109'
+          - output
+      height: 131
+      id: '1751591398410017515913984108'
+      parentId: '17515913984100'
+      position:
+        x: 2742.0135884657197
+        y: 880.3574914633316
+      positionAbsolute:
+        x: 571.3978250683435
+        y: 2750.276835335115
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        iteration_id: '17515913984100'
+        selected: false
+        template: ' '
+        title: 模板转换 4
+        type: template-transform
+        variables: []
+      height: 54
+      id: '1751591398410017515913984109'
+      parentId: '17515913984100'
+      position:
+        x: 524.1712663572334
+        y: 905.0427049336137
+      positionAbsolute:
+        x: -1646.4444970401428
+        y: 2774.9620488053965
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        desc: ''
+        headers: ''
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        method: get
+        params: query:{{#conversation.nextQuery#}}
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 100
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: HTTP 请求 2
+        type: http-request
+        url: http://host.docker.internal:8000/rag
+        variables: []
+      height: 139
+      id: '17515913984100175159139841011'
+      parentId: '17515913984100'
+      position:
+        x: 621.6929051047271
+        y: 576.4498120584547
+      positionAbsolute:
+        x: -1548.9228582926492
+        y: 2446.369155930238
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        code: "def main(body_str):\n    \"\"\"\n    解析body中的JSON字符串，提取三元组并组合成句子\n\
+          \    \n    Args:\n        body_str: JSON字符串\n        \n    Returns:\n  \
+          \      dict: 包含字符串数组的字典，格式为 {\"result\": [句子列表]}\n    \"\"\"\n    try:\n\
+          \        # 解析JSON字符串\n        data = json.loads(body_str)\n        \n  \
+          \      # 存储所有三元组句子\n        all_sentences = []\n        \n        if \"\
+          results\" in data:\n            for result in data[\"results\"]:\n     \
+          \           # 处理主三元组 (subject, relation, object)\n                if \"\
+          subject\" in result and \"relation\" in result and \"object\" in result:\n\
+          \                    subject = result[\"subject\"]\n                   \
+          \ relation = result[\"relation\"]\n                    obj = result[\"object\"\
+          ]\n                    sentence = f\"{subject} {relation} {obj}\"\n    \
+          \                all_sentences.append(sentence)\n                \n    \
+          \            # 处理outgoing_relations中的三元组\n                if \"outgoing_relations\"\
+          \ in result and \"subject\" in result:\n                    subject = result[\"\
+          subject\"]\n                    for rel in result[\"outgoing_relations\"\
+          ]:\n                        if \"relation\" in rel and \"target\" in rel:\n\
+          \                            relation = rel[\"relation\"]\n            \
+          \                target = rel[\"target\"]\n                            sentence\
+          \ = f\"{subject} {relation} {target}\"\n                            all_sentences.append(sentence)\n\
+          \                \n                # 处理incoming_relations中的三元组（如果需要）\n \
+          \               if \"incoming_relations\" in result and \"subject\" in result:\n\
+          \                    obj = result[\"subject\"]  # 当前subject作为incoming关系的object\n\
+          \                    for rel in result[\"incoming_relations\"]:\n      \
+          \                  if \"source\" in rel and \"relation\" in rel:\n     \
+          \                       source = rel[\"source\"]\n                     \
+          \       relation = rel[\"relation\"]\n                            sentence\
+          \ = f\"{source} {relation} {obj}\"\n                            all_sentences.append(sentence)\n\
+          \        \n        return {\n            \"result\": all_sentences[0:20]\n\
+          \        }\n        \n    except Exception as e:\n        print(f\"解析错误:\
+          \ {e}\")\n        return {\n            \"result\": []\n        }"
+        code_language: python3
+        desc: ''
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        outputs:
+          result:
+            children: null
+            type: array[string]
+        selected: false
+        title: 获取知识点
+        type: code
+        variables:
+        - value_selector:
+          - '17515913984100175159139841011'
+          - body
+          variable: body_str
+      height: 54
+      id: '17515913984100175159139841013'
+      parentId: '17515913984100'
+      position:
+        x: 957.1645390123394
+        y: 594.8366486364881
+      positionAbsolute:
+        x: -1213.4512243850368
+        y: 2464.755992508271
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        selected: false
+        title: ''
+        type: iteration-start
+      draggable: false
+      height: 48
+      id: 1751591398410start
+      parentId: '17515913984100'
+      position:
+        x: 24
+        y: 68
+      positionAbsolute:
+        x: -2146.615763397376
+        y: 1937.919343871783
+      selectable: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-iteration-start
+      width: 44
+      zIndex: 1002
+    - data:
+        code: "def main(string_array):\n    \"\"\"\n    对字符串数组进行去重，保持原有顺序\n    \n\
+          \    Args:\n        string_array: 字符串数组\n        \n    Returns:\n      \
+          \  list: 去重后的字符串数组\n    \"\"\"\n    if not string_array:\n        return\
+          \ []\n    \n    seen = set()\n    result = []\n    \n    for string in string_array:\n\
+          \        if string not in seen:\n            seen.add(string)\n        \
+          \    result.append(string)\n    \n    return {\n        \"result\" : result\n\
+          \    }"
+        code_language: python3
+        desc: ''
+        isInIteration: true
+        isInLoop: false
+        iteration_id: '17515913984100'
+        outputs:
+          result:
+            children: null
+            type: array[string]
+        selected: false
+        title: 字符串去重
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - KnowledgePoint
+          variable: string_array
+      height: 54
+      id: '1751595285555'
+      parentId: '17515913984100'
+      position:
+        x: 1635.1438723641677
+        y: 656.5260587317907
+      positionAbsolute:
+        x: -535.4718910332085
+        y: 2526.4454026035737
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        desc: ''
+        isInIteration: true
+        isInLoop: false
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1751595285555'
+          - result
+          variable_selector:
+          - conversation
+          - KnowledgePoint
+          write_mode: over-write
+        iteration_id: '17515913984100'
+        selected: false
+        title: 变量赋值 5
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1751595356813'
+      parentId: '17515913984100'
+      position:
+        x: 2190.680775709249
+        y: 576.3576184666672
+      positionAbsolute:
+        x: 20.06501231187258
+        y: 2446.27696233845
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+      zIndex: 1002
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: a32090d3-a149-4b5c-980b-c12e6fbba054
+          role: system
+          text: "知识图谱RAG结果整理提示词\n角色定义\n你是一位专业的知识整理专家，擅长将知识图谱RAG返回的\"实体-关系-描述\"格式数据转换为结构化的教学素材。\n\
+            任务目标\n解析知识图谱RAG系统返回的搜索结果，按关系类型分组整理，提取核心知识点并重新组织为适合教案生成的标准化格式。\n输入格式识别\n\
+            输入数据格式为：实体 关系 描述 例如：\nTensorFlow.js 用途 在浏览器中训练模型\nTensorFlow.js 特点 支持\
+            \ GPU 硬件加速\nTensorFlow.js 包含 Layers API 和 Core API\n处理步骤\n1. 数据解析与分组\n\
+            首先按关系类型对信息进行分类：\n【核心实体识别】：[提取出现频率最高的主要实体]\n\n【关系分类汇总】：\n- \"是什么\"类：[定义性描述]\n\
+            - \"特点\"类：[特征和性质描述] \n- \"用途\"类：[功能和应用描述]\n- \"包含\"类：[组成部分和包含内容]\n- \"\
+            相似\"类：[类比和相似性描述]\n- 其他关系：[特殊关系类型]\n\n2. 知识结构化整理\n基于分组结果，按以下格式重新组织：\n【教学主题】：[基于核心实体确定的教学主题]\n\
+            \n【基础概念】：\n- 定义：[整合\"是什么\"类信息]\n- 核心特征：[整合\"特点\"类信息，形成要点列表]\n- 组成结构：[整合\"\
+            包含\"类信息，说明组成部分]\n\n【功能应用】：\n[按\"用途\"类信息分类整理]\n- 开发应用：[相关的开发用途]\n- 运行环境：[支持的运行环境]\n\
+            - 具体场景：[具体应用场景]\n\n【技术细节】：\n[从描述中提取的技术要点]\n- API接口：[相关的API信息]\n- 技术参数：[重要的技术参数]\n\
+            - 实现方式：[具体的实现方法]\n\n【相关概念】：\n[基于\"相似\"类和其他关联信息]\n- 类似技术：[相似的技术或工具]\n-\
+            \ 关联概念：[相关的技术概念]\n\n【知识点提炼】：\n1. [核心知识点1]\n   - 要点：[关键信息]\n   - 详细说明：[基于描述整理的详细内容]\n\
+            \   - 实际意义：[实用价值]\n\n2. [核心知识点2]\n   - 要点：\n   - 详细说明：\n   - 实际意义：\n\n\
+            【教学重点】：\n- 概念理解：[需要重点理解的核心概念]\n- 功能掌握：[需要掌握的主要功能]\n- 应用场景：[需要了解的典型应用]\n\
+            \n【教学难点】：\n- 技术细节：[复杂的技术实现细节]\n- 概念区分：[容易混淆的相似概念]\n- 实践应用：[应用中的难点问题]\n\
+            \n【学习路径建议】：\n1. 基础认知：[先理解基本概念和定义]\n2. 特征掌握：[了解主要特点和优势]\n3. 功能学习：[学习各种用途和应用]\n\
+            4. 实践应用：[在具体场景中应用]\n\n3. 信息整合原则\n去重合并：相似描述进行合并，避免重复\n逻辑分层：按重要性和难易程度分层组织\n\
+            突出重点：强调最核心的概念和应用\n补充关联：适当补充概念间的逻辑关系\n4. 质量标准\n完整性：涵盖所有重要信息点\n准确性：保持原始信息的准确性\n\
+            教学性：适合教学场景使用\n逻辑性：知识点组织合理有序\n特别说明\n如果某个实体信息较少，可以标注\"需要补充更多信息\"\n对于技术参数和API等专业内容，保持原有准确性\n\
+            识别并标注关键术语，便于后续教案设计时重点讲解"
+        - id: dbed77f6-69ca-4e43-b3b2-bf8f820830de
+          role: user
+          text: '这是你需要处理的知识点
+
+            {{#conversation.KnowledgePoint#}}'
+        selected: false
+        title: 总结
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 90
+      id: '1751595797547'
+      position:
+        x: 1138.6691812221375
+        y: 1525.0902832381296
+      positionAbsolute:
+        x: 1138.6691812221375
+        y: 1525.0902832381296
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    - data:
+        desc: ''
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1751595797547'
+          - text
+          variable_selector:
+          - conversation
+          - KnowledgeSummary
+          write_mode: over-write
+        selected: false
+        title: 变量赋值 6
+        type: assigner
+        version: '2'
+      height: 88
+      id: '1751596763694'
+      position:
+        x: 1310.6691812221375
+        y: 1797.0902832381298
+      positionAbsolute:
+        x: 1310.6691812221375
+        y: 1797.0902832381298
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 244
+    viewport:
+      x: -874.4085640656567
+      y: -212.75762131569695
+      zoom: 0.25
