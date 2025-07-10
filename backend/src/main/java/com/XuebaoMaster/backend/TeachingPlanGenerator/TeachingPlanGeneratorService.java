@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator;
+package com.XuebaoMaster.backend.TeachingPlanGenerator;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;

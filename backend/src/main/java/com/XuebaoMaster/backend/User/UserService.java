@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.User;
+package com.XuebaoMaster.backend.User;
 import java.util.List;
 public interface UserService {
     public User createUser(User user);

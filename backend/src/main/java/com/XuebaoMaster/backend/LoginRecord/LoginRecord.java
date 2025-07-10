@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.LoginRecord;
+package com.XuebaoMaster.backend.LoginRecord;
 import com.XuebaoMaster.backend.User.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

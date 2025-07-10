@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.StudentEmotion.impl;
+package com.XuebaoMaster.backend.StudentEmotion.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.XuebaoMaster.backend.StudentEmotion.StudentEmotion;

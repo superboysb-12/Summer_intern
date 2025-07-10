@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator.impl;
+package com.XuebaoMaster.backend.TeachingPlanGenerator.impl;
 
 import com.XuebaoMaster.backend.TeachingPlanGenerator.TeachingPlanGenerator;
 import com.XuebaoMaster.backend.TeachingPlanGenerator.TeachingPlanGeneratorRepository;

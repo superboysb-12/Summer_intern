@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator.config;
+package com.XuebaoMaster.backend.TeachingPlanGenerator.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

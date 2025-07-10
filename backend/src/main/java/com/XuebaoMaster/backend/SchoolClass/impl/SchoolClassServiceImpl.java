@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.SchoolClass.impl;
+package com.XuebaoMaster.backend.SchoolClass.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.XuebaoMaster.backend.SchoolClass.SchoolClass;

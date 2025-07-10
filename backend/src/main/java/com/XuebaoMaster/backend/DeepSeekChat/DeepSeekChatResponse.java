@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.DeepSeekChat;
+package com.XuebaoMaster.backend.DeepSeekChat;
 import java.util.Map;
 public class DeepSeekChatResponse {
     private String id;

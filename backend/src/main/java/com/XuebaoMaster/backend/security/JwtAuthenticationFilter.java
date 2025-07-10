@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.security;
+package com.XuebaoMaster.backend.security;
 import com.XuebaoMaster.backend.User.CustomUserDetailsService;
 import com.XuebaoMaster.backend.util.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -23,9 +23,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsService userDetailsService;
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    
+    private final List<String> permitAllPaths = Arrays.asList(
             "/users/register",
             "/users/login",
             "/api/files/**");
+            
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

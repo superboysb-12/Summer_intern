@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.config;
+package com.XuebaoMaster.backend.config;
 import com.XuebaoMaster.backend.User.CustomUserDetailsService;
 import com.XuebaoMaster.backend.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +57,11 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of(
-                "http:
-                "http:
-                "http:
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "http://localhost:8081",
+                "http://localhost:5173"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setExposedHeaders(Arrays.asList("Authorization"));

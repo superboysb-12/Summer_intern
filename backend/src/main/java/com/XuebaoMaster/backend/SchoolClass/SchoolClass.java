@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.SchoolClass;
+package com.XuebaoMaster.backend.SchoolClass;
 import com.XuebaoMaster.backend.User.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

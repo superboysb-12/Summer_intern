@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.SchoolClass;
+package com.XuebaoMaster.backend.SchoolClass;
 import java.util.List;
 public interface SchoolClassService {
     SchoolClass createSchoolClass(SchoolClass schoolClass);

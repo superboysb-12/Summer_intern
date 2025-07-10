@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator;
+package com.XuebaoMaster.backend.TeachingPlanGenerator;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

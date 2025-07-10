@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.Course;
+package com.XuebaoMaster.backend.Course;
 import java.util.List;
 public interface CourseService {
     Course createCourse(Course course);

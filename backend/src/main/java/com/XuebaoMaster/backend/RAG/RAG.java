@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.RAG;
+package com.XuebaoMaster.backend.RAG;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 @Entity

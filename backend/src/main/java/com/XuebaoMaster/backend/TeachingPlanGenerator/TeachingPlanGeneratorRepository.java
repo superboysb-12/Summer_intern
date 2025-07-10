@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator;
+package com.XuebaoMaster.backend.TeachingPlanGenerator;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

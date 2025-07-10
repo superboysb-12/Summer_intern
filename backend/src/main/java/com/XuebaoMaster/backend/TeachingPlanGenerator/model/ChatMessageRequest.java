@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.TeachingPlanGenerator.model;
+package com.XuebaoMaster.backend.TeachingPlanGenerator.model;
 
 import java.util.HashMap;
 import java.util.Map;

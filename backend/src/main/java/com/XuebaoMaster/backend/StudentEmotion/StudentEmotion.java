@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.StudentEmotion;
+package com.XuebaoMaster.backend.StudentEmotion;
 import com.XuebaoMaster.backend.User.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.LoginRecord;
+package com.XuebaoMaster.backend.LoginRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

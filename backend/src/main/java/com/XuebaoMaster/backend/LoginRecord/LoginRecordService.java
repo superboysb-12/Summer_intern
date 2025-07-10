@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.LoginRecord;
+package com.XuebaoMaster.backend.LoginRecord;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;

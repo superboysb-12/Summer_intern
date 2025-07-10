@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.RAG;
+package com.XuebaoMaster.backend.RAG;
 import java.util.List;
 import java.util.Map;
 public class RAGResponse {

@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.File;
+package com.XuebaoMaster.backend.File;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Path;

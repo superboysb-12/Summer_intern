@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.File.impl;
+package com.XuebaoMaster.backend.File.impl;
 import com.XuebaoMaster.backend.File.FileEntity;
 import com.XuebaoMaster.backend.File.FileRepository;
 import com.XuebaoMaster.backend.File.FileService;

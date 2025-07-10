@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.StudyDuration;
+package com.XuebaoMaster.backend.StudyDuration;
 import com.XuebaoMaster.backend.User.User;
 import com.XuebaoMaster.backend.Course.Course;
 import jakarta.persistence.*;

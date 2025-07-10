@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.File;
+package com.XuebaoMaster.backend.File;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;

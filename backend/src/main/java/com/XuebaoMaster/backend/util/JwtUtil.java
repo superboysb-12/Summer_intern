@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.util;
+package com.XuebaoMaster.backend.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

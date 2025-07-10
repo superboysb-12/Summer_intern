@@ -1,4 +1,4 @@
-﻿package com.XuebaoMaster.backend.DeepSeekChat;
+package com.XuebaoMaster.backend.DeepSeekChat;
 import java.util.List;
 import java.util.Map;
 public interface DeepSeekChatService {
