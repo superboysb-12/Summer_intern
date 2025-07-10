@@ -1,9 +1,12 @@
 package com.XuebaoMaster.backend.File.impl;
+
 import com.XuebaoMaster.backend.File.FileEntity;
 import com.XuebaoMaster.backend.File.FileRepository;
 import com.XuebaoMaster.backend.File.FileService;
 import com.XuebaoMaster.backend.config.FileStorageProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.PageRequest;
@@ -18,25 +21,31 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
 @Service
 public class FileServiceImpl implements FileService {
     private final Path fileStorageLocation;
     private final FileRepository fileRepository;
+
     @Autowired
     public FileServiceImpl(FileStorageProperties fileStorageProperties, FileRepository fileRepository) {
         this.fileRepository = fileRepository;
-        this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir())
-                .toAbsolutePath().normalize();
+
+        // 使用相对路径，不转为绝对路径，避免指向硬盘根目录
+        this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).normalize();
+
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (Exception ex) {
             throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
     }
+
     @Override
     public Map<String, Object> uploadFiles(MultipartFile[] files, String path, boolean overwrite) {
         Map<String, Object> result = new HashMap<>();
@@ -80,6 +89,7 @@ public class FileServiceImpl implements FileService {
         result.put("failedUploads", failedUploads);
         return result;
     }
+
     @Override
     public FileEntity createFolder(String folderName, String parentPath) {
         if (folderName == null || folderName.isEmpty()) {
@@ -113,6 +123,7 @@ public class FileServiceImpl implements FileService {
         folder.setParentPath(normalizedParentPath);
         return fileRepository.save(folder);
     }
+
     @Override
     public List<FileEntity> getFileList(String path, boolean includeFiles) {
         String normalizedPath = path != null ? path : "/";
@@ -127,6 +138,7 @@ public class FileServiceImpl implements FileService {
         }
         return entries;
     }
+
     @Override
     public FileEntity renameFolder(Long folderId, String newName) {
         FileEntity folder = fileRepository.findById(folderId)
@@ -161,6 +173,7 @@ public class FileServiceImpl implements FileService {
         }
         return folder;
     }
+
     @Override
     public FileEntity moveFolder(Long folderId, String targetPath) {
         FileEntity folder = fileRepository.findById(folderId)
@@ -201,6 +214,7 @@ public class FileServiceImpl implements FileService {
         }
         return folder;
     }
+
     @Override
     public void deleteFolder(Long folderId, boolean force) {
         FileEntity folder = fileRepository.findById(folderId)
@@ -223,6 +237,7 @@ public class FileServiceImpl implements FileService {
         fileRepository.deleteAll(allChildren);
         fileRepository.delete(folder);
     }
+
     private void deleteDirectoryRecursively(File directory) throws IOException {
         if (directory.isDirectory()) {
             File[] files = directory.listFiles();
@@ -236,12 +251,14 @@ public class FileServiceImpl implements FileService {
             throw new IOException("Failed to delete " + directory);
         }
     }
+
     @Override
     public void deleteFoldersBatch(List<Long> folderIds, boolean force) {
         for (Long folderId : folderIds) {
             deleteFolder(folderId, force);
         }
     }
+
     @Override
     public Resource downloadFile(Long fileId) {
         FileEntity file = fileRepository.findById(fileId)
@@ -262,6 +279,7 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("File not found", ex);
         }
     }
+
     @Override
     public Resource downloadBatch(List<Long> fileIds, String zipName) {
         if (zipName == null || zipName.isEmpty()) {
@@ -274,7 +292,7 @@ public class FileServiceImpl implements FileService {
                 FileEntity file = fileRepository.findById(fileId)
                         .orElseThrow(() -> new RuntimeException("File not found: " + fileId));
                 if (file.isDirectory()) {
-                    continue; 
+                    continue;
                 }
                 Path filePath = this.fileStorageLocation.resolve(
                         file.getFilePath().substring(1) + file.getFileName());
@@ -291,6 +309,7 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("Could not create zip file", ex);
         }
     }
+
     @Override
     public FileEntity renameFile(Long fileId, String newName) {
         FileEntity file = fileRepository.findById(fileId)
@@ -314,6 +333,7 @@ public class FileServiceImpl implements FileService {
         file.setFileName(newName);
         return fileRepository.save(file);
     }
+
     @Override
     public FileEntity moveFile(Long fileId, String targetPath) {
         FileEntity file = fileRepository.findById(fileId)
@@ -344,6 +364,7 @@ public class FileServiceImpl implements FileService {
         file.setFilePath(normalizedTargetPath);
         return fileRepository.save(file);
     }
+
     @Override
     public FileEntity copyFile(Long fileId, String targetPath, String newName) {
         FileEntity sourceFile = fileRepository.findById(fileId)
@@ -380,6 +401,7 @@ public class FileServiceImpl implements FileService {
         newFile.setParentPath(normalizedTargetPath);
         return fileRepository.save(newFile);
     }
+
     @Override
     public void deleteFile(Long fileId) {
         FileEntity file = fileRepository.findById(fileId)
@@ -396,12 +418,14 @@ public class FileServiceImpl implements FileService {
         }
         fileRepository.delete(file);
     }
+
     @Override
     public void deleteFilesBatch(List<Long> fileIds) {
         for (Long fileId : fileIds) {
             deleteFile(fileId);
         }
     }
+
     @Override
     public Resource previewFile(Long fileId, String type) {
         FileEntity file = fileRepository.findById(fileId)
@@ -422,11 +446,13 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("File not found", ex);
         }
     }
+
     @Override
     public FileEntity getFileInfo(Long fileId) {
         return fileRepository.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
     }
+
     @Override
     public List<FileEntity> searchFiles(String query, String type, String path, int page, int limit) {
         String searchPath = path != null ? path : "/";
@@ -436,8 +462,144 @@ public class FileServiceImpl implements FileService {
             return fileRepository.findByFileNameContainingIgnoreCaseAndIsDirectory(query, false);
         }
     }
+
     @Override
     public Path getFileStoragePath() {
+        // 返回相对路径的文件存储位置
         return this.fileStorageLocation;
+    }
+
+    /**
+     * 系统启动时同步文件系统和数据库
+     * 清空数据库表，然后重新扫描uploads目录添加到表中
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void syncFilesOnStartup() {
+        try {
+            // 删除所有现有文件记录
+            fileRepository.deleteAll();
+
+            // 确保上传目录存在
+            Files.createDirectories(fileStorageLocation);
+
+            // 重新扫描并添加根目录
+            FileEntity rootDir = new FileEntity();
+            rootDir.setFileName("");
+            rootDir.setFilePath("/");
+            rootDir.setMimeType("directory");
+            rootDir.setFileSize(0L);
+            rootDir.setDirectory(true);
+            rootDir.setParentPath("");
+            rootDir.setCreatedAt(LocalDateTime.now());
+            rootDir.setUpdatedAt(LocalDateTime.now());
+            fileRepository.save(rootDir);
+
+            // 递归扫描目录
+            scanDirectory(fileStorageLocation.toFile(), "/");
+
+            System.out.println("文件系统与数据库同步完成！");
+        } catch (Exception e) {
+            System.err.println("同步文件系统失败: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 递归扫描目录，将文件和子目录添加到数据库
+     */
+    private void scanDirectory(File directory, String parentPath) throws IOException {
+        if (!directory.exists() || !directory.isDirectory()) {
+            return;
+        }
+
+        File[] files = directory.listFiles();
+        if (files == null) {
+            return;
+        }
+
+        for (File file : files) {
+            String fileName = file.getName();
+
+            FileEntity entity = new FileEntity();
+            entity.setFileName(fileName);
+            entity.setParentPath(parentPath);
+
+            if (file.isDirectory()) {
+                // 处理目录
+                String newPath = parentPath.endsWith("/") ? parentPath + fileName + "/"
+                        : parentPath + "/" + fileName + "/";
+                entity.setFilePath(newPath);
+                entity.setMimeType("directory");
+                entity.setFileSize(0L);
+                entity.setDirectory(true);
+                entity.setCreatedAt(LocalDateTime.now());
+                entity.setUpdatedAt(LocalDateTime.now());
+                fileRepository.save(entity);
+
+                // 递归处理子目录
+                scanDirectory(file, newPath);
+            } else {
+                // 处理文件
+                entity.setFilePath(parentPath);
+                entity.setFileSize(file.length());
+                entity.setDirectory(false);
+
+                // 尝试确定MIME类型
+                String mimeType = determineMimeType(fileName);
+                entity.setMimeType(mimeType);
+                entity.setCreatedAt(LocalDateTime.now());
+                entity.setUpdatedAt(LocalDateTime.now());
+                fileRepository.save(entity);
+            }
+        }
+    }
+
+    /**
+     * 简单的MIME类型确定方法
+     */
+    private String determineMimeType(String fileName) {
+        String extension = "";
+        int i = fileName.lastIndexOf('.');
+        if (i > 0) {
+            extension = fileName.substring(i + 1).toLowerCase();
+        }
+
+        switch (extension) {
+            case "txt":
+                return "text/plain";
+            case "html":
+                return "text/html";
+            case "css":
+                return "text/css";
+            case "js":
+                return "application/javascript";
+            case "json":
+                return "application/json";
+            case "pdf":
+                return "application/pdf";
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            case "gif":
+                return "image/gif";
+            case "svg":
+                return "image/svg+xml";
+            case "mp3":
+                return "audio/mpeg";
+            case "mp4":
+                return "video/mp4";
+            case "zip":
+                return "application/zip";
+            case "docx":
+                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "xlsx":
+                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            case "pptx":
+                return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+            default:
+                return "application/octet-stream";
+        }
     }
 }

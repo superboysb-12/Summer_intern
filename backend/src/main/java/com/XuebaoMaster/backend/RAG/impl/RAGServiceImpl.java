@@ -1,4 +1,5 @@
 package com.XuebaoMaster.backend.RAG.impl;
+
 import com.XuebaoMaster.backend.RAG.RAG;
 import com.XuebaoMaster.backend.RAG.RAGRepository;
 import com.XuebaoMaster.backend.RAG.RAGResponse;
@@ -29,51 +30,68 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 @Service
 public class RAGServiceImpl implements RAGService {
     private static final Logger logger = LoggerFactory.getLogger(RAGServiceImpl.class);
-    private static final String RAG_API_BASE_URL = "http://localhost:5000";
+    private static final String RAG_API_BASE_URL = "http://localhost:8000";
     @Autowired
     private RAGRepository ragRepository;
     @Autowired
     private RestTemplate restTemplate;
     @Autowired
     private ObjectMapper objectMapper;
+
     @Override
     public RAG saveRAG(RAG rag) {
         return ragRepository.save(rag);
     }
+
     @Override
     public List<RAG> getAllRAGs() {
         return ragRepository.findAll();
     }
+
     @Override
     public Optional<RAG> getRAGById(Long id) {
         return ragRepository.findById(id);
     }
+
     @Override
     public Optional<RAG> getRAGByName(String name) {
         return ragRepository.findByName(name);
     }
+
     @Override
     public void deleteRAG(Long id) {
         ragRepository.deleteById(id);
     }
+
     @Override
     public RAGResponse generateRAG(String sourceDir, String ragName, boolean forceRebuild) {
         try {
             if (sourceDir == null || sourceDir.isEmpty()) {
                 return RAGResponse.error("源文件夹路径不能为空");
             }
+
+            // 确保sourceDir是绝对路径
             File sourceDirFile = new File(sourceDir);
+            if (!sourceDirFile.isAbsolute()) {
+                sourceDirFile = sourceDirFile.getAbsoluteFile();
+                sourceDir = sourceDirFile.getAbsolutePath();
+                logger.info("将相对路径转换为绝对路径: {}", sourceDir);
+            }
+
             if (!sourceDirFile.exists() || !sourceDirFile.isDirectory()) {
                 return RAGResponse.error("源文件夹不存在或不是一个有效的目录");
             }
+
             String url = UriComponentsBuilder.fromHttpUrl(RAG_API_BASE_URL + "/generate_rag")
                     .queryParam("source_dir", sourceDir)
                     .queryParam("force_rebuild", forceRebuild)
                     .build()
                     .toUriString();
+
             ResponseEntity<HashMap> response = restTemplate.getForEntity(url, HashMap.class);
             HashMap<String, Object> responseBody = response.getBody();
             if (responseBody != null && Boolean.TRUE.equals(responseBody.get("success"))) {
@@ -113,16 +131,26 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("生成RAG数据时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse generateRAGAsync(String sourceDir, String ragName, boolean forceRebuild) {
         try {
             if (sourceDir == null || sourceDir.isEmpty()) {
                 return RAGResponse.error("源文件夹路径不能为空");
             }
+
+            // 确保sourceDir是绝对路径
             File sourceDirFile = new File(sourceDir);
+            if (!sourceDirFile.isAbsolute()) {
+                sourceDirFile = sourceDirFile.getAbsoluteFile();
+                sourceDir = sourceDirFile.getAbsolutePath();
+                logger.info("将相对路径转换为绝对路径: {}", sourceDir);
+            }
+
             if (!sourceDirFile.exists() || !sourceDirFile.isDirectory()) {
                 return RAGResponse.error("源文件夹不存在或不是一个有效的目录");
             }
+
             RAG newRag = new RAG(ragName, "", "");
             newRag.setStatus(RAG.RAGStatus.PENDING);
             newRag.setStatusMessage("RAG生成任务已提交，等待处理");
@@ -134,6 +162,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("提交RAG生成任务时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse checkRAGGenerationStatus(Long ragId) {
         try {
@@ -154,6 +183,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("检查RAG生成状态时发生错误: " + e.getMessage());
         }
     }
+
     @Async("ragTaskExecutor")
     public void processRAGGeneration(Long ragId, String sourceDir, boolean forceRebuild) {
         logger.info("开始异步生成RAG数据，ID: {}, 源目录: {}", ragId, sourceDir);
@@ -163,28 +193,45 @@ public class RAGServiceImpl implements RAGService {
                 logger.error("找不到指定ID的RAG: {}", ragId);
                 return;
             }
-            
+
+            // 确保sourceDir是绝对路径
+            File sourceDirFile = new File(sourceDir);
+            if (!sourceDirFile.isAbsolute()) {
+                sourceDirFile = sourceDirFile.getAbsoluteFile();
+                sourceDir = sourceDirFile.getAbsolutePath();
+                logger.info("将相对路径转换为绝对路径: {}", sourceDir);
+            }
+
+            if (!sourceDirFile.exists() || !sourceDirFile.isDirectory()) {
+                RAG rag = ragOpt.get();
+                rag.setStatus(RAG.RAGStatus.FAILED);
+                rag.setStatusMessage("源文件夹不存在或不是一个有效的目录: " + sourceDir);
+                saveRAG(rag);
+                logger.error("源文件夹不存在或不是一个有效的目录: {}", sourceDir);
+                return;
+            }
+
             RAG rag = ragOpt.get();
             rag.setStatus(RAG.RAGStatus.GENERATING);
             rag.setStatusMessage("正在生成RAG数据...");
             saveRAG(rag);
-            
+
             String url = UriComponentsBuilder.fromHttpUrl(RAG_API_BASE_URL + "/generate_rag")
                     .queryParam("source_dir", sourceDir)
                     .queryParam("force_rebuild", forceRebuild)
                     .build()
                     .toUriString();
-            
+
             logger.info("调用RAG API: {}", url);
             ResponseEntity<HashMap> response = restTemplate.getForEntity(url, HashMap.class);
             HashMap<String, Object> responseBody = response.getBody();
-            
+
             if (responseBody != null && Boolean.TRUE.equals(responseBody.get("success"))) {
                 String ragDir = (String) responseBody.get("rag_dir");
                 Path ragDirPath = Paths.get(ragDir);
                 String parentDir = ragDirPath.getParent().toString();
                 String knowledgeGraphPath = Paths.get(parentDir, "knowledge_graph", "output").toString();
-                
+
                 Path kgPath = Paths.get(knowledgeGraphPath);
                 if (!Files.exists(kgPath)) {
                     logger.info("知识图谱路径不存在（一级上溯）: {}", knowledgeGraphPath);
@@ -200,7 +247,7 @@ public class RAGServiceImpl implements RAGService {
                         logger.warn("尝试替代路径时出错", e);
                     }
                 }
-                
+
                 rag.setRagPath(ragDir);
                 rag.setKnowledgeGraphPath(knowledgeGraphPath);
                 rag.setStatus(RAG.RAGStatus.COMPLETED);
@@ -230,6 +277,7 @@ public class RAGServiceImpl implements RAGService {
             }
         }
     }
+
     @Override
     public RAGResponse performQuery(String query, Long ragId, Integer topK, Boolean includeGraphContext,
             Integer contextDepth) {
@@ -251,6 +299,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("执行RAG查询时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse performQueryByName(String query, String ragName, Integer topK, Boolean includeGraphContext,
             Integer contextDepth) {
@@ -275,6 +324,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("执行RAG查询时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse getKnowledgeGraph(Long ragId) {
         try {
@@ -292,6 +342,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("获取知识图谱数据时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse getKnowledgeGraphByName(String ragName) {
         try {
@@ -312,6 +363,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("获取知识图谱数据时发生错误: " + e.getMessage());
         }
     }
+
     private RAGResponse readAndMergeKnowledgeGraphFiles(String knowledgeGraphPath) {
         try {
             logger.info("尝试读取知识图谱，路径: {}", knowledgeGraphPath);
@@ -364,7 +416,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("处理知识图谱数据时发生错误: " + e.getMessage());
         }
     }
-    
+
     private RAGResponse executeRagQuery(String query, String ragPath, Integer topK, Boolean includeGraphContext,
             Integer contextDepth) {
         try {
@@ -398,6 +450,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("执行RAG查询时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse fixKnowledgeGraphPath(Long ragId) {
         try {
@@ -413,20 +466,20 @@ public class RAGServiceImpl implements RAGService {
             logger.info("修复RAG (ID: {}, 名称: {}) 的知识图谱路径", rag.getId(), rag.getName());
             logger.info("原始RAG路径: {}", ragPath);
             logger.info("原始知识图谱路径: {}", rag.getKnowledgeGraphPath());
-            
+
             Path ragPathObj = Paths.get(ragPath);
             String parentDir1 = ragPathObj.getParent().toString();
             String kgPath1 = Paths.get(parentDir1, "knowledge_graph", "output").toString();
             logger.info("尝试路径1: {}", kgPath1);
-            
+
             String parentDir2 = ragPathObj.getParent().getParent().toString();
             String kgPath2 = Paths.get(parentDir2, "knowledge_graph", "output").toString();
             logger.info("尝试路径2: {}", kgPath2);
-            
+
             Path kgPathObj1 = Paths.get(kgPath1);
             Path kgPathObj2 = Paths.get(kgPath2);
             String correctKnowledgeGraphPath;
-            
+
             if (Files.exists(kgPathObj1) && Files.isDirectory(kgPathObj1)) {
                 logger.info("路径1存在且是目录，使用路径1");
                 correctKnowledgeGraphPath = kgPath1;
@@ -441,11 +494,11 @@ public class RAGServiceImpl implements RAGService {
                         Files.exists(kgPathObj2) && Files.isDirectory(kgPathObj2));
                 return RAGResponse.error("无法找到有效的知识图谱路径。尝试的路径: \n" + kgPath1 + "\n" + kgPath2);
             }
-            
+
             logger.info("新知识图谱路径: {}", correctKnowledgeGraphPath);
             rag.setKnowledgeGraphPath(correctKnowledgeGraphPath);
             saveRAG(rag);
-            
+
             HashMap<String, Object> result = new HashMap<>();
             result.put("id", rag.getId());
             result.put("name", rag.getName());
@@ -458,6 +511,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("修复知识图谱路径时发生错误: " + e.getMessage());
         }
     }
+
     @Override
     public RAGResponse fixAllKnowledgeGraphPaths() {
         try {
@@ -477,7 +531,7 @@ public class RAGServiceImpl implements RAGService {
                     Path ragPathObj = Paths.get(ragPath);
                     String parentDir1 = ragPathObj.getParent().toString();
                     String kgPath1 = Paths.get(parentDir1, "knowledge_graph", "output").toString();
-                    
+
                     String parentDir2;
                     String kgPath2;
                     try {
@@ -487,23 +541,23 @@ public class RAGServiceImpl implements RAGService {
                         parentDir2 = parentDir1;
                         kgPath2 = kgPath1;
                     }
-                    
+
                     Path kgPathObj1 = Paths.get(kgPath1);
                     Path kgPathObj2 = Paths.get(kgPath2);
                     String correctKnowledgeGraphPath = null;
-                    
+
                     if (Files.exists(kgPathObj1) && Files.isDirectory(kgPathObj1)) {
                         correctKnowledgeGraphPath = kgPath1;
                     } else if (Files.exists(kgPathObj2) && Files.isDirectory(kgPathObj2)) {
                         correctKnowledgeGraphPath = kgPath2;
                     }
-                    
+
                     HashMap<String, Object> result = new HashMap<>();
                     result.put("id", rag.getId());
                     result.put("name", rag.getName());
                     result.put("ragPath", ragPath);
                     result.put("oldKnowledgeGraphPath", originalKgPath);
-                    
+
                     if (correctKnowledgeGraphPath != null) {
                         rag.setKnowledgeGraphPath(correctKnowledgeGraphPath);
                         saveRAG(rag);
@@ -538,7 +592,7 @@ public class RAGServiceImpl implements RAGService {
             return RAGResponse.error("批量修复知识图谱路径时发生错误: " + e.getMessage());
         }
     }
-    
+
     @PostConstruct
     public void initializeAndFixKnowledgeGraphPaths() {
         try {
@@ -551,28 +605,28 @@ public class RAGServiceImpl implements RAGService {
             logger.info("找到 {} 个RAG需要检查知识图谱路径", allRags.size());
             int fixedCount = 0;
             int errorCount = 0;
-            
+
             for (RAG rag : allRags) {
                 try {
                     if (rag.getRagPath() == null || rag.getRagPath().isEmpty()) {
                         logger.warn("RAG (ID: {}, 名称: {}) 的路径为空，跳过", rag.getId(), rag.getName());
                         continue;
                     }
-                    
+
                     String ragPath = rag.getRagPath();
                     String originalKgPath = rag.getKnowledgeGraphPath();
                     Path originalPath = Paths.get(originalKgPath);
-                    
+
                     if (Files.exists(originalPath) && Files.isDirectory(originalPath)) {
                         logger.info("RAG (ID: {}, 名称: {}) 的知识图谱路径正常，无需修复", rag.getId(), rag.getName());
                         continue;
                     }
-                    
+
                     logger.info("修复RAG (ID: {}, 名称: {}) 的知识图谱路径", rag.getId(), rag.getName());
                     Path ragPathObj = Paths.get(ragPath);
                     String parentDir1 = ragPathObj.getParent().toString();
                     String kgPath1 = Paths.get(parentDir1, "knowledge_graph", "output").toString();
-                    
+
                     String parentDir2;
                     String kgPath2;
                     try {
@@ -582,11 +636,11 @@ public class RAGServiceImpl implements RAGService {
                         parentDir2 = parentDir1;
                         kgPath2 = kgPath1;
                     }
-                    
+
                     Path kgPathObj1 = Paths.get(kgPath1);
                     Path kgPathObj2 = Paths.get(kgPath2);
                     String correctKnowledgeGraphPath = null;
-                    
+
                     if (Files.exists(kgPathObj1) && Files.isDirectory(kgPathObj1)) {
                         correctKnowledgeGraphPath = kgPath1;
                         logger.info("使用路径1: {}", kgPath1);
@@ -594,7 +648,7 @@ public class RAGServiceImpl implements RAGService {
                         correctKnowledgeGraphPath = kgPath2;
                         logger.info("使用路径2: {}", kgPath2);
                     }
-                    
+
                     if (correctKnowledgeGraphPath != null) {
                         rag.setKnowledgeGraphPath(correctKnowledgeGraphPath);
                         saveRAG(rag);

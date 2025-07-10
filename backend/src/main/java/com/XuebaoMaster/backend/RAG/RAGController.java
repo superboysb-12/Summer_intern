@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -82,6 +83,13 @@ public class RAGController {
             @RequestParam String ragName,
             @RequestParam(defaultValue = "false") boolean forceRebuild) {
 
+        // 确保sourceDir是绝对路径
+        File sourceDirFile = new File(sourceDir);
+        if (!sourceDirFile.isAbsolute()) {
+            sourceDirFile = sourceDirFile.getAbsoluteFile();
+            sourceDir = sourceDirFile.getAbsolutePath();
+        }
+
         RAGResponse response = ragService.generateRAG(sourceDir, ragName, forceRebuild);
         return ResponseEntity.ok(response);
     }
@@ -94,6 +102,13 @@ public class RAGController {
             @RequestParam String sourceDir,
             @RequestParam String ragName,
             @RequestParam(defaultValue = "false") boolean forceRebuild) {
+
+        // 确保sourceDir是绝对路径
+        File sourceDirFile = new File(sourceDir);
+        if (!sourceDirFile.isAbsolute()) {
+            sourceDirFile = sourceDirFile.getAbsoluteFile();
+            sourceDir = sourceDirFile.getAbsolutePath();
+        }
 
         RAGResponse response = ragService.generateRAGAsync(sourceDir, ragName, forceRebuild);
         return ResponseEntity.ok(response);
