@@ -1,5 +1,7 @@
 package com.XuebaoMaster.backend.TeachingPlanGenerator.impl;
 
+import com.XuebaoMaster.backend.RAG.RAG;
+import com.XuebaoMaster.backend.RAG.RAGRepository;
 import com.XuebaoMaster.backend.TeachingPlanGenerator.TeachingPlanGenerator;
 import com.XuebaoMaster.backend.TeachingPlanGenerator.TeachingPlanGeneratorRepository;
 import com.XuebaoMaster.backend.TeachingPlanGenerator.TeachingPlanGeneratorService;
@@ -23,7 +25,10 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorService {
@@ -42,8 +47,16 @@ public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorSe
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RAGRepository ragRepository;
+
     @Override
     public Long generateTeachingPlan(String prompt) {
+        return generateTeachingPlan(prompt, new HashMap<>());
+    }
+
+    @Override
+    public Long generateTeachingPlan(String prompt, Map<String, Object> inputs) {
         // 创建并保存教案生成任务
         TeachingPlanGenerator teachingPlanGenerator = new TeachingPlanGenerator();
         teachingPlanGenerator.setPrompt(prompt);
@@ -51,7 +64,50 @@ public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorSe
         TeachingPlanGenerator savedEntity = teachingPlanGeneratorRepository.save(teachingPlanGenerator);
 
         // 异步执行教案生成
-        generateTeachingPlanAsync(savedEntity.getId(), prompt);
+        generateTeachingPlanAsync(savedEntity.getId(), prompt, inputs);
+
+        return savedEntity.getId();
+    }
+
+    @Override
+    public Long generateTeachingPlanWithRagId(String prompt, Long ragId, Map<String, Object> inputs) {
+        // 查找指定的RAG
+        Optional<RAG> optionalRag = ragRepository.findById(ragId);
+        if (optionalRag.isEmpty()) {
+            // 创建并保存失败的教案生成任务
+            TeachingPlanGenerator teachingPlanGenerator = new TeachingPlanGenerator();
+            teachingPlanGenerator.setPrompt(prompt);
+            teachingPlanGenerator.setStatus("FAILED");
+            teachingPlanGenerator.setMessageId("找不到ID为" + ragId + "的RAG");
+            TeachingPlanGenerator savedEntity = teachingPlanGeneratorRepository.save(teachingPlanGenerator);
+            return savedEntity.getId();
+        }
+
+        RAG rag = optionalRag.get();
+        if (!RAG.RAGStatus.COMPLETED.equals(rag.getStatus())) {
+            // 创建并保存失败的教案生成任务
+            TeachingPlanGenerator teachingPlanGenerator = new TeachingPlanGenerator();
+            teachingPlanGenerator.setPrompt(prompt);
+            teachingPlanGenerator.setStatus("FAILED");
+            teachingPlanGenerator.setMessageId("指定的RAG尚未完成生成，当前状态: " + rag.getStatus());
+            TeachingPlanGenerator savedEntity = teachingPlanGeneratorRepository.save(teachingPlanGenerator);
+            return savedEntity.getId();
+        }
+
+        // 设置RAG路径
+        if (inputs == null) {
+            inputs = new HashMap<>();
+        }
+        inputs.put("ragURL", rag.getRagPath());
+
+        // 创建并保存教案生成任务
+        TeachingPlanGenerator teachingPlanGenerator = new TeachingPlanGenerator();
+        teachingPlanGenerator.setPrompt(prompt);
+        teachingPlanGenerator.setStatus("PENDING");
+        TeachingPlanGenerator savedEntity = teachingPlanGeneratorRepository.save(teachingPlanGenerator);
+
+        // 异步执行教案生成
+        generateTeachingPlanAsync(savedEntity.getId(), prompt, inputs);
 
         return savedEntity.getId();
     }
@@ -67,7 +123,7 @@ public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorSe
     }
 
     @Async("teachingPlanGeneratorTaskExecutor")
-    protected void generateTeachingPlanAsync(Long id, String prompt) {
+    protected void generateTeachingPlanAsync(Long id, String prompt, Map<String, Object> inputs) {
         TeachingPlanGenerator entity = teachingPlanGeneratorRepository.findById(id).orElse(null);
         if (entity == null) {
             logger.error("无法找到教案生成任务: {}", id);
@@ -88,7 +144,27 @@ public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorSe
             request.setConversation_id("");
             request.setUser(config.getUserId());
 
-            logger.info("开始向 {} 发送请求生成教案，提示词: {}", url, prompt);
+            // 设置RAG相关参数
+            if (inputs != null) {
+                // 如果有depth参数
+                if (inputs.containsKey("depth")) {
+                    request.addInput("depth", inputs.get("depth"));
+                }
+
+                // 如果有ragURL参数
+                if (inputs.containsKey("ragURL")) {
+                    request.addInput("ragURL", inputs.get("ragURL"));
+                }
+
+                // 添加其他可能的输入参数
+                for (Map.Entry<String, Object> entry : inputs.entrySet()) {
+                    if (!entry.getKey().equals("depth") && !entry.getKey().equals("ragURL")) {
+                        request.addInput(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+
+            logger.info("开始向 {} 发送请求生成教案，提示词: {}, RAG配置: {}", url, prompt, inputs);
 
             // 发送请求
             HttpEntity<ChatMessageRequest> requestEntity = new HttpEntity<>(request, headers);
@@ -177,6 +253,11 @@ public class TeachingPlanGeneratorServiceImpl implements TeachingPlanGeneratorSe
             entity.setMessageId("错误: " + e.getMessage());
             teachingPlanGeneratorRepository.save(entity);
         }
+    }
+
+    @Async("teachingPlanGeneratorTaskExecutor")
+    protected void generateTeachingPlanAsync(Long id, String prompt) {
+        generateTeachingPlanAsync(id, prompt, new HashMap<>());
     }
 
     private void downloadFile(String fileUrl, String destinationPath) throws IOException {

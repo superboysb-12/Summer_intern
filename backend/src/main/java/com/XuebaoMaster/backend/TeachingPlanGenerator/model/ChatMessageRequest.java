@@ -18,6 +18,16 @@ public class ChatMessageRequest {
         this.inputs = inputs;
     }
 
+    /**
+     * 添加input参数
+     * 
+     * @param key   参数名
+     * @param value 参数值
+     */
+    public void addInput(String key, Object value) {
+        this.inputs.put(key, value);
+    }
+
     public String getQuery() {
         return query;
     }

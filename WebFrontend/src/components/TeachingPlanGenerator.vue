@@ -16,6 +16,10 @@ const teachingPlanList = ref([])
 const loading = ref(false)
 const total = ref(0)
 
+// RAG列表数据
+const ragList = ref([])
+const loadingRag = ref(false)
+
 // 表单引用
 const generateFormRef = ref(null)
 
@@ -28,17 +32,39 @@ const queryParams = reactive({
 
 // 提交表单数据
 const generateForm = reactive({
-  prompt: ''
+  query: '',
+  useRag: false,
+  ragId: null,
+  inputs: {
+    depth: 2
+  }
 })
 
 // 对话框控制
 const generateDialogVisible = ref(false)
 
+// 深度选项
+const depthOptions = [
+  { value: 1, label: '1 - 非常基础' },
+  { value: 2, label: '2' },
+  { value: 3, label: '3' },
+  { value: 4, label: '4' },
+  { value: 5, label: '5 - 中等' },
+  { value: 6, label: '6' },
+  { value: 7, label: '7' },
+  { value: 8, label: '8' },
+  { value: 9, label: '9' },
+  { value: 10, label: '10 - 非常深入' }
+]
+
 // 表单校验规则
 const generateRules = {
-  prompt: [
+  query: [
     { required: true, message: '请输入教案提示词', trigger: 'blur' },
     { min: 2, max: 100, message: '长度在 2 到 100 个字符', trigger: 'blur' }
+  ],
+  ragId: [
+    { required: true, message: '请选择RAG', trigger: 'change', type: 'number' }
   ]
 }
 
@@ -75,15 +101,42 @@ const getTeachingPlanList = async () => {
   }
 }
 
+// 获取RAG列表
+const getRAGList = async () => {
+  loadingRag.value = true
+  try {
+    const response = await axios.get(`${BaseUrl}api/rag`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      ragList.value = response.data.data || []
+    } else {
+      ElMessage.error(response.data?.message || '获取RAG列表失败')
+    }
+  } catch (error) {
+    console.error('获取RAG列表失败:', error)
+    ElMessage.error('获取RAG列表失败')
+  } finally {
+    loadingRag.value = false
+  }
+}
+
 // 打开生成教案对话框
 const handleGenerate = () => {
   resetGenerateForm()
+  getRAGList() // 获取RAG列表
   generateDialogVisible.value = true
 }
 
 // 重置生成表单
 const resetGenerateForm = () => {
-  generateForm.prompt = ''
+  generateForm.query = ''
+  generateForm.useRag = false
+  generateForm.ragId = null
+  generateForm.inputs.depth = 5
 }
 
 // 提交生成教案表单
@@ -93,9 +146,21 @@ const submitGenerateForm = async (formEl) => {
   await formEl.validate(async (valid) => {
     if (valid) {
       try {
-        const response = await axios.post(`${BaseUrl}api/teaching-plan-generator/generate`, {
-          prompt: generateForm.prompt
-        }, {
+        let url = `${BaseUrl}api/teaching-plan-generator/generate`
+        let requestData = {
+          query: generateForm.query,
+          inputs: {
+            depth: generateForm.inputs.depth
+          }
+        }
+        
+        // 如果使用RAG，切换为使用RAG的API
+        if (generateForm.useRag && generateForm.ragId) {
+          url = `${BaseUrl}api/teaching-plan-generator/generate-with-rag`
+          requestData.ragId = generateForm.ragId
+        }
+        
+        const response = await axios.post(url, requestData, {
           headers: {
             'Authorization': `Bearer ${getToken()}`
           }
@@ -164,22 +229,6 @@ const downloadTeachingPlan = async (id, fileName) => {
       }
     })
     
-    // 从响应中获取文件名
-    let downloadFileName = fileName
-    const contentDisposition = response.headers['content-disposition']
-    if (contentDisposition) {
-      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/
-      const matches = filenameRegex.exec(contentDisposition)
-      if (matches != null && matches[1]) {
-        downloadFileName = matches[1].replace(/['"]/g, '')
-      }
-    }
-    
-    // 确保有文件名和扩展名
-    if (!downloadFileName) {
-      downloadFileName = fileName || `教案文件_${id}.docx`
-    }
-    
     // 创建Blob对象
     const blob = new Blob([response.data], { 
       type: response.headers['content-type'] || 'application/octet-stream' 
@@ -188,19 +237,36 @@ const downloadTeachingPlan = async (id, fileName) => {
     // 创建下载链接
     const url = window.URL.createObjectURL(blob)
     const link = document.createElement('a')
+    
+    // 从响应头获取文件名
+    const contentDisposition = response.headers['content-disposition']
+    let downloadFileName = '教案.docx'
+    if (contentDisposition) {
+      const fileNameMatch = contentDisposition.match(/filename="(.+)"/)
+      if (fileNameMatch && fileNameMatch.length === 2) {
+        downloadFileName = fileNameMatch[1]
+      }
+    } else if (fileName) {
+      // 如果没有从响应头获取到文件名，则使用传入的文件名
+      downloadFileName = fileName
+    } else {
+      // 如果都没有，使用默认文件名
+      downloadFileName = `教案文件_${id}.docx`
+    }
+    
     link.href = url
-    link.download = downloadFileName // 指定下载的文件名
+    link.setAttribute('download', downloadFileName)
     document.body.appendChild(link)
     link.click()
     
     // 清理
     window.URL.revokeObjectURL(url)
-    document.body.removeChild(link)
+    link.remove()
     
     ElMessage.success('文件下载成功')
   } catch (error) {
     console.error('下载文件失败:', error)
-    ElMessage.error('下载文件失败')
+    ElMessage.error('下载文件失败: ' + (error.response?.status === 404 ? '文件不存在或任务未完成' : '请求失败'))
   }
 }
 
@@ -375,16 +441,49 @@ onMounted(() => {
         :rules="generateRules"
         label-width="120px"
       >
-        <el-form-item label="教案提示词" prop="prompt">
+        <el-form-item label="教案提示词" prop="query">
           <el-input 
-            v-model="generateForm.prompt" 
+            v-model="generateForm.query" 
             type="textarea" 
             :rows="3"
             placeholder="请输入教案提示词，如: tensorflow.js" 
           />
         </el-form-item>
+        
+        <el-form-item label="深度设置">
+          <el-select v-model="generateForm.inputs.depth" placeholder="请选择教案深度">
+            <el-option
+              v-for="item in depthOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+        
+        <el-form-item label="使用RAG">
+          <el-switch v-model="generateForm.useRag" />
+        </el-form-item>
+        
+        <el-form-item label="选择RAG" prop="ragId" v-if="generateForm.useRag">
+          <el-select 
+            v-model="generateForm.ragId" 
+            placeholder="请选择RAG"
+            :loading="loadingRag"
+            filterable
+          >
+            <el-option
+              v-for="item in ragList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        
         <div class="form-tips">
           <p><i class="el-icon-info"></i> 提示：教案生成是异步处理的，可能需要较长时间（约15分钟）才能完成。</p>
+          <p v-if="generateForm.useRag"><i class="el-icon-info"></i> 使用RAG可以基于知识图谱生成更加专业的教案。</p>
         </div>
       </el-form>
       <template #footer>
