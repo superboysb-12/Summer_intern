@@ -18,6 +18,7 @@ const FileManage = () => import('../components/FileManage.vue')
 const RAGManage = () => import('../components/RAGManage.vue')
 const DeepSeekChat = () => import('../components/DeepSeekChat.vue')
 const TeachingPlanGenerator = () => import('../components/TeachingPlanGenerator.vue')
+const UtilityTools = () => import('../components/UtilityTools.vue')
 
 const routes=[
     {
@@ -84,6 +85,11 @@ const routes=[
                 path: 'deepseek',
                 component: DeepSeekChat,
                 meta: { title: '系统管理 - DeepSeek Chat' }
+            },
+            {
+                path: 'tools',
+                component: UtilityTools,
+                meta: { title: '系统管理 - 实用工具' }
             }
         ]
     },

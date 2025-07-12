@@ -34,6 +34,7 @@ const getActiveMenu = () => {
   if (path.includes('/manage/rag')) return 'rag'
   if (path.includes('/manage/deepseek')) return 'deepseek'
   if (path.includes('/manage/teaching-plan')) return 'teaching-plan'
+  if (path.includes('/manage/tools')) return 'tools'
   if (path.includes('/manage/data')) return 'data-overview'
   if (path.includes('/manage/settings')) return 'settings'
   return 'home'
@@ -72,6 +73,9 @@ const handleMenuSelect = (key) => {
       break
     case 'teaching-plan':
       router.push('/manage/teaching-plan')
+      break
+    case 'tools':
+      router.push('/manage/tools')
       break
     case 'data-overview':
       router.push('/manage/data')

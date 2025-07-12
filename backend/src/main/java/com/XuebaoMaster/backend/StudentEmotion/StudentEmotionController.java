@@ -11,12 +11,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.XuebaoMaster.backend.User.User;
+import com.XuebaoMaster.backend.User.UserService;
+import com.XuebaoMaster.backend.StudentEmotion.AutoEmotionScoreService;
+
 @RestController
 @RequestMapping("/student-emotions")
 public class StudentEmotionController {
 
     @Autowired
     private StudentEmotionService studentEmotionService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AutoEmotionScoreService autoEmotionScoreService;
 
     /**
      * 创建学生情感记录
@@ -249,6 +259,56 @@ public class StudentEmotionController {
             return ResponseEntity.ok(statistics);
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * 手动触发指定用户的情绪评分计算
+     * 
+     * @param userId 用户ID
+     * @return 计算的情绪评分
+     */
+    @PostMapping("/calculate-score/{userId}")
+    public ResponseEntity<Map<String, Object>> calculateUserEmotionScore(@PathVariable Long userId) {
+        try {
+            User user = userService.getUserById(userId);
+            int score = autoEmotionScoreService.calculateUserEmotionScore(user);
+
+            // 保存计算结果
+            StudentEmotion emotion = studentEmotionService.createStudentEmotion(userId, score);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("userId", userId);
+            response.put("score", score);
+            response.put("createdAt", emotion.getCreatedAt());
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * 手动触发所有活跃用户的情绪评分计算
+     * 
+     * @return 操作状态
+     */
+    @PostMapping("/calculate-scores/all")
+    public ResponseEntity<Map<String, Object>> calculateAllEmotionScores() {
+        try {
+            autoEmotionScoreService.calculateDailyEmotionScores();
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("message", "所有活跃用户的情绪评分计算已完成");
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", "error");
+            response.put("message", "情绪评分计算过程中出错");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }

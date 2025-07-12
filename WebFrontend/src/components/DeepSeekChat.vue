@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, Delete, Download, RefreshRight, Connection, ChatLineSquare } from '@element-plus/icons-vue'
 import axios from 'axios'
@@ -11,6 +11,10 @@ const getToken = () => localStorage.getItem('token')
 
 // 聊天消息列表
 const messages = ref([])
+
+const displayedMessages = computed(() => {
+  return messages.value.filter(m => m.role !== 'system')
+})
 
 // 当前输入的消息
 const currentMessage = ref('')
@@ -141,73 +145,82 @@ const preventChatAreaScroll = (e) => {
   }
 }
 
-// 加载保存的对话列表
-const loadSavedChats = () => {
+// 加载用户的对话列表
+const loadUserConversations = async () => {
+  const user = store.getUserInfo()
+  if (!user?.id) return
+  
   try {
-    const savedChatsData = localStorage.getItem('deepseekChats')
-    if (savedChatsData) {
-      savedChats.value = JSON.parse(savedChatsData)
+    const response = await axios.get(`${BaseUrl}api/deepseek/conversations/user/${user.id}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    if (response.data) {
+      // 按更新时间降序排序
+      savedChats.value = response.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.createdAt))
     }
   } catch (error) {
-    console.error('加载保存的对话失败:', error)
+    console.error('加载对话列表失败:', error)
+    ElMessage.error('加载对话列表失败')
   }
 }
 
-// 保存当前对话
-const saveCurrentChat = () => {
-  // 如果没有消息，则不保存
-  if (messages.value.length === 0) return
-  
-  // 创建一个唯一ID（如果没有的话）
-  if (!chatHistory.id) {
-    chatHistory.id = Date.now().toString()
+// 更新会话标题
+const updateChatTitle = async (conversationId, title) => {
+  try {
+    await axios.put(`${BaseUrl}api/deepseek/conversation/${conversationId}/title`, { title }, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+  } catch (error) {
+    console.error('更新标题失败:', error)
+    // 不向用户显示此错误，因为它是一个后台操作
   }
-  
-  const chatToSave = {
-    id: chatHistory.id,
-    title: chatHistory.title,
-    messages: [...messages.value],
-    timestamp: new Date().toISOString()
-  }
-  
-  // 查找是否已存在相同ID的对话
-  const existingIndex = savedChats.value.findIndex(chat => chat.id === chatToSave.id)
-  
-  if (existingIndex !== -1) {
-    // 更新现有对话
-    savedChats.value[existingIndex] = chatToSave
-  } else {
-    // 添加新对话
-    savedChats.value.push(chatToSave)
-  }
-  
-  // 保存到localStorage
-  localStorage.setItem('deepseekChats', JSON.stringify(savedChats.value))
-  ElMessage.success('对话已保存')
 }
+
 
 // 加载指定对话
-const loadChat = (chatId) => {
-  const chat = savedChats.value.find(c => c.id === chatId)
-  if (chat) {
-    chatHistory.id = chat.id
-    chatHistory.title = chat.title
-    messages.value = [...chat.messages]
-    ElMessage.success('对话已加载')
+const loadChat = async (chatId) => {
+  try {
+    const response = await axios.get(`${BaseUrl}api/deepseek/conversation/${chatId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    const chat = response.data
+    if (chat) {
+      chatHistory.id = chat.id
+      chatHistory.title = chat.title
+      // 后端返回的消息包含更多字段，我们只需要role和content
+      messages.value = chat.messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }))
+      ElMessage.success('对话已加载')
+      await nextTick()
+      scrollToBottom()
+    }
+  } catch (error) {
+    console.error('加载对话失败:', error)
+    ElMessage.error('加载对话失败')
   }
 }
 
 // 删除保存的对话
-const deleteChat = (chatId) => {
-  savedChats.value = savedChats.value.filter(chat => chat.id !== chatId)
-  localStorage.setItem('deepseekChats', JSON.stringify(savedChats.value))
-  
-  // 如果删除的是当前对话，则清空当前对话
-  if (chatHistory.id === chatId) {
-    clearChat()
+const deleteChat = async (chatId) => {
+  try {
+    await axios.delete(`${BaseUrl}api/deepseek/conversation/${chatId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    
+    savedChats.value = savedChats.value.filter(chat => chat.id !== chatId)
+    
+    // 如果删除的是当前对话，则清空当前对话
+    if (chatHistory.id === chatId) {
+      clearChat()
+    }
+    
+    ElMessage.success('对话已删除')
+  } catch (error) {
+    console.error('删除对话失败:', error)
+    ElMessage.error('删除对话失败')
   }
-  
-  ElMessage.success('对话已删除')
 }
 
 // 获取RAG列表
@@ -232,6 +245,12 @@ const getRAGList = async () => {
 
 // 发送消息
 const sendMessage = async () => {
+  const user = store.getUserInfo()
+  if (!user?.id) {
+    ElMessage.error('请先登录')
+    return
+  }
+
   if (!currentMessage.value.trim()) {
     return
   }
@@ -265,15 +284,7 @@ const sendMessage = async () => {
   loading.value = true
   
   try {
-    // 准备请求体
-    const requestBody = {
-      messages: messages.value.filter(msg => !msg.isLoading).map(msg => ({
-        role: msg.role,
-        content: msg.content
-      }))
-    }
-    
-    // 添加系统消息 - 学习帮助助手提示词（隐式添加，不显示在界面上）
+    // 准备系统消息 (包含RAG上下文)
     let systemPrompt = learningAssistantPrompt
     
     // 如果启用了RAG，并且选择了RAG，则添加RAG查询
@@ -322,50 +333,72 @@ const sendMessage = async () => {
       }
     }
     
-    // 在消息列表的最前面添加系统消息
-    requestBody.messages.unshift({
-      role: "system",
-      content: systemPrompt
-    })
-    
-    // 发送请求到DeepSeek API
-    const response = await axios.post(`${BaseUrl}api/deepseek/chat`, requestBody, {
-      headers: {
-        'Authorization': `Bearer ${getToken()}`
-      }
-    })
-    
-    // 处理响应
-    if (response.data && response.data.choices && response.data.choices.length > 0) {
-      // 更新临时消息为实际响应
-      const aiResponseIndex = messages.value.findIndex(msg => msg.isLoading)
-      if (aiResponseIndex !== -1) {
-        messages.value[aiResponseIndex] = {
-          role: 'assistant',
-          content: response.data.choices[0].message.content
+    // 准备要发送到API的消息
+    const apiMessages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: tempMessage }
+    ]
+
+    let response;
+
+    if (!chatHistory.id) {
+      // 1. 创建新会话
+      response = await axios.post(`${BaseUrl}api/deepseek/conversation/user/${user.id}`, { messages: apiMessages }, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      });
+
+      if (response.data && response.data.response && response.data.response.choices) {
+        const aiResponse = response.data.response.choices[0].message
+        
+        // 更新临时消息为实际响应
+        const aiResponseIndex = messages.value.findIndex(msg => msg.isLoading)
+        if (aiResponseIndex !== -1) {
+          messages.value[aiResponseIndex] = { role: 'assistant', content: aiResponse.content }
         }
+
+        // 设置当前会话信息
+        chatHistory.id = response.data.conversation_id
+        const newTitle = tempMessage.substring(0, 30) + (tempMessage.length > 30 ? '...' : '')
+        chatHistory.title = newTitle
+
+        // 在本地列表中添加新会话并更新标题
+        savedChats.value.unshift({ id: chatHistory.id, title: newTitle, updatedAt: new Date().toISOString() })
+        await updateChatTitle(chatHistory.id, newTitle)
+
+      } else {
+        throw new Error('获取回复失败')
       }
-      
-      // 保存到聊天历史
-      chatHistory.messages = [...messages.value]
-      
-      // 更新聊天标题（如果是第一次回复）
-      if (!chatHistory.id && messages.value.length === 2) {
-        chatHistory.title = tempMessage.substring(0, 30) + (tempMessage.length > 30 ? '...' : '')
-      }
-      
-      // 自动保存到localStorage
-      saveCurrentChat()
     } else {
-      // 移除临时消息
-      messages.value = messages.value.filter(msg => !msg.isLoading)
-      ElMessage.error('获取回复失败')
+      // 2. 向现有会话发送消息
+      response = await axios.post(`${BaseUrl}api/deepseek/conversation/${chatHistory.id}/message`, { messages: apiMessages }, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      })
+
+      if (response.data && response.data.choices) {
+        const aiResponse = response.data.choices[0].message
+        
+        // 更新临时消息为实际响应
+        const aiResponseIndex = messages.value.findIndex(msg => msg.isLoading)
+        if (aiResponseIndex !== -1) {
+          messages.value[aiResponseIndex] = { role: 'assistant', content: aiResponse.content }
+        }
+
+        // 更新会话列表中的时间戳，以便排序
+        const chatInList = savedChats.value.find(c => c.id === chatHistory.id)
+        if (chatInList) {
+          chatInList.updatedAt = new Date().toISOString()
+        }
+        savedChats.value.sort((a, b) => new Date(b.updatedAt) - new Date(a.createdAt))
+
+      } else {
+        throw new Error('获取回复失败')
+      }
     }
   } catch (error) {
     console.error('发送消息失败:', error)
     // 移除临时消息
     messages.value = messages.value.filter(msg => !msg.isLoading)
-    ElMessage.error('发送消息失败')
+    ElMessage.error(error.message || '发送消息失败')
   } finally {
     loading.value = false
   }
@@ -417,7 +450,7 @@ const scrollToBottom = () => {
 // 页面加载时获取RAG列表并加载保存的对话
 onMounted(() => {
   getRAGList()
-  loadSavedChats()
+  loadUserConversations()
   
   // 添加聊天区域的滚动事件监听
   const chatMessages = document.querySelector('.chat-messages')
@@ -436,13 +469,7 @@ onUnmounted(() => {
   }
 })
 
-// 监听消息变化，自动保存对话
-watch(messages, () => {
-  if (messages.value.length > 0 && !messages.value.some(msg => msg.isLoading)) {
-    chatHistory.messages = [...messages.value]
-    // 不在每次消息变化时都保存，避免频繁写入localStorage
-  }
-}, { deep: true })
+// 不再需要监听消息来保存
 </script>
 
 <template>
@@ -505,7 +532,7 @@ watch(messages, () => {
       
       <!-- 聊天消息区域 -->
       <div class="chat-messages">
-        <div v-if="messages.length === 0" class="empty-chat">
+        <div v-if="displayedMessages.length === 0" class="empty-chat">
           <div class="empty-chat-content">
             <el-icon :size="64"><ChatLineSquare /></el-icon>
             <h2>开始一个新的对话</h2>
@@ -514,7 +541,7 @@ watch(messages, () => {
         </div>
         
         <template v-else>
-          <div v-for="(message, index) in messages" :key="index" class="message" :class="message.role">
+          <div v-for="(message, index) in displayedMessages" :key="index" class="message" :class="message.role">
             <div class="message-header">
               <span class="role-badge">{{ message.role === 'user' ? '我' : 'DeepSeek AI' }}</span>
             </div>
