@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, User, Files } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
+import CourseFileManage from './CourseFileManage.vue'
+import EnrollmentStats from './EnrollmentStats.vue'
 
 const router = useRouter()
 const store = useCounterStore()
@@ -37,6 +39,19 @@ const courseForm = reactive({
 const dialogVisible = ref(false)
 const dialogTitle = ref('添加课程')
 const formMode = ref('add')
+
+// 选课情况对话框和课程资源管理对话框共用的变量
+const enrollmentDialogVisible = ref(false)
+const courseFileDialogVisible = ref(false)
+const currentCourseId = ref(null)
+const currentCourseName = ref('')
+
+// 打开课程资源管理对话框
+const openCourseFileDialog = (course) => {
+  currentCourseId.value = course.courseId
+  currentCourseName.value = course.name
+  courseFileDialogVisible.value = true
+}
 
 // 表单校验规则
 const rules = {
@@ -225,6 +240,33 @@ const formatDate = (dateString) => {
   return date.toLocaleString()
 }
 
+// 查看选课情况
+const viewEnrollments = (row) => {
+  currentCourseId.value = row.courseId
+  currentCourseName.value = row.name
+  enrollmentDialogVisible.value = true
+}
+
+// 获取学生状态显示
+const getStatusDisplay = (status) => {
+  switch(status) {
+    case 'enrolled': return '进行中'
+    case 'completed': return '已完成'
+    case 'withdrawn': return '已退课'
+    default: return status || '未知状态'
+  }
+}
+
+// 获取状态对应的标签类型
+const getStatusType = (status) => {
+  switch(status) {
+    case 'enrolled': return 'warning'
+    case 'completed': return 'success'
+    case 'withdrawn': return 'info'
+    default: return 'info'
+  }
+}
+
 // 生命周期钩子
 onMounted(() => {
   getCourseList()
@@ -285,11 +327,13 @@ onMounted(() => {
             {{ formatDate(scope.row.updatedAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="240" fixed="right">
+        <el-table-column label="操作" width="380" fixed="right">
           <template #default="scope">
             <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.courseId)">删除</el-button>
             <el-button type="success" link :icon="DataAnalysis" @click="viewCourseData(scope.row.courseId)">数据查看</el-button>
+            <el-button type="info" link :icon="User" @click="viewEnrollments(scope.row)">选课情况</el-button>
+            <el-button type="warning" link :icon="Files" @click="openCourseFileDialog(scope.row)">课程资源</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -341,6 +385,24 @@ onMounted(() => {
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 使用新的选课情况组件 -->
+    <EnrollmentStats
+      :visible="enrollmentDialogVisible"
+      @update:visible="val => enrollmentDialogVisible = val"
+      type="course"
+      :id="currentCourseId"
+      :name="currentCourseName"
+    />
+    
+    <!-- 课程资源管理对话框 -->
+    <CourseFileManage
+      :visible="courseFileDialogVisible"
+      @update:visible="val => courseFileDialogVisible = val"
+      :courseId="currentCourseId"
+      :courseName="currentCourseName"
+      @refresh="getCourseList"
+    />
   </div>
 </template>
 

@@ -9,8 +9,15 @@ const registerForm = ref({
   password: '',
   confirmPassword: '',
   email: '',
-  phone: ''
+  phone: '',
+  role: 'STUDENT' // 默认角色为学生，使用大写
 })
+
+const roleOptions = [
+  { label: '学生', value: 'STUDENT' },
+  { label: '教师', value: 'TEACHER' },
+  { label: '管理员', value: 'ADMIN' }
+]
 
 const rules = ref({
   username: [
@@ -21,6 +28,9 @@ const rules = ref({
   ],
   confirmPassword: [
     { validator: validatePass, trigger: 'blur' }
+  ],
+  role: [
+    { required: true, message: '请选择用户角色', trigger: 'change' }
   ]
 })
 
@@ -50,7 +60,8 @@ const handleRegister = async () => {
       registerForm.value.username, 
       registerForm.value.password,
       registerForm.value.email,
-      registerForm.value.phone
+      registerForm.value.phone,
+      registerForm.value.role
     )
     if (result) {
       ElMessage.success('注册成功')
@@ -105,6 +116,28 @@ const handleRegister = async () => {
             :prefix-icon="Lock"
             show-password
           />
+        </div>
+        
+        <div class="form-item role-selection">
+          <label>用户角色 <span class="required">*</span></label>
+          <div class="role-options">
+            <div 
+              v-for="option in roleOptions" 
+              :key="option.value"
+              class="role-option"
+              :class="{ 'active': registerForm.role === option.value }"
+              @click="registerForm.role = option.value"
+            >
+              <div class="role-icon">
+                <i class="el-icon" :class="
+                  option.value === 'STUDENT' ? 'el-icon-user' : 
+                  option.value === 'TEACHER' ? 'el-icon-collection' : 
+                  'el-icon-setting'
+                "></i>
+              </div>
+              <div class="role-label">{{ option.label }}</div>
+            </div>
+          </div>
         </div>
         
         <div class="form-item">
@@ -207,6 +240,60 @@ const handleRegister = async () => {
   color: #909399;
   font-size: 12px;
   font-weight: normal;
+}
+
+.role-selection {
+  margin-bottom: 24px;
+}
+
+.role-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.role-option {
+  flex: 1;
+  margin: 0 6px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  border: 2px solid #e4e7ed;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.role-option:first-child {
+  margin-left: 0;
+}
+
+.role-option:last-child {
+  margin-right: 0;
+}
+
+.role-option:hover {
+  border-color: #a0cfff;
+  background-color: #ecf5ff;
+}
+
+.role-option.active {
+  border-color: #409eff;
+  background-color: #ecf5ff;
+}
+
+.role-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #606266;
+}
+
+.role-option.active .role-icon {
+  color: #409eff;
+}
+
+.role-label {
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .register-button {

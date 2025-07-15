@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, Reading } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
+import EnrollmentStats from './EnrollmentStats.vue'
 
 const router = useRouter()
 const store = useCounterStore()
@@ -36,6 +37,11 @@ const classForm = reactive({
 const dialogVisible = ref(false)
 const dialogTitle = ref('添加班级')
 const formMode = ref('add')
+
+// 选课情况对话框
+const enrollmentDialogVisible = ref(false)
+const currentClassId = ref(null)
+const currentClassName = ref('')
 
 // 表单校验规则
 const rules = {
@@ -221,6 +227,33 @@ const formatDate = (dateString) => {
   return date.toLocaleString()
 }
 
+// 查看班级选课情况
+const viewClassEnrollments = (row) => {
+  currentClassId.value = row.id
+  currentClassName.value = row.className
+  enrollmentDialogVisible.value = true
+}
+
+// 获取学生状态显示
+const getStatusDisplay = (status) => {
+  switch(status) {
+    case 'enrolled': return '进行中'
+    case 'completed': return '已完成'
+    case 'withdrawn': return '已退课'
+    default: return status || '未知状态'
+  }
+}
+
+// 获取状态对应的标签类型
+const getStatusType = (status) => {
+  switch(status) {
+    case 'enrolled': return 'warning'
+    case 'completed': return 'success'
+    case 'withdrawn': return 'info'
+    default: return 'info'
+  }
+}
+
 // 生命周期钩子
 onMounted(() => {
   getClassList()
@@ -279,11 +312,12 @@ onMounted(() => {
             {{ formatDate(scope.row.updatedAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="240" fixed="right">
+        <el-table-column label="操作" width="320" fixed="right">
           <template #default="scope">
             <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
             <el-button type="success" link :icon="DataAnalysis" @click="viewClassData(scope.row.id)">数据查看</el-button>
+            <el-button type="info" link :icon="Reading" @click="viewClassEnrollments(scope.row)">选课情况</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -326,6 +360,15 @@ onMounted(() => {
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 使用新的选课情况组件 -->
+    <EnrollmentStats
+      :visible="enrollmentDialogVisible"
+      @update:visible="val => enrollmentDialogVisible = val"
+      type="class"
+      :id="currentClassId"
+      :name="currentClassName"
+    />
   </div>
 </template>
 
@@ -387,5 +430,39 @@ onMounted(() => {
   .pagination {
     justify-content: center;
   }
+}
+
+.statistics-card {
+  margin-bottom: 20px;
+}
+
+.statistics-content {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stat-item {
+  text-align: center;
+  min-width: 100px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #606266;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #303133;
+  margin-top: 5px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style> 

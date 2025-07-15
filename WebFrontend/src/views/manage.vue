@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { 
   HomeFilled, 
@@ -18,6 +18,7 @@ import {
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
 import { useRouter, useRoute } from 'vue-router'
+import NotificationPanel from '../components/NotificationPanel.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -30,6 +31,7 @@ const getActiveMenu = () => {
   if (path.includes('/manage/users')) return 'users'
   if (path.includes('/manage/classes')) return 'classes'
   if (path.includes('/manage/courses')) return 'courses'
+  if (path.includes('/manage/student-courses')) return 'student-courses'
   if (path.includes('/manage/files')) return 'files'
   if (path.includes('/manage/rag')) return 'rag'
   if (path.includes('/manage/deepseek')) return 'deepseek'
@@ -37,6 +39,11 @@ const getActiveMenu = () => {
   if (path.includes('/manage/tools')) return 'tools'
   if (path.includes('/manage/data')) return 'data-overview'
   if (path.includes('/manage/settings')) return 'settings'
+  if (path.includes('/manage/assignments')) return 'assignments'
+  if (path.includes('/manage/study-records')) return 'study-records'
+  if (path.includes('/manage/resources')) return 'resources'
+  if (path.includes('/manage/enrollment-stats')) return 'enrollment-stats'
+  if (path.includes('/manage/messages')) return 'messages'
   return 'home'
 }
 
@@ -46,45 +53,59 @@ const activeMenu = ref(getActiveMenu())
 const store = useCounterStore()
 const userInfo = ref(store.getUserInfo() || {})
 
+// 角色权限常量
+const ROLES = {
+  ADMIN: 'ADMIN',
+  TEACHER: 'TEACHER',
+  STUDENT: 'STUDENT'
+}
+
+// 获取当前用户角色
+const userRole = computed(() => userInfo.value.userRole || ROLES.STUDENT)
+
+// 定义菜单项与权限
+const menuItems = [
+  { key: 'home', title: '首页', icon: HomeFilled, path: '/manage', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { 
+    key: 'data', 
+    title: '数据分析', 
+    icon: DataAnalysis, 
+    roles: [ROLES.ADMIN, ROLES.TEACHER],
+    children: [
+      { key: 'data-overview', title: '数据概览', path: '/manage/data', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+      { key: 'enrollment-stats', title: '选课统计', path: '/manage/enrollment-stats', roles: [ROLES.ADMIN, ROLES.TEACHER] }
+    ]
+  },
+  { key: 'users', title: '用户管理', icon: User, path: '/manage/users', roles: [ROLES.ADMIN] },
+  { key: 'classes', title: '班级管理', icon: School, path: '/manage/classes', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { key: 'courses', title: '课程管理', icon: Reading, path: '/manage/courses', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { key: 'student-courses', title: '我的课程', icon: Reading, path: '/manage/student-courses', roles: [ROLES.STUDENT] },
+  { key: 'assignments', title: '作业管理', icon: Document, path: '/manage/assignments', roles: [ROLES.STUDENT] },
+  { key: 'study-records', title: '学习记录', icon: DataAnalysis, path: '/manage/study-records', roles: [ROLES.STUDENT] },
+  { key: 'resources', title: '学习资源', icon: Collection, path: '/manage/resources', roles: [ROLES.STUDENT] },
+  { key: 'files', title: '文件管理', icon: Document, path: '/manage/files', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { key: 'messages', title: '通知管理', icon: Bell, path: '/manage/messages', roles: [ROLES.ADMIN] },
+  { key: 'rag', title: 'RAG知识库', icon: Collection, path: '/manage/rag', roles: [ROLES.ADMIN] },
+  { key: 'teaching-plan', title: '教案生成', icon: Edit, path: '/manage/teaching-plan', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { key: 'deepseek', title: 'DeepSeek Chat', icon: ChatDotRound, path: '/manage/deepseek', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { key: 'tools', title: '实用工具', icon: Tools, path: '/manage/tools', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { key: 'settings', title: '系统设置', icon: Setting, path: '/manage/settings', roles: [ROLES.ADMIN] },
+]
+
+// 根据用户角色过滤菜单项
+const filteredMenuItems = computed(() => {
+  return menuItems.filter(item => item.roles.includes(userRole.value))
+})
+
 // 处理菜单点击
 const handleMenuSelect = (key) => {
   activeMenu.value = key
-  switch(key) {
-    case 'home':
-      router.push('/manage')
-      break
-    case 'users':
-      router.push('/manage/users')
-      break
-    case 'classes':
-      router.push('/manage/classes')
-      break
-    case 'courses':
-      router.push('/manage/courses')
-      break
-    case 'files':
-      router.push('/manage/files')
-      break
-    case 'rag':
-      router.push('/manage/rag')
-      break
-    case 'deepseek':
-      router.push('/manage/deepseek')
-      break
-    case 'teaching-plan':
-      router.push('/manage/teaching-plan')
-      break
-    case 'tools':
-      router.push('/manage/tools')
-      break
-    case 'data-overview':
-      router.push('/manage/data')
-      break
-    case 'settings':
-      router.push('/manage/settings')
-      break
-    default:
-      router.push('/manage')
+  // 查找菜单项并跳转
+  const menuItem = menuItems.find(item => item.key === key) || 
+                   menuItems.flatMap(item => item.children || []).find(child => child.key === key)
+  
+  if (menuItem && menuItem.path) {
+    router.push(menuItem.path)
   }
 }
 
@@ -116,9 +137,7 @@ onMounted(() => {
         <h1 class="logo">管理系统</h1>
       </div>
       <div class="header-right">
-        <el-badge :value="3" class="notification-badge">
-          <el-button type="primary" :icon="Bell" circle text />
-        </el-badge>
+        <NotificationPanel />
         <el-dropdown>
           <div class="user-info">
             <el-avatar 
@@ -131,6 +150,11 @@ onMounted(() => {
               v-else
             >{{ userInfo.username?.substring(0, 1) }}</el-avatar>
             <span class="username">{{ userInfo.username }}</span>
+            <span class="role-tag">{{ 
+              userInfo.userRole === 'ADMIN' ? '管理员' : 
+              userInfo.userRole === 'TEACHER' ? '教师' : 
+              '学生'
+            }}</span>
           </div>
           <template #dropdown>
             <el-dropdown-menu>
@@ -153,63 +177,29 @@ onMounted(() => {
           text-color="rgba(255, 255, 255, 0.85)"
           active-text-color="#60a5fa"
         >
-          <el-menu-item index="home">
-            <el-icon><HomeFilled /></el-icon>
-            <template #title>首页</template>
-          </el-menu-item>
-          
-          <el-sub-menu index="data">
-            <template #title>
-              <el-icon><DataAnalysis /></el-icon>
-              <span>数据分析</span>
-            </template>
-            <el-menu-item index="data-overview">数据概览</el-menu-item>
-          </el-sub-menu>
-          
-          <el-menu-item index="users">
-            <el-icon><User /></el-icon>
-            <template #title>用户管理</template>
-          </el-menu-item>
-          
-          <el-menu-item index="classes">
-            <el-icon><School /></el-icon>
-            <template #title>班级管理</template>
-          </el-menu-item>
-          
-          <el-menu-item index="courses">
-            <el-icon><Reading /></el-icon>
-            <template #title>课程管理</template>
-          </el-menu-item>
-          
-          <el-menu-item index="files">
-            <el-icon><Document /></el-icon>
-            <template #title>文件管理</template>
-          </el-menu-item>
-          
-          <el-menu-item index="rag">
-            <el-icon><Collection /></el-icon>
-            <template #title>RAG知识库</template>
-          </el-menu-item>
-          
-          <el-menu-item index="teaching-plan">
-            <el-icon><Edit /></el-icon>
-            <template #title>教案生成</template>
-          </el-menu-item>
-          
-          <el-menu-item index="deepseek">
-            <el-icon><ChatDotRound /></el-icon>
-            <template #title>DeepSeek Chat</template>
-          </el-menu-item>
-          
-          <el-menu-item index="tools">
-            <el-icon><Tools /></el-icon>
-            <template #title>实用工具</template>
-          </el-menu-item>
-          
-          <el-menu-item index="settings">
-            <el-icon><Setting /></el-icon>
-            <template #title>系统设置</template>
-          </el-menu-item>
+          <!-- 动态生成菜单项 -->
+          <template v-for="item in filteredMenuItems" :key="item.key">
+            <!-- 带子菜单的菜单项 -->
+            <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.key">
+              <template #title>
+                <el-icon><component :is="item.icon" /></el-icon>
+                <span>{{ item.title }}</span>
+              </template>
+              <el-menu-item 
+                v-for="child in item.children.filter(child => child.roles.includes(userRole))" 
+                :key="child.key" 
+                :index="child.key"
+              >
+                {{ child.title }}
+              </el-menu-item>
+            </el-sub-menu>
+            
+            <!-- 普通菜单项 -->
+            <el-menu-item v-else :index="item.key">
+              <el-icon><component :is="item.icon" /></el-icon>
+              <template #title>{{ item.title }}</template>
+            </el-menu-item>
+          </template>
         </el-menu>
       </el-aside>
       
@@ -248,26 +238,21 @@ onMounted(() => {
 
 .collapse-btn {
   margin-right: 15px;
-  border: none;
-  background: transparent;
-  color: #ffffff;
 }
 
 .logo {
   margin: 0;
   font-size: 18px;
-  font-weight: 600;
-  color: #ffffff;
+  color: white;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
 .notification-badge {
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .user-info {
@@ -277,9 +262,16 @@ onMounted(() => {
 }
 
 .username {
-  margin-left: 8px;
-  font-size: 14px;
-  color: #ffffff;
+  margin: 0 8px;
+  color: white;
+}
+
+.role-tag {
+  background-color: #60a5fa;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
 .main-container {
@@ -291,36 +283,30 @@ onMounted(() => {
 .aside {
   background-color: #1e293b;
   transition: width 0.3s;
-  overflow-x: hidden;
+  height: 100%;
+  overflow: auto;
 }
 
 .menu {
-  height: 100%;
   border-right: none;
+  height: 100%;
+}
+
+.menu:not(.el-menu--collapse) {
+  width: 220px;
 }
 
 .main {
-  flex: 1;
   padding: 20px;
   overflow-y: auto;
-  background: #f8fafc;
-  border-left: 1px solid #e2e8f0;
+  background-color: #f8fafc;
 }
 
-.el-menu {
-  transition: width 0.3s;
+:deep(.el-menu-item.is-active) {
+  background-color: #334155;
 }
 
-:deep(.el-button.is-circle) {
-  color: #ffffff;
-}
-
-:deep(.el-badge__content) {
-  background-color: #60a5fa;
-}
-
-:deep(.el-avatar) {
-  background-color: #60a5fa;
-  color: #ffffff;
+:deep(.el-menu-item:hover), :deep(.el-sub-menu__title:hover) {
+  background-color: #334155;
 }
 </style>

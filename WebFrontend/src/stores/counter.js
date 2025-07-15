@@ -31,14 +31,14 @@ export const useCounterStore = defineStore('counter', () => {
     }
   }
 
-  const register = async (username, password, email, phone) => {
+  const register = async (username, password, email, phone, role) => {
     try {
       const response = await axios.post(BaseUrl + 'users/register', { 
         username, 
         password,
         email: email || undefined,
         phone: phone || undefined,
-        userRole: 'ADMIN',
+        userRole: role || 'STUDENT',
       })
       return true
     } catch (error) {
@@ -51,6 +51,19 @@ export const useCounterStore = defineStore('counter', () => {
     return userInfo.value
   }
 
+  const getUserRole = () => {
+    return userInfo.value.userRole || 'STUDENT'
+  }
+
+  const hasPermission = (requiredRoles) => {
+    if (!requiredRoles || requiredRoles.length === 0) {
+      return true
+    }
+    
+    const currentRole = getUserRole()
+    return requiredRoles.includes(currentRole)
+  }
+
   const logout = () => {
     token.value = ''
     userInfo.value = {}
@@ -58,5 +71,12 @@ export const useCounterStore = defineStore('counter', () => {
     localStorage.removeItem('userInfo')
   }
 
-  return { login, register, getUserInfo, logout }
+  return { 
+    login, 
+    register, 
+    getUserInfo, 
+    getUserRole,
+    hasPermission,
+    logout 
+  }
 })

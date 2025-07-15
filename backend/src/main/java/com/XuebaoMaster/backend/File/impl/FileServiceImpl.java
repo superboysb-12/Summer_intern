@@ -163,14 +163,24 @@ public class FileServiceImpl implements FileService {
         folder.setFileName(newName);
         folder.setFilePath(newFolderPath);
         fileRepository.save(folder);
-        List<FileEntity> children = fileRepository.findAllByPathStartingWith(oldFolderPath);
+
+        // 使用findByFilePathStartingWith查找以旧路径开头的所有文件和文件夹
+        List<FileEntity> children = fileRepository.findByFilePathStartingWith(oldFolderPath);
         for (FileEntity child : children) {
-            String newChildPath = child.getFilePath().replace(oldFolderPath, newFolderPath);
-            String newParentPath = child.getParentPath().replace(oldFolderPath, newFolderPath);
-            child.setFilePath(newChildPath);
-            child.setParentPath(newParentPath);
-            fileRepository.save(child);
+            if (!child.getId().equals(folder.getId())) {
+                String newChildPath = newFolderPath + child.getFilePath().substring(oldFolderPath.length());
+                child.setFilePath(newChildPath);
+
+                // 如果是文件夹，更新其parentPath
+                if (child.isDirectory()) {
+                    child.setParentPath(
+                            child.getFilePath().substring(0, child.getFilePath().lastIndexOf(child.getFileName())));
+                }
+
+                fileRepository.save(child);
+            }
         }
+
         return folder;
     }
 
@@ -204,14 +214,26 @@ public class FileServiceImpl implements FileService {
         folder.setFilePath(newFolderPath);
         folder.setParentPath(normalizedTargetPath);
         fileRepository.save(folder);
-        List<FileEntity> children = fileRepository.findAllByPathStartingWith(oldFolderPath);
+
+        // 使用findByFilePathStartingWith查找以旧路径开头的所有文件和文件夹
+        List<FileEntity> children = fileRepository.findByFilePathStartingWith(oldFolderPath);
         for (FileEntity child : children) {
-            String newChildPath = child.getFilePath().replace(oldFolderPath, newFolderPath);
-            String newParentPath = child.getParentPath().replace(oldFolderPath, newFolderPath);
-            child.setFilePath(newChildPath);
-            child.setParentPath(newParentPath);
-            fileRepository.save(child);
+            if (!child.getId().equals(folder.getId())) {
+                String newChildPath = newFolderPath + child.getFilePath().substring(oldFolderPath.length());
+                child.setFilePath(newChildPath);
+
+                // 更新parentPath
+                if (child.isDirectory()) {
+                    child.setParentPath(
+                            child.getFilePath().substring(0, child.getFilePath().lastIndexOf(child.getFileName())));
+                } else {
+                    child.setParentPath(child.getFilePath());
+                }
+
+                fileRepository.save(child);
+            }
         }
+
         return folder;
     }
 
@@ -233,7 +255,9 @@ public class FileServiceImpl implements FileService {
         } catch (IOException ex) {
             throw new RuntimeException("Could not delete folder", ex);
         }
-        List<FileEntity> allChildren = fileRepository.findAllByPathStartingWith(folder.getFilePath());
+
+        // 使用findByFilePathStartingWith查找以该路径开头的所有文件和文件夹
+        List<FileEntity> allChildren = fileRepository.findByFilePathStartingWith(folder.getFilePath());
         fileRepository.deleteAll(allChildren);
         fileRepository.delete(folder);
     }
