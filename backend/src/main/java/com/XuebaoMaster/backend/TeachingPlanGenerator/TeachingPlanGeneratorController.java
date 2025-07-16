@@ -212,6 +212,17 @@ public class TeachingPlanGeneratorController {
                 plan.put("filePath", entity.getFilePath());
                 plan.put("conversationId", entity.getConversationId());
                 plan.put("messageId", entity.getMessageId());
+
+                // 添加编辑和效率相关字段
+                if (entity.getEditDuration() != null && entity.getEditDuration() > 0) {
+                    plan.put("editDuration", entity.getEditDuration());
+                    plan.put("editStartTime", entity.getEditStartTime());
+                    plan.put("editEndTime", entity.getEditEndTime());
+                    plan.put("efficiencyIndex", entity.getEfficiencyIndex());
+                    plan.put("hasBeenEdited", true);
+                } else {
+                    plan.put("hasBeenEdited", false);
+                }
             }
 
             return plan;
@@ -221,6 +232,198 @@ public class TeachingPlanGeneratorController {
         response.put("success", true);
         response.put("teachingPlans", plansList);
         response.put("count", plansList.size());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 开始在线编辑教案
+     *
+     * @param id 教案生成任务ID
+     * @return 包含教案内容的响应
+     */
+    @GetMapping("/{id}/edit")
+    public ResponseEntity<Map<String, Object>> startEditTeachingPlan(@PathVariable Long id) {
+        try {
+            Map<String, Object> response = teachingPlanGeneratorService.startOnlineEdit(id);
+
+            if (response.containsKey("success") && (Boolean) response.get("success")) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "开始编辑失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 保存编辑中的教案内容
+     *
+     * @param id      教案生成任务ID
+     * @param request 包含编辑内容的请求
+     * @return 保存结果
+     */
+    @PostMapping("/{id}/edit/save")
+    public ResponseEntity<Map<String, Object>> saveEditedContent(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+
+        String editContent = request.get("content");
+        if (editContent == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "编辑内容不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Map<String, Object> response = teachingPlanGeneratorService.saveOnlineEdit(id, editContent);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * 完成教案编辑并计算效率指数
+     *
+     * @param id 教案生成任务ID
+     * @return 包含效率指数的响应
+     */
+    @PostMapping("/{id}/edit/finish")
+    public ResponseEntity<Map<String, Object>> finishEditTeachingPlan(@PathVariable Long id) {
+        Map<String, Object> response = teachingPlanGeneratorService.finishOnlineEdit(id);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * 获取教学效率统计数据
+     *
+     * @return 包含效率统计的响应
+     */
+    @GetMapping("/efficiency/statistics")
+    public ResponseEntity<Map<String, Object>> getEfficiencyStatistics() {
+        Map<String, Object> response = teachingPlanGeneratorService.getEfficiencyStatistics();
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 获取课程优化建议
+     *
+     * @param id 教案生成任务ID
+     * @return 包含优化建议的响应
+     */
+    @GetMapping("/{id}/optimization")
+    public ResponseEntity<Map<String, Object>> getCourseOptimizationSuggestions(@PathVariable Long id) {
+        Map<String, Object> response = teachingPlanGeneratorService.getCourseOptimizationSuggestions(id);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * 测试文件路径是否可访问（仅用于调试）
+     *
+     * @param id 教案生成任务ID
+     * @return 包含文件信息的响应
+     */
+    @GetMapping("/{id}/test-file")
+    public ResponseEntity<Map<String, Object>> testFilePath(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            TeachingPlanGenerator entity = teachingPlanGeneratorService.getTeachingPlanGeneratorById(id);
+            if (entity == null) {
+                response.put("success", false);
+                response.put("message", "找不到指定的教案生成任务");
+                return ResponseEntity.ok(response);
+            }
+
+            String filePath = entity.getFilePath();
+            if (filePath == null) {
+                response.put("success", false);
+                response.put("message", "文件路径为空");
+                return ResponseEntity.ok(response);
+            }
+
+            Path path = Paths.get(filePath);
+            boolean exists = Files.exists(path);
+            boolean isReadable = Files.isReadable(path);
+            boolean isFile = Files.isRegularFile(path);
+
+            response.put("success", true);
+            response.put("filePath", filePath);
+            response.put("exists", exists);
+            response.put("isReadable", isReadable);
+            response.put("isFile", isFile);
+            if (exists) {
+                response.put("size", Files.size(path));
+                response.put("lastModified", Files.getLastModifiedTime(path).toString());
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "检查文件失败: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
+    }
+
+    /**
+     * 检查教案生成任务详情（调试用）
+     *
+     * @param id 教案生成任务ID
+     * @return 返回教案生成任务详情
+     */
+    @GetMapping("/{id}/details")
+    public ResponseEntity<Map<String, Object>> getTeachingPlanDetails(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        TeachingPlanGenerator entity = teachingPlanGeneratorService.getTeachingPlanGeneratorById(id);
+        if (entity == null) {
+            response.put("success", false);
+            response.put("message", "找不到指定的教案生成任务");
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("success", true);
+        response.put("id", entity.getId());
+        response.put("prompt", entity.getPrompt());
+        response.put("status", entity.getStatus());
+        response.put("fileName", entity.getFileName());
+        response.put("filePath", entity.getFilePath());
+        response.put("editStartTime", entity.getEditStartTime());
+        response.put("editEndTime", entity.getEditEndTime());
+        response.put("editDuration", entity.getEditDuration());
+
+        // 检查editContent字段
+        if (entity.getEditContent() != null) {
+            response.put("editContentLength", entity.getEditContent().length());
+            response.put("editContentSample",
+                    entity.getEditContent().length() > 100 ? entity.getEditContent().substring(0, 100) + "..."
+                            : entity.getEditContent());
+        } else {
+            response.put("editContentLength", 0);
+            response.put("editContentSample", null);
+        }
+
+        response.put("efficiencyIndex", entity.getEfficiencyIndex());
+        response.put("optimizationSuggestions", entity.getOptimizationSuggestions());
+        response.put("createdAt", entity.getCreatedAt());
+        response.put("updatedAt", entity.getUpdatedAt());
 
         return ResponseEntity.ok(response);
     }

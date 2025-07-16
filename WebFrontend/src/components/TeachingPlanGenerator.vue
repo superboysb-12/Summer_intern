@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Download, RefreshRight, Document } from '@element-plus/icons-vue'
+import { Search, Plus, Download, RefreshRight, Document, Edit, Histogram } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
@@ -331,6 +331,181 @@ const formatDateTime = (dateTimeStr) => {
 onMounted(() => {
   getTeachingPlanList()
 })
+
+// 教学效率统计
+const efficiencyStatsDialogVisible = ref(false)
+const singleEfficiencyDialogVisible = ref(false)
+const loadingEfficiency = ref(false)
+const efficiencyStats = ref({})
+const currentEfficiency = ref(null)
+const efficiencyChartRef = ref(null)
+let efficiencyChart = null
+
+// 在线编辑教案
+const editTeachingPlan = (id) => {
+  router.push(`/teaching-plan-editor/${id}`)
+}
+
+// 查看单个教案效率
+const viewEfficiency = async (id) => {
+  loadingEfficiency.value = true
+  currentEfficiency.value = null
+  
+  try {
+    const response = await axios.get(`${BaseUrl}api/teaching-plan-generator/${id}/optimization`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      currentEfficiency.value = response.data
+      singleEfficiencyDialogVisible.value = true
+    } else {
+      ElMessage.error(response.data?.message || '获取效率数据失败')
+    }
+  } catch (error) {
+    console.error('获取效率数据失败:', error)
+    ElMessage.error('获取效率数据失败')
+  } finally {
+    loadingEfficiency.value = false
+  }
+}
+
+// 查看教学效率统计数据
+const viewEfficiencyStatistics = async () => {
+  loadingEfficiency.value = true
+  efficiencyStats.value = {}
+  
+  try {
+    const response = await axios.get(`${BaseUrl}api/teaching-plan-generator/efficiency/statistics`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      efficiencyStats.value = response.data
+      efficiencyStatsDialogVisible.value = true
+      
+      // 如果有月度数据，创建图表
+      if (response.data.hasData && response.data.monthlyEfficiency) {
+        setTimeout(() => {
+          createEfficiencyChart(response.data.monthlyEfficiency)
+        }, 300)
+      }
+    } else {
+      ElMessage.error(response.data?.message || '获取效率统计失败')
+    }
+  } catch (error) {
+    console.error('获取效率统计失败:', error)
+    ElMessage.error('获取效率统计失败')
+  } finally {
+    loadingEfficiency.value = false
+  }
+}
+
+// 创建效率趋势图表
+const createEfficiencyChart = (monthlyData) => {
+  if (!efficiencyChartRef.value) return
+  
+  // 导入echarts
+  import('echarts').then((echarts) => {
+    if (efficiencyChart) {
+      efficiencyChart.dispose()
+    }
+    
+    efficiencyChart = echarts.init(efficiencyChartRef.value)
+    
+    const months = Object.keys(monthlyData).sort()
+    const values = months.map(month => monthlyData[month])
+    
+    const option = {
+      tooltip: {
+        trigger: 'axis',
+        formatter: '{b}: {c}'
+      },
+      xAxis: {
+        type: 'category',
+        data: months,
+        axisLabel: {
+          rotate: 45
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '效率指数'
+      },
+      series: [{
+        data: values,
+        type: 'line',
+        smooth: true,
+        lineStyle: {
+          width: 3,
+          color: '#409EFF'
+        },
+        itemStyle: {
+          color: '#409EFF'
+        }
+      }]
+    }
+    
+    efficiencyChart.setOption(option)
+    
+    // 响应窗口大小变化
+    window.addEventListener('resize', () => {
+      if (efficiencyChart) {
+        efficiencyChart.resize()
+      }
+    })
+  })
+}
+
+// 格式化优化建议
+const formatSuggestions = (suggestions) => {
+  if (!suggestions) return ''
+  return suggestions
+    .replace(/\n/g, '<br>')
+    .replace(/- (.*)/g, '<li>$1</li>')
+}
+
+// 获取效率指数对应的颜色
+const getEfficiencyColor = (value) => {
+  if (value >= 80) return '#67C23A'
+  if (value >= 60) return '#E6A23C'
+  return '#F56C6C'
+}
+
+// 格式化时长
+const formatDuration = (seconds) => {
+  if (!seconds && seconds !== 0) return '--'
+  
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  
+  return [
+    hours > 0 ? `${hours}小时` : '',
+    minutes > 0 ? `${minutes}分钟` : '',
+    `${remainingSeconds}秒`
+  ].filter(Boolean).join(' ')
+}
+
+// 监听对话框关闭
+watch(efficiencyStatsDialogVisible, (val) => {
+  if (!val && efficiencyChart) {
+    efficiencyChart.dispose()
+    efficiencyChart = null
+  }
+})
+
+// 组件卸载前清理图表
+onBeforeUnmount(() => {
+  if (efficiencyChart) {
+    efficiencyChart.dispose()
+    efficiencyChart = null
+  }
+})
 </script>
 
 <template>
@@ -357,6 +532,7 @@ onMounted(() => {
       </el-form>
       <div class="action-buttons">
         <el-button type="primary" :icon="Plus" @click="handleGenerate">生成教案</el-button>
+        <el-button type="success" :icon="Histogram" @click="viewEfficiencyStatistics">教学效率统计</el-button>
         <el-button type="default" :icon="RefreshRight" @click="getTeachingPlanList">刷新</el-button>
       </div>
     </div>
@@ -409,6 +585,24 @@ onMounted(() => {
             @click="downloadTeachingPlan(row.id, row.fileName)"
           >
             下载
+          </el-button>
+          <el-button 
+            v-if="row.status === 'COMPLETED'" 
+            type="warning" 
+            size="small" 
+            :icon="Edit"
+            @click="editTeachingPlan(row.id)"
+          >
+            在线编辑
+          </el-button>
+          <el-button
+            v-if="row.efficiencyIndex !== undefined"
+            type="success"
+            size="small"
+            :icon="Histogram"
+            @click="viewEfficiency(row.id)"
+          >
+            效率指数
           </el-button>
         </template>
       </el-table-column>
@@ -493,6 +687,111 @@ onMounted(() => {
         </div>
       </template>
     </el-dialog>
+
+    <!-- 教学效率统计对话框 -->
+    <el-dialog 
+      v-model="efficiencyStatsDialogVisible" 
+      title="教学效率统计"
+      width="800px"
+      append-to-body
+    >
+      <div v-loading="loadingEfficiency">
+        <div v-if="efficiencyStats.hasData">
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <el-statistic title="已编辑教案数" :value="efficiencyStats.totalEditedPlans" />
+            </el-col>
+            <el-col :span="8">
+              <el-statistic title="平均效率指数" :value="efficiencyStats.avgEfficiencyIndex" :precision="2" />
+            </el-col>
+            <el-col :span="8">
+              <el-statistic title="平均编辑时长" :value="formatDuration(efficiencyStats.avgEditDuration)" />
+            </el-col>
+          </el-row>
+          
+          <div class="stats-section" v-if="efficiencyStats.mostEfficient">
+            <h4>效率最高的教案</h4>
+            <p>
+              <span class="label">提示词：</span>
+              <span>{{ efficiencyStats.mostEfficient.prompt }}</span>
+            </p>
+            <p>
+              <span class="label">效率指数：</span>
+              <span class="value high">{{ efficiencyStats.mostEfficient.efficiencyIndex.toFixed(2) }}</span>
+            </p>
+            <el-button 
+              type="primary" 
+              size="small"
+              @click="viewEfficiency(efficiencyStats.mostEfficient.id)"
+            >
+              查看详情
+            </el-button>
+          </div>
+          
+          <div class="stats-section" v-if="efficiencyStats.leastEfficient">
+            <h4>效率最低的教案</h4>
+            <p>
+              <span class="label">提示词：</span>
+              <span>{{ efficiencyStats.leastEfficient.prompt }}</span>
+            </p>
+            <p>
+              <span class="label">效率指数：</span>
+              <span class="value low">{{ efficiencyStats.leastEfficient.efficiencyIndex.toFixed(2) }}</span>
+            </p>
+            <el-button 
+              type="primary" 
+              size="small"
+              @click="viewEfficiency(efficiencyStats.leastEfficient.id)"
+            >
+              查看详情
+            </el-button>
+          </div>
+          
+          <div class="stats-chart" v-if="efficiencyStats.monthlyEfficiency">
+            <h4>月度效率指数趋势</h4>
+            <div ref="efficiencyChartRef" style="height: 300px"></div>
+          </div>
+        </div>
+        
+        <div v-else class="no-data-message">
+          <el-empty description="暂无教学效率数据" />
+          <p class="tip">编辑并完成至少一份教案后，即可查看效率统计</p>
+        </div>
+      </div>
+    </el-dialog>
+
+    <!-- 单个教案效率对话框 -->
+    <el-dialog 
+      v-model="singleEfficiencyDialogVisible" 
+      title="教案效率详情"
+      width="600px"
+      append-to-body
+    >
+      <div v-loading="loadingEfficiency">
+        <div v-if="currentEfficiency">
+          <el-descriptions :column="1" border>
+            <el-descriptions-item label="提示词">{{ currentEfficiency.prompt }}</el-descriptions-item>
+            <el-descriptions-item label="效率指数">
+              <el-progress 
+                :percentage="currentEfficiency.efficiencyIndex" 
+                :color="getEfficiencyColor(currentEfficiency.efficiencyIndex)"
+                :format="val => val.toFixed(2)"
+              />
+            </el-descriptions-item>
+            <el-descriptions-item label="编辑时长">{{ formatDuration(currentEfficiency.editDuration) }}</el-descriptions-item>
+          </el-descriptions>
+          
+          <div class="optimization-section" v-if="currentEfficiency.optimizationSuggestions">
+            <h4>优化建议</h4>
+            <div v-html="formatSuggestions(currentEfficiency.optimizationSuggestions)" class="suggestions"></div>
+          </div>
+        </div>
+        
+        <div v-else class="no-data-message">
+          <p>无法获取效率数据</p>
+        </div>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -537,5 +836,60 @@ onMounted(() => {
   border-radius: 4px;
   color: #666;
   font-size: 0.9em;
+}
+
+.stats-section {
+  margin-top: 25px;
+  padding: 15px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+}
+
+.stats-chart {
+  margin-top: 25px;
+}
+
+.label {
+  font-weight: bold;
+  color: #606266;
+  margin-right: 10px;
+}
+
+.value {
+  font-weight: bold;
+}
+
+.value.high {
+  color: #67C23A;
+}
+
+.value.low {
+  color: #F56C6C;
+}
+
+.optimization-section {
+  margin-top: 20px;
+}
+
+.suggestions {
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  line-height: 1.6;
+}
+
+.tip {
+  color: #909399;
+  font-size: 0.9em;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 0;
 }
 </style> 

@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, User, Files } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, User, Files, Notebook } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
 import CourseFileManage from './CourseFileManage.vue'
 import EnrollmentStats from './EnrollmentStats.vue'
+import HomeworkManage from './HomeworkManage.vue'
 
 const router = useRouter()
 const store = useCounterStore()
@@ -43,6 +44,7 @@ const formMode = ref('add')
 // 选课情况对话框和课程资源管理对话框共用的变量
 const enrollmentDialogVisible = ref(false)
 const courseFileDialogVisible = ref(false)
+const homeworkDialogVisible = ref(false)
 const currentCourseId = ref(null)
 const currentCourseName = ref('')
 
@@ -51,6 +53,13 @@ const openCourseFileDialog = (course) => {
   currentCourseId.value = course.courseId
   currentCourseName.value = course.name
   courseFileDialogVisible.value = true
+}
+
+// 打开课程作业管理对话框
+const openHomeworkDialog = (course) => {
+  currentCourseId.value = course.courseId
+  currentCourseName.value = course.name
+  homeworkDialogVisible.value = true
 }
 
 // 表单校验规则
@@ -277,7 +286,7 @@ onMounted(() => {
   <div class="course-manage-container">
     <div class="page-header">
       <h2>课程管理</h2>
-      <p>管理系统课程信息，包括创建、编辑和删除课程</p>
+      <p>管理课程信息，包括创建、编辑和删除课程</p>
     </div>
     
     <!-- 搜索工具栏 -->
@@ -327,13 +336,14 @@ onMounted(() => {
             {{ formatDate(scope.row.updatedAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="380" fixed="right">
+        <el-table-column label="操作" width="450" fixed="right">
           <template #default="scope">
             <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.courseId)">删除</el-button>
             <el-button type="success" link :icon="DataAnalysis" @click="viewCourseData(scope.row.courseId)">数据查看</el-button>
             <el-button type="info" link :icon="User" @click="viewEnrollments(scope.row)">选课情况</el-button>
             <el-button type="warning" link :icon="Files" @click="openCourseFileDialog(scope.row)">课程资源</el-button>
+            <el-button type="primary" link :icon="Notebook" @click="openHomeworkDialog(scope.row)">作业管理</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -403,6 +413,15 @@ onMounted(() => {
       :courseName="currentCourseName"
       @refresh="getCourseList"
     />
+    
+    <!-- 课程作业管理对话框 -->
+    <HomeworkManage
+      :visible="homeworkDialogVisible"
+      @update:visible="val => homeworkDialogVisible = val"
+      :courseId="currentCourseId"
+      :courseName="currentCourseName"
+      @refresh="getCourseList"
+    />
   </div>
 </template>
 
@@ -444,25 +463,21 @@ onMounted(() => {
     border-radius: 8px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
   }
-
+  
   .pagination {
     margin-top: 20px;
     display: flex;
     justify-content: flex-end;
   }
   
-  /* 响应式设计 */
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
   @media (max-width: 768px) {
-    .el-form-item {
-      margin-bottom: 10px;
-    }
-    
-    .toolbar {
-      flex-direction: column;
-    }
-    
-    .pagination {
-      justify-content: center;
+    .page-header h2 {
+      font-size: 20px;
     }
   }
 </style> 

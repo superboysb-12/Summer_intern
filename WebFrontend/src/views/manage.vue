@@ -14,7 +14,8 @@ import {
   Reading,
   Collection,
   ChatDotRound,
-  Edit
+  Edit,
+  PieChart
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
 import { useRouter, useRoute } from 'vue-router'
@@ -44,6 +45,7 @@ const getActiveMenu = () => {
   if (path.includes('/manage/resources')) return 'resources'
   if (path.includes('/manage/enrollment-stats')) return 'enrollment-stats'
   if (path.includes('/manage/messages')) return 'messages'
+  if (path.includes('/manage/usage-statistics')) return 'usage-statistics'
   return 'home'
 }
 
@@ -73,7 +75,8 @@ const menuItems = [
     roles: [ROLES.ADMIN, ROLES.TEACHER],
     children: [
       { key: 'data-overview', title: '数据概览', path: '/manage/data', roles: [ROLES.ADMIN, ROLES.TEACHER] },
-      { key: 'enrollment-stats', title: '选课统计', path: '/manage/enrollment-stats', roles: [ROLES.ADMIN, ROLES.TEACHER] }
+      { key: 'enrollment-stats', title: '选课统计', path: '/manage/enrollment-stats', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+      { key: 'usage-statistics', title: '使用统计', path: '/manage/usage-statistics', roles: [ROLES.ADMIN, ROLES.TEACHER] }
     ]
   },
   { key: 'users', title: '用户管理', icon: User, path: '/manage/users', roles: [ROLES.ADMIN] },

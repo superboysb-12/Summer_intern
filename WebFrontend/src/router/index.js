@@ -9,6 +9,7 @@ const UserManageDataChart = () => import('../components/UserManageDataChart.vue'
 const CourseManageDataChart = () => import('../components/CourseManageDataChart.vue')
 const ClassManageDataChart = () => import('../components/ClassManageDataChart.vue')
 const EnrollmentStats = () => import('../components/admin/EnrollmentStats.vue')
+const UsageStatistics = () => import('../components/UsageStatistics.vue')
 
 // 管理页面子组件
 const HomeCards = () => import('../components/HomeCards.vue')
@@ -19,6 +20,7 @@ const FileManage = () => import('../components/FileManage.vue')
 const RAGManage = () => import('../components/RAGManage.vue')
 const DeepSeekChat = () => import('../components/DeepSeekChat.vue')
 const TeachingPlanGenerator = () => import('../components/TeachingPlanGenerator.vue')
+const TeachingPlanEditor = () => import('../components/TeachingPlanEditor.vue')
 const UtilityTools = () => import('../components/UtilityTools.vue')
 
 // 学生专属组件
@@ -183,6 +185,15 @@ const routes = [
                     title: '系统管理 - 通知管理',
                     roles: [ROLES.ADMIN]  // 仅管理员可访问
                 }
+            },
+            // 使用统计
+            {
+                path: 'usage-statistics',
+                component: UsageStatistics,
+                meta: {
+                    title: '系统管理 - 使用统计',
+                    roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
+                }
             }
         ]
     },
@@ -228,6 +239,15 @@ const routes = [
         meta: {
             requiresAuth: true,
             title: '课程管理数据分析',
+            roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
+        }
+    },
+    {
+        path: '/teaching-plan-editor/:id',
+        component: TeachingPlanEditor,
+        meta: {
+            requiresAuth: true,
+            title: '教案在线编辑',
             roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
         }
     }
