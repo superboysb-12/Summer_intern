@@ -341,6 +341,11 @@ const currentEfficiency = ref(null)
 const efficiencyChartRef = ref(null)
 let efficiencyChart = null
 
+// 添加优化建议相关的状态
+const optimizationDialogVisible = ref(false)
+const optimizationLoading = ref(false)
+const currentOptimizationData = ref(null)
+
 // 在线编辑教案
 const editTeachingPlan = (id) => {
   router.push(`/teaching-plan-editor/${id}`)
@@ -465,15 +470,13 @@ const createEfficiencyChart = (monthlyData) => {
 const formatSuggestions = (suggestions) => {
   if (!suggestions) return ''
   return suggestions
-    .replace(/\n/g, '<br>')
-    .replace(/- (.*)/g, '<li>$1</li>')
 }
 
 // 获取效率指数对应的颜色
 const getEfficiencyColor = (value) => {
-  if (value >= 80) return '#67C23A'
-  if (value >= 60) return '#E6A23C'
-  return '#F56C6C'
+  if (value >= 80) return 'success'
+  if (value >= 60) return 'warning'
+  return 'danger'
 }
 
 // 格式化时长
@@ -506,20 +509,170 @@ onBeforeUnmount(() => {
     efficiencyChart = null
   }
 })
+
+// 查看优化建议
+const handleViewOptimization = async (row) => {
+  try {
+    if (!row || !row.id) {
+      ElMessage.warning('找不到教案信息')
+      return
+    }
+    
+    // 设置加载状态
+    optimizationLoading.value = true
+    optimizationDialogVisible.value = true
+    currentOptimizationData.value = { 
+      prompt: row.prompt, 
+      efficiencyIndex: row.efficiencyIndex,
+      editDuration: row.editDuration
+    }
+    
+    // 获取优化建议
+    try {
+      const response = await axios.get(`${BaseUrl}api/teaching-plan-generator/${row.id}/optimization`, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      })
+      
+      if (response.data && response.data.success) {
+        currentOptimizationData.value = {
+          ...currentOptimizationData.value,
+          ...response.data
+        }
+      } else {
+        ElMessage.error(response.data?.message || '获取优化建议失败')
+      }
+    } catch (error) {
+      console.error('获取优化建议失败:', error)
+      ElMessage.error('获取优化建议失败: ' + (error.response?.data?.message || error.message))
+    }
+    
+    // 使用大模型生成针对性建议
+    if (currentOptimizationData.value.prompt) {
+      try {
+        // 构建系统提示词和用户消息
+        const systemPrompt = `你是一位专业的教育教学顾问，专长于提供针对性的教案优化建议。
+请基于以下信息，提供具体、实用的优化建议：
+- 教案主题: ${currentOptimizationData.value.prompt}
+- 效率指数: ${currentOptimizationData.value.efficiencyIndex}
+- 编辑时长: ${formatDuration(currentOptimizationData.value.editDuration)}
+
+请严格按照以下JSON格式输出你的建议，不要包含任何其他文本：
+
+{
+  "summary": "整体优化方向的简短总结，不超过50字",
+  "categories": [
+    {
+      "name": "教学目标",
+      "score": 分数（1-10的整数，表示当前表现，10为最佳）,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "内容结构",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "教学活动",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "时间安排",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "教学资源",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    }
+  ],
+  "overall_suggestion": "综合性建议，100-200字"
+}
+
+必须确保输出是有效的JSON格式，可以直接被JSON.parse()解析。`;
+
+        const userMessage = `请为"${currentOptimizationData.value.prompt}"这个主题的教案生成结构化的优化建议JSON。`;
+
+        // 准备要发送到API的消息
+        const apiMessages = [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
+        ];
+
+        // 直接调用DeepSeekChat API
+        const aiResponse = await axios.post(`${BaseUrl}api/deepseek/chat`, 
+          { messages: apiMessages },
+          { headers: { 'Authorization': `Bearer ${getToken()}` } }
+        );
+                
+        if (aiResponse.data && aiResponse.data.choices && aiResponse.data.choices.length > 0) {
+          const aiMessage = aiResponse.data.choices[0].message;
+          try {
+            // 获取内容
+            let contentToProcess = aiMessage.content;
+            
+            // 处理可能带有的Markdown代码块
+            // 首先检查是否包含```json标记的代码块
+            const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
+            const markdownMatch = jsonBlockRegex.exec(contentToProcess);
+            
+            if (markdownMatch && markdownMatch[1]) {
+              // 如果找到了json代码块，则提取其中的内容
+              contentToProcess = markdownMatch[1].trim();
+              console.log('从Markdown代码块提取JSON:', contentToProcess);
+            }
+            
+            // 尝试解析JSON响应
+            currentOptimizationData.value.structuredSuggestions = JSON.parse(contentToProcess);
+            // 保留原始文本以备后用
+            currentOptimizationData.value.additionalSuggestions = aiMessage.content;
+          } catch (jsonError) {
+            console.error('JSON解析失败:', jsonError);
+            currentOptimizationData.value.additionalSuggestions = aiMessage.content;
+            currentOptimizationData.value.jsonParseError = true;
+          }
+        } else {
+          currentOptimizationData.value.additionalSuggestions = '无法获取优化建议，请稍后再试';
+        }
+      } catch (aiError) {
+        console.error('获取AI针对性建议失败:', aiError);
+        currentOptimizationData.value.additionalSuggestions = '获取AI针对性建议失败，请稍后再试';
+      }
+    }
+  } catch (error) {
+    console.error('获取优化建议失败:', error)
+    ElMessage.error('获取优化建议失败: ' + (error.response?.data?.message || error.message))
+    // 如果在对话框已打开的情况下出错，则关闭对话框
+    if (optimizationDialogVisible.value) {
+      optimizationDialogVisible.value = false
+    }
+  } finally {
+    // 无论成功失败，都关闭加载状态
+    optimizationLoading.value = false
+  }
+}
 </script>
 
 <template>
-  <div class="container">
-    <!-- 搜索工具栏 -->
-    <el-card class="search-card">
-      <el-form :inline="true" :model="queryParams">
+  <div class="teaching-plan-generator-container">
+    <!-- 工具栏 -->
+    <div class="toolbar">
+      <el-form :inline="true" :model="queryParams" class="search-form">
         <el-form-item>
-          <el-input
-            v-model="queryParams.keyword"
-            placeholder="输入教案提示词搜索"
-            clearable
-            @keyup.enter="handleSearch"
-          >
+          <el-input v-model="queryParams.keyword" placeholder="请输入教案提示词" clearable @keyup.enter="handleSearch">
             <template #prefix>
               <el-icon><Search /></el-icon>
             </template>
@@ -530,25 +683,21 @@ onBeforeUnmount(() => {
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
-    </el-card>
-    
-    <!-- 操作工具栏 -->
-    <div class="toolbar">
-      <div class="flex gap-sm flex-wrap">
-        <el-button type="primary" :icon="Plus" @click="handleGenerate">生成教案</el-button>
-        <el-button type="success" :icon="Histogram" @click="viewEfficiencyStatistics">教学效率统计</el-button>
-        <el-button :icon="RefreshRight" @click="getTeachingPlanList">刷新</el-button>
+      
+      <div class="toolbar-right">
+        <el-button type="success" plain @click="handleGenerate" :icon="Plus">生成教案</el-button>
+        <el-button type="primary" plain @click="viewEfficiencyStatistics" :icon="Histogram">效率统计</el-button>
+        <el-button type="info" plain @click="getTeachingPlanList" :icon="RefreshRight" :loading="loading">刷新</el-button>
       </div>
     </div>
     
     <!-- 教案列表表格 -->
-    <el-card class="table-card">
     <el-table
       v-loading="loading"
       :data="teachingPlanList"
+      style="width: 100%; margin-top: 10px; margin-bottom: 10px"
       border
       stripe
-        style="width: 100%;"
     >
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="prompt" label="提示词" min-width="150" show-overflow-tooltip />
@@ -572,13 +721,12 @@ onBeforeUnmount(() => {
           {{ row.fileName || '-' }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200" fixed="right">
+      <el-table-column label="操作" width="280" fixed="right">
         <template #default="{ row }">
-            <div class="flex justify-center gap-sm flex-wrap">
           <el-button 
             v-if="row.status === 'PENDING'" 
             type="info" 
-            size="small" 
+            link
             @click="refreshTeachingPlanStatus(row.id)"
           >
             刷新状态
@@ -586,8 +734,7 @@ onBeforeUnmount(() => {
           <el-button 
             v-if="row.status === 'COMPLETED'" 
             type="primary" 
-            size="small" 
-            :icon="Download"
+            link
             @click="downloadTeachingPlan(row.id, row.fileName)"
           >
             下载
@@ -595,8 +742,7 @@ onBeforeUnmount(() => {
           <el-button 
             v-if="row.status === 'COMPLETED'" 
             type="warning" 
-            size="small" 
-            :icon="Edit"
+            link
             @click="editTeachingPlan(row.id)"
           >
             在线编辑
@@ -604,19 +750,25 @@ onBeforeUnmount(() => {
           <el-button
             v-if="row.efficiencyIndex !== undefined"
             type="success"
-            size="small"
-            :icon="Histogram"
+            link
             @click="viewEfficiency(row.id)"
           >
             效率指数
           </el-button>
-            </div>
+          <el-button
+            v-if="row.efficiencyIndex !== undefined"
+            type="info"
+            link
+            @click="handleViewOptimization(row)"
+          >
+            优化建议
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
     
     <!-- 分页控件 -->
-      <div class="pagination">
+    <div class="pagination-container">
       <el-pagination
         v-if="total > 0"
         :current-page="queryParams.pageNum"
@@ -628,20 +780,19 @@ onBeforeUnmount(() => {
         @current-change="val => { queryParams.pageNum = val; getTeachingPlanList() }"
       />
     </div>
-    </el-card>
     
     <!-- 生成教案对话框 -->
     <el-dialog 
       v-model="generateDialogVisible" 
       title="生成教案"
-      width="500px"
+      width="50%"
       append-to-body
     >
       <el-form 
         ref="generateFormRef"
         :model="generateForm"
         :rules="generateRules"
-        label-width="120px"
+        label-width="100px"
       >
         <el-form-item label="教案提示词" prop="query">
           <el-input 
@@ -653,7 +804,7 @@ onBeforeUnmount(() => {
         </el-form-item>
         
         <el-form-item label="深度设置">
-          <el-select v-model="generateForm.inputs.depth" placeholder="请选择教案深度">
+          <el-select v-model="generateForm.inputs.depth" placeholder="请选择教案深度" style="width: 100%">
             <el-option
               v-for="item in depthOptions"
               :key="item.value"
@@ -673,17 +824,18 @@ onBeforeUnmount(() => {
             placeholder="请选择RAG"
             :loading="loadingRag"
             filterable
+            style="width: 100%"
           >
             <el-option
               v-for="item in ragList"
               :key="item.id"
-              :label="item.name"
+              :label="`${item.name} (ID: ${item.id})`"
               :value="item.id"
             />
           </el-select>
         </el-form-item>
         
-        <div class="card-body bg-secondary radius-md text-sm text-tertiary">
+        <div class="form-tip">
           <p><i class="el-icon-info"></i> 提示：教案生成是异步处理的，可能需要较长时间（约15分钟）才能完成。</p>
           <p v-if="generateForm.useRag"><i class="el-icon-info"></i> 使用RAG可以基于知识图谱生成更加专业的教案。</p>
         </div>
@@ -700,71 +852,86 @@ onBeforeUnmount(() => {
     <el-dialog 
       v-model="efficiencyStatsDialogVisible" 
       title="教学效率统计"
-      width="800px"
+      width="70%"
       append-to-body
     >
       <div v-loading="loadingEfficiency">
         <div v-if="efficiencyStats.hasData">
-          <el-row :gutter="20">
-            <el-col :span="8">
-              <el-statistic title="已编辑教案数" :value="efficiencyStats.totalEditedPlans" />
-            </el-col>
-            <el-col :span="8">
-              <el-statistic title="平均效率指数" :value="efficiencyStats.avgEfficiencyIndex" :precision="2" />
-            </el-col>
-            <el-col :span="8">
-              <el-statistic title="平均编辑时长" :value="formatDuration(efficiencyStats.avgEditDuration)" />
-            </el-col>
-          </el-row>
-          
-          <div class="card bg-secondary radius-md p-md mt-lg" v-if="efficiencyStats.mostEfficient">
-            <h4 class="mb-sm">效率最高的教案</h4>
-            <p class="mb-sm">
-              <span class="font-bold text-tertiary mr-sm">提示词：</span>
-              <span>{{ efficiencyStats.mostEfficient.prompt }}</span>
-            </p>
-            <p class="mb-sm">
-              <span class="font-bold text-tertiary mr-sm">效率指数：</span>
-              <span class="font-bold text-success">{{ efficiencyStats.mostEfficient.efficiencyIndex.toFixed(2) }}</span>
-            </p>
-            <el-button 
-              type="primary" 
-              size="small"
-              @click="viewEfficiency(efficiencyStats.mostEfficient.id)"
-            >
-              查看详情
-            </el-button>
+          <!-- 统计总览 -->
+          <div class="efficiency-overview">
+            <div class="efficiency-card">
+              <div class="card-title">已编辑教案数</div>
+              <div class="card-value">{{ efficiencyStats.totalEditedPlans || 0 }}</div>
+            </div>
+            
+            <div class="efficiency-card">
+              <div class="card-title">平均效率指数</div>
+              <div class="card-value" :class="'text-' + getEfficiencyColor(efficiencyStats.avgEfficiencyIndex)">
+                {{ efficiencyStats.avgEfficiencyIndex?.toFixed(2) || '无数据' }}
+              </div>
+            </div>
+            
+            <div class="efficiency-card">
+              <div class="card-title">平均编辑时长</div>
+              <div class="card-value">
+                {{ formatDuration(efficiencyStats.avgEditDuration) }}
+              </div>
+            </div>
           </div>
           
-          <div class="card bg-secondary radius-md p-md mt-lg" v-if="efficiencyStats.leastEfficient">
-            <h4 class="mb-sm">效率最低的教案</h4>
-            <p class="mb-sm">
-              <span class="font-bold text-tertiary mr-sm">提示词：</span>
-              <span>{{ efficiencyStats.leastEfficient.prompt }}</span>
-            </p>
-            <p class="mb-sm">
-              <span class="font-bold text-tertiary mr-sm">效率指数：</span>
-              <span class="font-bold text-danger">{{ efficiencyStats.leastEfficient.efficiencyIndex.toFixed(2) }}</span>
-            </p>
-            <el-button 
-              type="primary" 
-              size="small"
-              @click="viewEfficiency(efficiencyStats.leastEfficient.id)"
-            >
-              查看详情
-            </el-button>
+          <!-- 效率详情 -->
+          <div v-if="efficiencyStats.mostEfficient || efficiencyStats.leastEfficient" class="efficiency-details">
+            <el-divider content-position="center">效率详情</el-divider>
+            
+            <div class="detail-section" v-if="efficiencyStats.mostEfficient">
+              <h4>最高效率教案</h4>
+              <div class="detail-item">
+                <span>提示词: {{ efficiencyStats.mostEfficient.prompt }}</span>
+              </div>
+              <div class="detail-item">
+                <span>效率指数: </span>
+                <el-tag :type="getEfficiencyColor(efficiencyStats.mostEfficient.efficiencyIndex)">
+                  {{ efficiencyStats.mostEfficient.efficiencyIndex?.toFixed(2) }}
+                </el-tag>
+                <el-button 
+                  type="primary" 
+                  link
+                  @click="viewEfficiency(efficiencyStats.mostEfficient.id)"
+                >
+                  查看详情
+                </el-button>
+              </div>
+            </div>
+            
+            <div class="detail-section" v-if="efficiencyStats.leastEfficient">
+              <h4>最低效率教案</h4>
+              <div class="detail-item">
+                <span>提示词: {{ efficiencyStats.leastEfficient.prompt }}</span>
+              </div>
+              <div class="detail-item">
+                <span>效率指数: </span>
+                <el-tag :type="getEfficiencyColor(efficiencyStats.leastEfficient.efficiencyIndex)">
+                  {{ efficiencyStats.leastEfficient.efficiencyIndex?.toFixed(2) }}
+                </el-tag>
+                <el-button 
+                  type="primary" 
+                  link
+                  @click="viewEfficiency(efficiencyStats.leastEfficient.id)"
+                >
+                  查看详情
+                </el-button>
+              </div>
+            </div>
           </div>
           
-          <div class="mt-lg" v-if="efficiencyStats.monthlyEfficiency">
-            <h4 class="mb-sm">月度效率指数趋势</h4>
+          <!-- 月度效率趋势 -->
+          <div v-if="efficiencyStats.monthlyEfficiency && Object.keys(efficiencyStats.monthlyEfficiency).length > 0" class="efficiency-trend">
+            <el-divider content-position="center">月度效率趋势</el-divider>
             <div ref="efficiencyChartRef" style="height: 300px"></div>
           </div>
         </div>
         
-        <div v-else class="flex flex-col items-center justify-center py-xl">
-          <el-empty description="暂无教学效率数据" />
-          <p class="text-tertiary text-sm text-center mt-sm">编辑并完成至少一份教案后，即可查看效率统计</p>
-        </div>
+        <el-empty v-else description="暂无效率数据" />
       </div>
     </el-dialog>
 
@@ -772,62 +939,422 @@ onBeforeUnmount(() => {
     <el-dialog 
       v-model="singleEfficiencyDialogVisible" 
       title="教案效率详情"
-      width="600px"
+      width="60%"
       append-to-body
     >
       <div v-loading="loadingEfficiency">
-        <div v-if="currentEfficiency">
-          <el-descriptions :column="1" border>
-            <el-descriptions-item label="提示词">{{ currentEfficiency.prompt }}</el-descriptions-item>
-            <el-descriptions-item label="效率指数">
-              <el-progress 
-                :percentage="currentEfficiency.efficiencyIndex" 
-                :color="getEfficiencyColor(currentEfficiency.efficiencyIndex)"
-                :format="val => val.toFixed(2)"
-              />
-            </el-descriptions-item>
-            <el-descriptions-item label="编辑时长">{{ formatDuration(currentEfficiency.editDuration) }}</el-descriptions-item>
-          </el-descriptions>
+        <div v-if="currentEfficiency" class="efficiency-container">
+          <div class="question-info">
+            <div class="info-item">
+              <span class="info-label">提示词:</span>
+              <span class="info-value">{{ currentEfficiency.prompt }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">效率指数:</span>
+              <span class="info-value">
+                <el-tag :type="getEfficiencyColor(currentEfficiency.efficiencyIndex)">
+                  {{ currentEfficiency.efficiencyIndex?.toFixed(2) }}
+                </el-tag>
+              </span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">编辑时长:</span>
+              <span class="info-value">{{ formatDuration(currentEfficiency.editDuration) }}</span>
+            </div>
+          </div>
           
-          <div class="mt-lg" v-if="currentEfficiency.optimizationSuggestions">
-            <h4 class="mb-md">优化建议</h4>
-            <div v-html="formatSuggestions(currentEfficiency.optimizationSuggestions)" class="card-body bg-secondary radius-md line-height-md"></div>
+          <el-divider content-position="center">优化建议</el-divider>
+          
+          <div v-if="currentEfficiency.optimizationSuggestions" class="suggestion-content">
+            <pre>{{ currentEfficiency.optimizationSuggestions }}</pre>
+          </div>
+          <el-empty v-else description="暂无优化建议" />
+        </div>
+        
+        <el-empty v-else description="无法获取效率数据" />
+      </div>
+    </el-dialog>
+
+    <!-- 优化建议对话框 -->
+    <el-dialog 
+      v-model="optimizationDialogVisible" 
+      title="教案优化建议"
+      width="70%"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div v-loading="optimizationLoading" element-loading-text="正在生成优化建议..." class="optimization-container">
+        <div v-if="currentOptimizationData" class="question-info">
+          <div class="info-item">
+            <span class="info-label">教案主题:</span>
+            <span class="info-value">{{ currentOptimizationData.prompt }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">效率指数:</span>
+            <span class="info-value">
+              <el-tag :type="getEfficiencyColor(currentOptimizationData.efficiencyIndex)">
+                {{ currentOptimizationData.efficiencyIndex?.toFixed(2) }}
+              </el-tag>
+            </span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">编辑时长:</span>
+            <span class="info-value">{{ formatDuration(currentOptimizationData.editDuration) }}</span>
           </div>
         </div>
         
-        <div v-else class="flex flex-col items-center justify-center py-lg">
-          <p>无法获取效率数据</p>
+        <el-divider content-position="center">优化建议</el-divider>
+        
+        <div v-if="currentOptimizationData && currentOptimizationData.optimizationSuggestions" class="suggestion-content">
+          <el-alert
+            type="success"
+            :closable="false"
+            show-icon
+            title="系统建议"
+          >
+            <pre>{{ currentOptimizationData.optimizationSuggestions }}</pre>
+          </el-alert>
         </div>
+        
+        <div v-if="currentOptimizationData && currentOptimizationData.structuredSuggestions" class="structured-suggestion-content">
+          <div class="suggestion-header">
+            <h3 class="suggestion-summary">{{ currentOptimizationData.structuredSuggestions.summary }}</h3>
+          </div>
+          
+          <!-- 分类评分卡片 -->
+          <div class="categories-grid">
+            <el-card v-for="(category, index) in currentOptimizationData.structuredSuggestions.categories" :key="index" class="category-card" shadow="hover">
+              <template #header>
+                <div class="category-header">
+                  <span class="category-name">{{ category.name }}</span>
+                  <el-rate
+                    v-model="category.score"
+                    :max="10"
+                    disabled
+                    show-score
+                    text-color="#ff9900"
+                  />
+                </div>
+              </template>
+              
+              <div class="category-content">
+                <div class="strengths-section">
+                  <h4 class="section-title">优势</h4>
+                  <ul class="points-list">
+                    <li v-for="(strength, i) in category.strengths" :key="i">{{ strength }}</li>
+                  </ul>
+                </div>
+                
+                <div class="weaknesses-section">
+                  <h4 class="section-title">不足</h4>
+                  <ul class="points-list">
+                    <li v-for="(weakness, i) in category.weaknesses" :key="i">{{ weakness }}</li>
+                  </ul>
+                </div>
+                
+                <div class="suggestions-section">
+                  <h4 class="section-title">建议</h4>
+                  <ul class="points-list">
+                    <li v-for="(suggestion, i) in category.suggestions" :key="i">{{ suggestion }}</li>
+                  </ul>
+                </div>
+              </div>
+            </el-card>
+          </div>
+          
+          <!-- 综合建议 -->
+          <div class="overall-suggestion">
+            <el-alert
+              type="success"
+              :closable="false"
+              show-icon
+              title="综合建议"
+            >
+              <p>{{ currentOptimizationData.structuredSuggestions.overall_suggestion }}</p>
+            </el-alert>
+          </div>
+        </div>
+
+        <div v-else-if="currentOptimizationData && currentOptimizationData.additionalSuggestions && !currentOptimizationData.structuredSuggestions" class="additional-suggestion-content">
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            :title="currentOptimizationData.jsonParseError ? '针对性建议 (解析失败，显示原始内容)' : '针对性建议'"
+            style="margin-top: 15px;"
+          >
+            <pre>{{ currentOptimizationData.additionalSuggestions }}</pre>
+          </el-alert>
+        </div>
+        
+        <el-empty v-if="currentOptimizationData && !optimizationLoading && !currentOptimizationData.optimizationSuggestions && !currentOptimizationData.additionalSuggestions" description="暂无优化建议" />
       </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="optimizationDialogVisible = false" :disabled="optimizationLoading">关闭</el-button>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
 <style scoped>
-/* 添加特定的自定义样式 */
+.teaching-plan-generator-container {
+  padding: 20px;
+  background-color: var(--el-bg-color);
+  min-height: calc(100vh - 60px);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-form {
+  flex-grow: 1;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.form-tip {
+  margin: 15px 0;
+  padding: 10px 15px;
+  background-color: var(--el-color-info-light-9);
+  border-radius: 4px;
+  color: var(--el-text-color-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.form-tip p {
+  margin: 5px 0;
+}
+
+.efficiency-container {
+  padding: 10px;
+}
+
+.question-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+}
+
+.info-label {
+  font-weight: bold;
+  margin-right: 10px;
+  min-width: 80px;
+}
+
+.efficiency-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.efficiency-card {
+  padding: 15px;
+  text-align: center;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.card-title {
+  font-size: 16px;
+  color: var(--el-text-color-secondary);
+  margin-bottom: 10px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--el-color-primary);
+}
+
 .text-success {
-  color: var(--success-color);
+  color: var(--el-color-success);
+}
+
+.text-warning {
+  color: var(--el-color-warning);
 }
 
 .text-danger {
-  color: var(--danger-color);
+  color: var(--el-color-danger);
 }
 
-.font-bold {
+.text-primary {
+  color: var(--el-color-primary);
+}
+
+.efficiency-details {
+  margin-top: 20px;
+}
+
+.detail-section {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  margin-bottom: 15px;
+  background-color: var(--el-fill-color-lighter);
+}
+
+.detail-section h4 {
+  margin-top: 0;
+  color: var(--el-color-primary);
+  border-bottom: 1px solid var(--el-border-color-light);
+  padding-bottom: 10px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 10px;
+}
+
+.efficiency-trend {
+  margin-top: 20px;
+}
+
+.suggestion-content {
+  background-color: var(--el-fill-color-lighter);
+  padding: 15px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.optimization-container {
+  padding: 10px;
+}
+
+.structured-suggestion-content {
+  margin-top: 20px;
+}
+
+.suggestion-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--el-border-color-light);
+}
+
+.suggestion-summary {
+  margin: 0;
+  color: var(--el-color-primary);
+  font-size: 18px;
   font-weight: bold;
 }
 
-.line-height-md {
-  line-height: 1.6;
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  margin-bottom: 15px;
 }
 
-.py-xl {
-  padding-top: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
+.category-card {
+  border-radius: 8px;
+  overflow: hidden;
 }
 
-.py-lg {
-  padding-top: var(--spacing-lg);
-  padding-bottom: var(--spacing-lg);
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--el-border-color-light);
+}
+
+.category-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--el-color-primary);
+}
+
+.category-content {
+  padding: 15px;
+}
+
+.section-title {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--el-color-primary);
+  border-bottom: 1px solid var(--el-border-color-light);
+  padding-bottom: 5px;
+}
+
+.strengths-section .section-title {
+  color: var(--el-color-success);
+}
+
+.weaknesses-section .section-title {
+  color: var(--el-color-danger);
+}
+
+.suggestions-section .section-title {
+  color: var(--el-color-primary);
+}
+
+.strengths-section .points-list li {
+  color: var(--el-color-success-dark-2);
+}
+
+.weaknesses-section .points-list li {
+  color: var(--el-color-danger-dark-2);
+}
+
+.suggestions-section .points-list li {
+  color: var(--el-color-primary-dark-2);
+}
+
+.points-list {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0 0 10px 0;
+}
+
+.points-list li {
+  margin-bottom: 5px;
+  color: var(--el-text-color-regular);
+  font-size: 14px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.overall-suggestion {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid var(--el-border-color-light);
+}
+
+.additional-suggestion-content {
+  margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+  .efficiency-overview,
+  .question-info {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 

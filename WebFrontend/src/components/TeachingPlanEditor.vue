@@ -335,7 +335,7 @@ const startEdit = async (retryCount = 0) => {
         window.open(`${BaseUrl}api/teaching-plan-generator/${planId}/details`, '_blank');
       }).catch(() => {
         // 返回列表
-        router.push('/teaching-plan-generator');
+        router.push('/manage/teaching-plan');
       });
     }
   } finally {
@@ -547,10 +547,10 @@ const backToList = () => {
         type: 'warning'
       }
     ).then(() => {
-      router.push('/teaching-plan-generator')
+      router.push('/manage/teaching-plan')
     }).catch(() => {})
   } else {
-    router.push('/teaching-plan-generator')
+    router.push('/manage/teaching-plan')
   }
 }
 
@@ -605,7 +605,7 @@ const formatDuration = (seconds) => {
 onMounted(() => {
   if (!planId) {
     ElMessage.error('缺少教案ID参数')
-    router.push('/teaching-plan-generator')
+    router.push('/manage/teaching-plan')
     return
   }
   

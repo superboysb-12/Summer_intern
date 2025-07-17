@@ -32,6 +32,24 @@ public class QuestionGenerator {
     @Column(name = "status_message")
     private String statusMessage;
 
+    @Column(name = "design_start_time")
+    private LocalDateTime designStartTime;
+
+    @Column(name = "design_end_time")
+    private LocalDateTime designEndTime;
+
+    @Column(name = "design_duration")
+    private Long designDuration; // in seconds
+
+    @Column(name = "design_content", columnDefinition = "LONGTEXT")
+    private String designContent;
+
+    @Column(name = "efficiency_index")
+    private Double efficiencyIndex;
+
+    @Column(name = "optimization_suggestions", columnDefinition = "TEXT")
+    private String optimizationSuggestions;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -102,6 +120,54 @@ public class QuestionGenerator {
 
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
+    }
+
+    public LocalDateTime getDesignStartTime() {
+        return designStartTime;
+    }
+
+    public void setDesignStartTime(LocalDateTime designStartTime) {
+        this.designStartTime = designStartTime;
+    }
+
+    public LocalDateTime getDesignEndTime() {
+        return designEndTime;
+    }
+
+    public void setDesignEndTime(LocalDateTime designEndTime) {
+        this.designEndTime = designEndTime;
+    }
+
+    public Long getDesignDuration() {
+        return designDuration;
+    }
+
+    public void setDesignDuration(Long designDuration) {
+        this.designDuration = designDuration;
+    }
+
+    public String getDesignContent() {
+        return designContent;
+    }
+
+    public void setDesignContent(String designContent) {
+        this.designContent = designContent;
+    }
+
+    public Double getEfficiencyIndex() {
+        return efficiencyIndex;
+    }
+
+    public void setEfficiencyIndex(Double efficiencyIndex) {
+        this.efficiencyIndex = efficiencyIndex;
+    }
+
+    public String getOptimizationSuggestions() {
+        return optimizationSuggestions;
+    }
+
+    public void setOptimizationSuggestions(String optimizationSuggestions) {
+        this.optimizationSuggestions = optimizationSuggestions;
     }
 
     public LocalDateTime getCreatedAt() {

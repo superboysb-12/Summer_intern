@@ -1,10 +1,12 @@
 <script setup>
 import { ref, onMounted, reactive, watch, onBeforeUnmount } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Download, RefreshRight, Document, Edit, Histogram, Delete } from '@element-plus/icons-vue'
+import { Search, Plus, Download, RefreshRight, Document, Edit, Histogram, Delete, Timer } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
+// 移除marked导入，改用CDN方式
+import { copyToClipboard } from '../utils/clipboard'
 
 const router = useRouter()
 const store = useCounterStore()
@@ -26,7 +28,6 @@ const loadingTypes = ref(false)
 
 // 表单引用
 const generateFormRef = ref(null)
-const editFormRef = ref(null)
 
 // 分页参数
 const queryParams = reactive({
@@ -47,15 +48,9 @@ const generateForm = reactive({
 // 对话框控制
 const generateDialogVisible = ref(false)
 const detailDialogVisible = ref(false)
-const editDialogVisible = ref(false)
 
 // 当前查看的题目
 const currentQuestion = ref(null)
-// 编辑题目表单
-const editForm = reactive({
-  id: null,
-  questionJson: ''
-})
 
 // 自动刷新状态相关
 const refreshInterval = ref(null)
@@ -255,55 +250,7 @@ const handleViewDetail = async (row) => {
   }
 }
 
-// 打开编辑题目对话框
-const handleEdit = (row) => {
-  try {
-    // 确保已有题目数据
-    if (!row.questionJson) {
-      ElMessage.warning('该题目尚未生成完成或没有JSON数据')
-      return
-    }
-    
-    editForm.id = row.id
-    editForm.questionJson = row.questionJson
-    editDialogVisible.value = true
-  } catch (error) {
-    console.error('打开编辑对话框失败:', error)
-    ElMessage.error('打开编辑对话框失败')
-  }
-}
 
-// 提交编辑表单
-const submitEditForm = async () => {
-  try {
-    // 校验JSON格式
-    try {
-      JSON.parse(editForm.questionJson)
-    } catch (e) {
-      ElMessage.error('JSON格式不正确，请检查')
-      return
-    }
-    
-    const response = await axios.put(`${BaseUrl}api/question-generator/${editForm.id}`, {
-      questionJson: editForm.questionJson
-    }, {
-      headers: {
-        'Authorization': `Bearer ${getToken()}`
-      }
-    })
-    
-    if (response.data && response.data.success) {
-      ElMessage.success('更新题目成功')
-      editDialogVisible.value = false
-      getQuestionList() // 刷新列表
-    } else {
-      ElMessage.error(response.data?.message || '更新题目失败')
-    }
-  } catch (error) {
-    console.error('更新题目失败:', error)
-    ElMessage.error('更新题目失败')
-  }
-}
 
 // 刷新单个题目状态
 const refreshQuestionStatus = async (id) => {
@@ -421,6 +368,30 @@ const formatJson = (json) => {
   }
 }
 
+// 添加格式化题目函数
+const renderQuestion = (questionJson) => {
+  try {
+    if (!questionJson) return '';
+    
+    const question = JSON.parse(questionJson);
+    
+    // 如果不是有效的题目JSON，直接返回格式化的原始内容
+    if (!question.type) {
+      return formatJson(questionJson);
+    }
+    
+    return question; // 返回解析后的对象，而不是格式化的字符串
+  } catch (e) {
+    return formatJson(questionJson);
+  }
+};
+
+// 格式化解析文本，处理换行符
+const formatExplanation = (text) => {
+  if (!text) return '';
+  return text.replace(/\n/g, '<br>');
+};
+
 // 在detailDialogVisible变量后添加以下内容
 const solutionDialogVisible = ref(false);
 const solutionLoading = ref(false);
@@ -503,6 +474,363 @@ const handleBatchDelete = async () => {
   }
 };
 
+// 添加 markdownToHtml 和 handleCopySolution 方法
+const markdownToHtml = (markdown) => {
+  if (!markdown) return '';
+  // 检查window.marked是否可用
+  if (typeof window.marked === 'undefined') {
+    // 如果marked不可用，简单返回原始文本并添加基本HTML格式
+    return markdown
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+  }
+  return window.marked.parse(markdown);
+};
+
+const handleCopySolution = () => {
+  if (currentSolution.value) {
+    copyToClipboard(currentSolution.value)
+      .then(() => {
+        ElMessage.success('解答内容已复制到剪贴板');
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+        ElMessage.error('复制失败，请手动复制');
+      });
+  }
+};
+
+// 添加设计相关的状态
+const designDialogVisible = ref(false)
+const designEfficiencyDialogVisible = ref(false)
+const optimizationDialogVisible = ref(false)
+const designContent = ref('')
+const designLoading = ref(false)
+const saveDesignLoading = ref(false)
+const finishDesignLoading = ref(false)
+const currentEfficiencyData = ref(null)
+const currentOptimizationData = ref(null)
+const optimizationLoading = ref(false)
+
+// 开始设计课后练习
+const handleStartDesign = async (row) => {
+  try {
+    if (row.status !== 'COMPLETED') {
+      ElMessage.warning('只能为已完成生成的题目进行设计')
+      return
+    }
+    
+    designLoading.value = true
+    currentQuestion.value = row
+    
+    const response = await axios.get(`${BaseUrl}api/question-generator/${row.id}/design`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      designContent.value = response.data.content || ''
+      designDialogVisible.value = true
+    } else {
+      ElMessage.error(response.data?.message || '开始设计失败')
+    }
+  } catch (error) {
+    console.error('开始设计失败:', error)
+    ElMessage.error('开始设计失败: ' + (error.response?.data?.message || error.message))
+  } finally {
+    designLoading.value = false
+  }
+}
+
+// 保存设计内容
+const handleSaveDesign = async () => {
+  try {
+    if (!currentQuestion.value || !currentQuestion.value.id) {
+      ElMessage.warning('找不到当前题目')
+      return
+    }
+    
+    saveDesignLoading.value = true
+    
+    const response = await axios.post(`${BaseUrl}api/question-generator/${currentQuestion.value.id}/design/save`, {
+      content: designContent.value
+    }, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('设计内容已保存')
+    } else {
+      ElMessage.error(response.data?.message || '保存设计内容失败')
+    }
+  } catch (error) {
+    console.error('保存设计内容失败:', error)
+    ElMessage.error('保存设计内容失败: ' + (error.response?.data?.message || error.message))
+  } finally {
+    saveDesignLoading.value = false
+  }
+}
+
+// 完成设计并计算效率指数
+const handleFinishDesign = async () => {
+  try {
+    if (!currentQuestion.value || !currentQuestion.value.id) {
+      ElMessage.warning('找不到当前题目')
+      return
+    }
+    
+    // 先保存最新内容
+    await handleSaveDesign()
+    
+    finishDesignLoading.value = true
+    
+    const response = await axios.post(`${BaseUrl}api/question-generator/${currentQuestion.value.id}/design/finish`, {}, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('课后练习设计已完成')
+      designDialogVisible.value = false
+      
+      // 显示效率数据
+      currentEfficiencyData.value = response.data
+      designEfficiencyDialogVisible.value = true
+      
+      // 刷新列表
+      getQuestionList()
+    } else {
+      ElMessage.error(response.data?.message || '完成设计失败')
+    }
+  } catch (error) {
+    console.error('完成设计失败:', error)
+    ElMessage.error('完成设计失败: ' + (error.response?.data?.message || error.message))
+  } finally {
+    finishDesignLoading.value = false
+  }
+}
+
+// 获取效率统计数据
+const handleViewEfficiencyStatistics = async () => {
+  try {
+    const response = await axios.get(`${BaseUrl}api/question-generator/design/efficiency/statistics`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      if (!response.data.hasData) {
+        ElMessage.info('暂无效率统计数据')
+        return
+      }
+      
+      currentEfficiencyData.value = response.data
+      designEfficiencyDialogVisible.value = true
+    } else {
+      ElMessage.error(response.data?.message || '获取效率统计数据失败')
+    }
+  } catch (error) {
+    console.error('获取效率统计数据失败:', error)
+    ElMessage.error('获取效率统计数据失败: ' + (error.response?.data?.message || error.message))
+  }
+}
+
+// 查看优化建议
+const handleViewOptimization = async (row) => {
+  try {
+    if (!row || !row.id) {
+      ElMessage.warning('找不到题目信息')
+      return
+    }
+    
+    // 设置加载状态
+    optimizationLoading.value = true
+    optimizationDialogVisible.value = true
+    currentOptimizationData.value = { 
+      query: row.query, 
+      questionType: row.questionType,
+      efficiencyIndex: row.efficiencyIndex,
+      designDuration: row.designDuration
+    }
+    
+    // 获取基本优化建议
+    try {
+    const response = await axios.get(`${BaseUrl}api/question-generator/${row.id}/optimization`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+        currentOptimizationData.value = {
+          ...currentOptimizationData.value,
+          ...response.data
+        }
+    } else {
+        ElMessage.error(response.data?.message || '获取基础优化建议失败')
+      }
+    } catch (error) {
+      console.error('获取基础优化建议失败:', error)
+      ElMessage.error('获取基础优化建议失败: ' + (error.response?.data?.message || error.message))
+    }
+    
+    // 使用大模型生成针对性建议
+    if (currentOptimizationData.value.query && currentOptimizationData.value.questionType) {
+      try {
+        // 构建系统提示词和用户消息
+        const systemPrompt = `你是一位专业的教育教学顾问，专长于提供针对性的课后练习优化建议。
+请基于以下信息，提供具体、实用的优化建议：
+- 题目关键词: ${currentOptimizationData.value.query}
+- 题目类型: ${currentOptimizationData.value.questionType}
+- 效率指数: ${currentOptimizationData.value.efficiencyIndex}
+- 设计时长: ${formatDuration(currentOptimizationData.value.designDuration)}
+
+请严格按照以下JSON格式输出你的建议，不要包含任何其他文本：
+
+{
+  "summary": "整体优化方向的简短总结，不超过50字",
+  "categories": [
+    {
+      "name": "教学目标",
+      "score": 分数（1-10的整数，表示当前表现，10为最佳）,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "内容设计",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "难度梯度",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "学生参与度",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    },
+    {
+      "name": "创新性",
+      "score": 分数,
+      "strengths": ["优势点1", "优势点2"],
+      "weaknesses": ["不足点1", "不足点2"],
+      "suggestions": ["具体建议1", "具体建议2"]
+    }
+  ],
+  "overall_suggestion": "综合性建议，100-200字"
+}
+
+必须确保输出是有效的JSON格式，可以直接被JSON.parse()解析。`;
+
+        const userMessage = `请为"${currentOptimizationData.value.query}"这道${currentOptimizationData.value.questionType}生成结构化的优化建议JSON。`;
+
+        // 准备要发送到API的消息
+        const apiMessages = [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userMessage }
+        ];
+
+        // 直接调用DeepSeekChat API
+        const aiResponse = await axios.post(`${BaseUrl}api/deepseek/chat`, 
+          { messages: apiMessages },
+          { headers: { 'Authorization': `Bearer ${getToken()}` } }
+        );
+                  
+          if (aiResponse.data && aiResponse.data.choices && aiResponse.data.choices.length > 0) {
+            const aiMessage = aiResponse.data.choices[0].message;
+            try {
+              // 获取内容
+              let contentToProcess = aiMessage.content;
+              
+              // 处理可能带有的Markdown代码块
+              // 首先检查是否包含```json标记的代码块
+              const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/;
+              const markdownMatch = jsonBlockRegex.exec(contentToProcess);
+              
+              if (markdownMatch && markdownMatch[1]) {
+                // 如果找到了json代码块，则提取其中的内容
+                contentToProcess = markdownMatch[1].trim();
+                console.log('从Markdown代码块提取JSON:', contentToProcess);
+              }
+              
+              // 尝试解析JSON响应
+              currentOptimizationData.value.structuredSuggestions = JSON.parse(contentToProcess);
+              // 保留原始文本以备后用
+              currentOptimizationData.value.additionalSuggestions = aiMessage.content;
+            } catch (jsonError) {
+              console.error('JSON解析失败:', jsonError);
+              currentOptimizationData.value.additionalSuggestions = aiMessage.content;
+              currentOptimizationData.value.jsonParseError = true;
+            }
+          } else {
+            currentOptimizationData.value.additionalSuggestions = '无法获取优化建议，请稍后再试';
+          }
+      } catch (aiError) {
+        console.error('获取AI针对性建议失败:', aiError);
+        currentOptimizationData.value.additionalSuggestions = '获取AI针对性建议失败，请稍后再试';
+      }
+    }
+  } catch (error) {
+    console.error('获取优化建议失败:', error)
+    ElMessage.error('获取优化建议失败: ' + (error.response?.data?.message || error.message))
+    // 如果在对话框已打开的情况下出错，则关闭对话框
+    if (optimizationDialogVisible.value) {
+      optimizationDialogVisible.value = false
+    }
+  } finally {
+    // 无论成功失败，都关闭加载状态
+    optimizationLoading.value = false
+  }
+}
+
+// 格式化时长显示
+const formatDuration = (seconds) => {
+  if (!seconds && seconds !== 0) return '未知'
+  
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
+  const remainingSeconds = seconds % 60
+  
+  let result = ''
+  if (hours > 0) {
+    result += `${hours}小时`
+  }
+  if (minutes > 0) {
+    result += `${minutes}分钟`
+  }
+  if (remainingSeconds > 0 || result === '') {
+    result += `${remainingSeconds}秒`
+  }
+  
+  return result
+}
+
+// 效率指数颜色
+const getEfficiencyColor = (index) => {
+  if (!index && index !== 0) return ''
+  
+  if (index >= 90) return 'success'
+  if (index >= 70) return 'primary'
+  if (index >= 50) return 'warning'
+  return 'danger'
+}
+
 // 生命周期钩子
 onMounted(() => {
   getQuestionList()
@@ -526,6 +854,7 @@ watch(
 
 <template>
   <div class="question-generator-container">
+    <!-- 现有工具栏 -->
     <div class="toolbar">
       <el-form :inline="true" :model="queryParams" class="search-form">
         <el-form-item>
@@ -545,6 +874,7 @@ watch(
         <el-button type="success" plain @click="handleGenerate" :icon="Plus">生成题目</el-button>
         <el-button type="danger" plain @click="handleBatchDelete" :disabled="!selectedQuestions.length" :icon="Delete">批量删除</el-button>
         <el-button type="primary" plain @click="handleRefresh" :icon="RefreshRight" :loading="loading">刷新</el-button>
+        <el-button type="info" plain @click="handleViewEfficiencyStatistics" :icon="Histogram">效率统计</el-button>
         <el-switch
           v-model="autoRefreshEnabled"
           active-text="自动刷新"
@@ -553,6 +883,7 @@ watch(
       </div>
     </div>
     
+    <!-- 现有表格 -->
     <el-table
       v-loading="loading"
       :data="questionList"
@@ -577,12 +908,26 @@ watch(
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="效率指数" prop="efficiencyIndex" width="120">
+        <template #default="scope">
+          <el-tag v-if="scope.row.efficiencyIndex" :type="getEfficiencyColor(scope.row.efficiencyIndex)" effect="light">
+            {{ scope.row.efficiencyIndex?.toFixed(2) || '未计算' }}
+          </el-tag>
+          <span v-else>未计算</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="设计时长" prop="designDuration" width="120">
+        <template #default="scope">
+          <span v-if="scope.row.designDuration">{{ formatDuration(scope.row.designDuration) }}</span>
+          <span v-else>-</span>
+        </template>
+      </el-table-column>
       <el-table-column label="创建时间" prop="createdAt" width="180">
         <template #default="scope">
           {{ scope.row.createdAt ? new Date(scope.row.createdAt).toLocaleString() : '未知' }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="280" fixed="right">
+      <el-table-column label="操作" width="380" fixed="right">
         <template #default="scope">
           <el-button 
             type="primary" 
@@ -592,14 +937,6 @@ watch(
           >
             查看
           </el-button>
-          <el-button 
-            type="success"
-            link
-            @click="handleEdit(scope.row)"
-            :disabled="scope.row.status !== 'COMPLETED'"
-          >
-            编辑
-          </el-button>
           <el-button
             type="info"
             link
@@ -608,10 +945,27 @@ watch(
           >
             解答
           </el-button>
+          <el-button
+            type="warning"
+            link
+            @click="handleStartDesign(scope.row)"
+            :disabled="scope.row.status !== 'COMPLETED'"
+          >
+            设计
+          </el-button>
+          <el-button
+            type="primary"
+            link
+            @click="handleViewOptimization(scope.row)"
+            :disabled="!scope.row.efficiencyIndex"
+          >
+            优化建议
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
     
+    <!-- 分页和其他现有对话框 -->
     <div class="pagination-container">
       <el-pagination
         :current-page="queryParams.pageNum"
@@ -734,48 +1088,142 @@ watch(
         <el-divider content-position="center">题目内容</el-divider>
         
         <div class="question-content" v-if="currentQuestion.questionJson">
-          <pre>{{ formatJson(currentQuestion.questionJson) }}</pre>
+          <!-- 选择题专用显示 -->
+          <div v-if="renderQuestion(currentQuestion.questionJson).type === '选择题'" class="choice-question">
+            <div class="question-title">
+              <span class="question-type-tag">【选择题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).question }}
+            </div>
+            <div class="options-container">
+              <div 
+                v-for="(option, key) in renderQuestion(currentQuestion.questionJson).options" 
+                :key="key"
+                class="option-item"
+                :class="{'correct-option': key === renderQuestion(currentQuestion.questionJson).answer}"
+              >
+                <span class="option-key">{{ key }}.</span>
+                <span class="option-content">{{ option }}</span>
+              </div>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer">
+              <span class="answer-label">答案：</span>
+              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
+              <div class="explanation-label">解析：</div>
+              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
+            </div>
+          </div>
+          <!-- 判断题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '判断题'" class="true-false-question">
+            <div class="question-title">
+              <span class="question-type-tag judge-tag">【判断题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).statement }}
+            </div>
+            <div class="judge-options">
+              <div 
+                class="judge-option" 
+                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '正确' }"
+              >
+                <span class="judge-icon">✓</span>正确
+              </div>
+              <div 
+                class="judge-option"
+                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '错误' }"
+              >
+                <span class="judge-icon">✗</span>错误
+              </div>
+            </div>
+            <div class="question-answer">
+              <span class="answer-label">答案：</span>
+              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
+              <div class="explanation-label">解析：</div>
+              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
+            </div>
+          </div>
+          <!-- 问答题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '问答题'" class="qa-question">
+            <div class="question-title">
+              <span class="question-type-tag qa-tag">【问答题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).question }}
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).key_points && renderQuestion(currentQuestion.questionJson).key_points.length > 0" class="key-points">
+              <div class="key-points-title">关键点：</div>
+              <ul class="key-points-list">
+                <li v-for="(point, index) in renderQuestion(currentQuestion.questionJson).key_points" :key="index">
+                  {{ point }}
+                </li>
+              </ul>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer qa-answer">
+              <div class="answer-label">参考答案：</div>
+              <div class="answer-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).answer)"></div>
+            </div>
+          </div>
+          <!-- 编程题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '编程题'" class="programming-question">
+            <div class="question-title">
+              <span class="question-type-tag programming-tag">【编程题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).title }}
+            </div>
+            
+            <div class="section">
+              <div class="section-title">题目描述：</div>
+              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).description)"></div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).input_format">
+              <div class="section-title">输入格式：</div>
+              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).input_format }}</pre>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).output_format">
+              <div class="section-title">输出格式：</div>
+              <div class="section-content">{{ renderQuestion(currentQuestion.questionJson).output_format }}</div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).examples && renderQuestion(currentQuestion.questionJson).examples.length > 0">
+              <div class="section-title">示例：</div>
+              <div v-for="(example, index) in renderQuestion(currentQuestion.questionJson).examples" :key="index" class="example-item">
+                <div class="example-header">示例 {{ index + 1 }}：</div>
+                <div class="example-content">
+                  <div class="example-input">
+                    <div class="example-label">输入：</div>
+                    <pre class="code-block">{{ example.input }}</pre>
+                  </div>
+                  <div class="example-output">
+                    <div class="example-label">输出：</div>
+                    <pre class="code-block">{{ example.output }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).solution_approach">
+              <div class="section-title">解题思路：</div>
+              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).solution_approach)"></div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).reference_code">
+              <div class="section-title">参考代码：</div>
+              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).reference_code }}</pre>
+            </div>
+          </div>
+          <!-- 其他题型仍使用JSON格式展示 -->
+          <pre v-else>{{ formatJson(currentQuestion.questionJson) }}</pre>
         </div>
         <el-empty v-else description="暂无题目内容" />
       </div>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="detailDialogVisible = false">关闭</el-button>
-          <el-button 
-            type="primary" 
-            @click="handleEdit(currentQuestion); detailDialogVisible = false"
-            v-if="currentQuestion && currentQuestion.status === 'COMPLETED'"
-          >
-            编辑
-          </el-button>
         </div>
       </template>
     </el-dialog>
     
-    <!-- 编辑题目对话框 -->
-    <el-dialog
-      v-model="editDialogVisible"
-      title="编辑题目"
-      width="70%"
-      append-to-body
-    >
-      <el-form ref="editFormRef" :model="editForm">
-        <el-form-item label="题目JSON" prop="questionJson">
-          <el-input
-            v-model="editForm.questionJson"
-            type="textarea"
-            :rows="15"
-            placeholder="请输入题目JSON"
-          />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="editDialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="submitEditForm">保存</el-button>
-        </div>
-      </template>
-    </el-dialog>
+
 
     <!-- 题目解答对话框 -->
     <el-dialog
@@ -799,7 +1247,131 @@ watch(
         <el-divider content-position="center">题目内容</el-divider>
         
         <div class="question-content" v-if="currentQuestion && currentQuestion.questionJson">
-          <pre>{{ formatJson(currentQuestion.questionJson) }}</pre>
+          <!-- 选择题专用显示 -->
+          <div v-if="renderQuestion(currentQuestion.questionJson).type === '选择题'" class="choice-question">
+            <div class="question-title">
+              <span class="question-type-tag">【选择题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).question }}
+            </div>
+            <div class="options-container">
+              <div 
+                v-for="(option, key) in renderQuestion(currentQuestion.questionJson).options" 
+                :key="key"
+                class="option-item"
+                :class="{'correct-option': key === renderQuestion(currentQuestion.questionJson).answer}"
+              >
+                <span class="option-key">{{ key }}.</span>
+                <span class="option-content">{{ option }}</span>
+              </div>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer">
+              <span class="answer-label">答案：</span>
+              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
+              <div class="explanation-label">解析：</div>
+              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
+            </div>
+          </div>
+          <!-- 判断题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '判断题'" class="true-false-question">
+            <div class="question-title">
+              <span class="question-type-tag judge-tag">【判断题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).statement }}
+            </div>
+            <div class="judge-options">
+              <div 
+                class="judge-option" 
+                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '正确' }"
+              >
+                <span class="judge-icon">✓</span>正确
+              </div>
+              <div 
+                class="judge-option"
+                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '错误' }"
+              >
+                <span class="judge-icon">✗</span>错误
+              </div>
+            </div>
+            <div class="question-answer">
+              <span class="answer-label">答案：</span>
+              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
+              <div class="explanation-label">解析：</div>
+              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
+            </div>
+          </div>
+          <!-- 问答题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '问答题'" class="qa-question">
+            <div class="question-title">
+              <span class="question-type-tag qa-tag">【问答题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).question }}
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).key_points && renderQuestion(currentQuestion.questionJson).key_points.length > 0" class="key-points">
+              <div class="key-points-title">关键点：</div>
+              <ul class="key-points-list">
+                <li v-for="(point, index) in renderQuestion(currentQuestion.questionJson).key_points" :key="index">
+                  {{ point }}
+                </li>
+              </ul>
+            </div>
+            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer qa-answer">
+              <div class="answer-label">参考答案：</div>
+              <div class="answer-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).answer)"></div>
+            </div>
+          </div>
+          <!-- 编程题专用显示 -->
+          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '编程题'" class="programming-question">
+            <div class="question-title">
+              <span class="question-type-tag programming-tag">【编程题】</span>
+              {{ renderQuestion(currentQuestion.questionJson).title }}
+            </div>
+            
+            <div class="section">
+              <div class="section-title">题目描述：</div>
+              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).description)"></div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).input_format">
+              <div class="section-title">输入格式：</div>
+              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).input_format }}</pre>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).output_format">
+              <div class="section-title">输出格式：</div>
+              <div class="section-content">{{ renderQuestion(currentQuestion.questionJson).output_format }}</div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).examples && renderQuestion(currentQuestion.questionJson).examples.length > 0">
+              <div class="section-title">示例：</div>
+              <div v-for="(example, index) in renderQuestion(currentQuestion.questionJson).examples" :key="index" class="example-item">
+                <div class="example-header">示例 {{ index + 1 }}：</div>
+                <div class="example-content">
+                  <div class="example-input">
+                    <div class="example-label">输入：</div>
+                    <pre class="code-block">{{ example.input }}</pre>
+                  </div>
+                  <div class="example-output">
+                    <div class="example-label">输出：</div>
+                    <pre class="code-block">{{ example.output }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).solution_approach">
+              <div class="section-title">解题思路：</div>
+              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).solution_approach)"></div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).reference_code">
+              <div class="section-title">参考代码：</div>
+              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).reference_code }}</pre>
+            </div>
+          </div>
+          <!-- 其他题型仍使用JSON格式展示 -->
+          <pre v-else>{{ formatJson(currentQuestion.questionJson) }}</pre>
         </div>
         
         <el-divider content-position="center">题目解答</el-divider>
@@ -813,6 +1385,295 @@ watch(
         <div class="dialog-footer">
           <el-button @click="solutionDialogVisible = false">关闭</el-button>
           <el-button type="primary" @click="handleCopySolution" v-if="currentSolution">复制解答</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    
+    <!-- 课后练习设计对话框 -->
+    <el-dialog
+      v-model="designDialogVisible"
+      title="课后练习设计与修正"
+      width="70%"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div v-if="currentQuestion" class="design-header">
+        <div class="info-item">
+          <span class="info-label">检索词:</span>
+          <span class="info-value">{{ currentQuestion.query }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">题目类型:</span>
+          <span class="info-value">{{ formatQuestionType(currentQuestion.questionType) }}</span>
+        </div>
+      </div>
+      
+      <el-divider content-position="center">设计内容</el-divider>
+      
+      <div class="design-content" v-loading="designLoading">
+        <el-input
+          v-model="designContent"
+          type="textarea"
+          :rows="15"
+          placeholder="请在此处设计和修正课后练习内容"
+          resize="both"
+        />
+        
+        <div class="design-tips">
+          <h4>设计建议：</h4>
+          <ul>
+            <li>根据学生实际水平设置适当的难度梯度</li>
+            <li>增加实践型题目，培养学生动手能力</li>
+            <li>添加开放性问题，激发创造性思维</li>
+            <li>明确考察重点，与教学目标对应</li>
+          </ul>
+        </div>
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="designDialogVisible = false">取消</el-button>
+          <el-button type="info" @click="handleSaveDesign" :loading="saveDesignLoading">保存</el-button>
+          <el-button type="primary" @click="handleFinishDesign" :loading="finishDesignLoading">完成设计</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    
+    <!-- 设计效率结果对话框 -->
+    <el-dialog
+      v-model="designEfficiencyDialogVisible"
+      title="课后练习设计效率统计"
+      width="50%"
+      append-to-body
+    >
+      <div v-if="currentEfficiencyData" class="efficiency-container" v-loading="false">
+        <!-- 统计总览 -->
+        <div class="efficiency-overview">
+          <div class="efficiency-card">
+            <div class="card-title">平均效率指数</div>
+            <div class="card-value" :class="'text-' + getEfficiencyColor(currentEfficiencyData.avgEfficiencyIndex)">
+              {{ currentEfficiencyData.avgEfficiencyIndex?.toFixed(2) || '无数据' }}
+            </div>
+          </div>
+          
+          <div class="efficiency-card">
+            <div class="card-title">平均设计时长</div>
+            <div class="card-value">
+              {{ formatDuration(currentEfficiencyData.avgDesignDuration) }}
+            </div>
+          </div>
+          
+          <div class="efficiency-card">
+            <div class="card-title">已设计题目数</div>
+            <div class="card-value">{{ currentEfficiencyData.totalDesignedQuestions || 0 }}</div>
+          </div>
+        </div>
+        
+        <!-- 效率详情 -->
+        <div v-if="currentEfficiencyData.mostEfficient || currentEfficiencyData.leastEfficient" class="efficiency-details">
+          <el-divider content-position="center">效率详情</el-divider>
+          
+          <div class="detail-section" v-if="currentEfficiencyData.mostEfficient">
+            <h4>最高效率题目</h4>
+            <div class="detail-item">
+              <span>题目ID: {{ currentEfficiencyData.mostEfficient.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span>检索词: {{ currentEfficiencyData.mostEfficient.query }}</span>
+            </div>
+            <div class="detail-item">
+              <span>题目类型: {{ formatQuestionType(currentEfficiencyData.mostEfficient.questionType) }}</span>
+            </div>
+            <div class="detail-item">
+              <span>效率指数: </span>
+              <el-tag :type="getEfficiencyColor(currentEfficiencyData.mostEfficient.efficiencyIndex)">
+                {{ currentEfficiencyData.mostEfficient.efficiencyIndex?.toFixed(2) }}
+              </el-tag>
+            </div>
+          </div>
+          
+          <div class="detail-section" v-if="currentEfficiencyData.leastEfficient">
+            <h4>最低效率题目</h4>
+            <div class="detail-item">
+              <span>题目ID: {{ currentEfficiencyData.leastEfficient.id }}</span>
+            </div>
+            <div class="detail-item">
+              <span>检索词: {{ currentEfficiencyData.leastEfficient.query }}</span>
+            </div>
+            <div class="detail-item">
+              <span>题目类型: {{ formatQuestionType(currentEfficiencyData.leastEfficient.questionType) }}</span>
+            </div>
+            <div class="detail-item">
+              <span>效率指数: </span>
+              <el-tag :type="getEfficiencyColor(currentEfficiencyData.leastEfficient.efficiencyIndex)">
+                {{ currentEfficiencyData.leastEfficient.efficiencyIndex?.toFixed(2) }}
+              </el-tag>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 月度效率趋势 -->
+        <div v-if="currentEfficiencyData.monthlyEfficiency && Object.keys(currentEfficiencyData.monthlyEfficiency).length > 0" class="efficiency-trend">
+          <el-divider content-position="center">月度效率趋势</el-divider>
+          
+          <div class="month-chart">
+            <el-timeline>
+              <el-timeline-item
+                v-for="(value, month) in currentEfficiencyData.monthlyEfficiency"
+                :key="month"
+                :type="getEfficiencyColor(value)"
+                :timestamp="month"
+              >
+                效率指数: {{ value.toFixed(2) }}
+              </el-timeline-item>
+            </el-timeline>
+          </div>
+        </div>
+        
+        <!-- 优化建议 -->
+        <div v-if="currentEfficiencyData.optimizationSuggestions" class="optimization-section">
+          <el-divider content-position="center">优化建议</el-divider>
+          
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+          >
+            <pre>{{ currentEfficiencyData.optimizationSuggestions }}</pre>
+          </el-alert>
+        </div>
+      </div>
+      <el-empty v-else description="暂无效率数据" />
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="designEfficiencyDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    
+    <!-- 优化建议对话框 -->
+    <el-dialog
+      v-model="optimizationDialogVisible"
+      title="课后练习优化建议"
+      width="50%"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div v-loading="optimizationLoading" element-loading-text="正在生成优化建议..." class="optimization-container">
+        <div v-if="currentOptimizationData" class="question-info">
+          <div class="info-item">
+            <span class="info-label">检索词:</span>
+            <span class="info-value">{{ currentOptimizationData.query }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">题目类型:</span>
+            <span class="info-value">{{ formatQuestionType(currentOptimizationData.questionType) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">设计时长:</span>
+            <span class="info-value">{{ formatDuration(currentOptimizationData.designDuration) }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">效率指数:</span>
+            <span class="info-value">
+              <el-tag :type="getEfficiencyColor(currentOptimizationData.efficiencyIndex)">
+                {{ currentOptimizationData.efficiencyIndex?.toFixed(2) }}
+              </el-tag>
+            </span>
+          </div>
+        </div>
+        
+        <el-divider content-position="center">优化建议</el-divider>
+        
+        <div v-if="currentOptimizationData && currentOptimizationData.optimizationSuggestions" class="suggestion-content">
+          <el-alert
+            type="success"
+            :closable="false"
+            show-icon
+            title="系统建议"
+          >
+            <pre>{{ currentOptimizationData.optimizationSuggestions }}</pre>
+          </el-alert>
+        </div>
+        
+        <div v-if="currentOptimizationData && currentOptimizationData.structuredSuggestions" class="structured-suggestion-content">
+          <div class="suggestion-header">
+            <h3 class="suggestion-summary">{{ currentOptimizationData.structuredSuggestions.summary }}</h3>
+          </div>
+          
+          <!-- 分类评分卡片 -->
+          <div class="categories-grid">
+            <el-card v-for="(category, index) in currentOptimizationData.structuredSuggestions.categories" :key="index" class="category-card" shadow="hover">
+              <template #header>
+                <div class="category-header">
+                  <span class="category-name">{{ category.name }}</span>
+                  <el-rate
+                    v-model="category.score"
+                    :max="10"
+                    disabled
+                    show-score
+                    text-color="#ff9900"
+                  />
+                </div>
+              </template>
+              
+              <div class="category-content">
+                <div class="strengths-section">
+                  <h4 class="section-title">优势</h4>
+                  <ul class="points-list">
+                    <li v-for="(strength, i) in category.strengths" :key="i">{{ strength }}</li>
+                  </ul>
+                </div>
+                
+                <div class="weaknesses-section">
+                  <h4 class="section-title">不足</h4>
+                  <ul class="points-list">
+                    <li v-for="(weakness, i) in category.weaknesses" :key="i">{{ weakness }}</li>
+                  </ul>
+                </div>
+                
+                <div class="suggestions-section">
+                  <h4 class="section-title">建议</h4>
+                  <ul class="points-list">
+                    <li v-for="(suggestion, i) in category.suggestions" :key="i">{{ suggestion }}</li>
+                  </ul>
+                </div>
+              </div>
+            </el-card>
+          </div>
+          
+          <!-- 综合建议 -->
+          <div class="overall-suggestion">
+            <el-alert
+              type="success"
+              :closable="false"
+              show-icon
+              title="综合建议"
+            >
+              <p>{{ currentOptimizationData.structuredSuggestions.overall_suggestion }}</p>
+            </el-alert>
+          </div>
+        </div>
+
+        <div v-else-if="currentOptimizationData && currentOptimizationData.additionalSuggestions" class="additional-suggestion-content">
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            :title="currentOptimizationData.jsonParseError ? '针对性建议 (解析失败，显示原始内容)' : '针对性建议'"
+            style="margin-top: 15px;"
+          >
+            <pre>{{ currentOptimizationData.additionalSuggestions }}</pre>
+          </el-alert>
+        </div>
+        
+        <el-empty v-if="currentOptimizationData && !optimizationLoading && !currentOptimizationData.optimizationSuggestions && !currentOptimizationData.additionalSuggestions" description="暂无优化建议" />
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="optimizationDialogVisible = false" :disabled="optimizationLoading">关闭</el-button>
         </div>
       </template>
     </el-dialog>
@@ -877,5 +1738,507 @@ watch(
 .question-content pre {
   white-space: pre-wrap;
   margin: 0;
+}
+
+.choice-question {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.question-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: var(--el-color-primary);
+}
+
+.question-type-tag {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.option-item:hover {
+  background-color: var(--el-color-primary-light-8);
+}
+
+.option-item.correct-option {
+  border-color: var(--el-color-success);
+  background-color: var(--el-color-success-light-9);
+  color: var(--el-color-success);
+}
+
+.option-key {
+  font-weight: bold;
+  margin-right: 10px;
+  color: var(--el-color-primary);
+}
+
+.option-content {
+  flex-grow: 1;
+}
+
+.question-answer {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-light);
+  font-weight: bold;
+  color: var(--el-color-danger);
+}
+
+.question-explanation {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-light);
+}
+
+.explanation-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--el-color-info);
+}
+
+.explanation-content {
+  color: var(--el-text-color-secondary);
+}
+
+.true-false-question {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.judge-tag {
+  background-color: var(--el-color-success-light-9);
+  color: var(--el-color-success);
+}
+
+.judge-options {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-light);
+}
+
+.judge-option {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.judge-option:hover {
+  background-color: var(--el-color-primary-light-8);
+}
+
+.judge-option.selected-option {
+  border-color: var(--el-color-success);
+  background-color: var(--el-color-success-light-9);
+  color: var(--el-color-success);
+}
+
+.judge-icon {
+  font-size: 18px;
+  margin-right: 5px;
+}
+
+.qa-question {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.qa-tag {
+  background-color: var(--el-color-info-light-9);
+  color: var(--el-color-info);
+}
+
+.key-points {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-light);
+}
+
+.key-points-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--el-color-primary);
+}
+
+.key-points-list {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 10px 0;
+}
+
+.key-points-list li {
+  margin-bottom: 8px;
+  padding-left: 5px;
+  position: relative;
+  color: var(--el-text-color-secondary);
+  line-height: 1.5;
+}
+
+.key-points-list li::before {
+  content: "•";
+  color: var(--el-color-primary);
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+  position: absolute;
+  left: 0;
+}
+
+.qa-answer {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--el-border-color-light);
+}
+
+.qa-answer .answer-content {
+  line-height: 1.6;
+  text-align: justify;
+  color: var(--el-text-color-primary);
+  white-space: pre-wrap;
+  padding: 10px;
+  background-color: var(--el-fill-color-lighter);
+  border-radius: 4px;
+}
+
+.programming-question {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.programming-tag {
+  background-color: var(--el-color-warning-light-9);
+  color: var(--el-color-warning);
+}
+
+.section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed var(--el-border-color-light);
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--el-color-primary);
+}
+
+.section-content {
+  color: var(--el-text-color-secondary);
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.code-block {
+  background-color: var(--el-color-info-light-9);
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9em;
+  font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+  color: var(--el-text-color-primary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  border-left: 4px solid var(--el-color-primary);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.example-item {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed var(--el-border-color-light);
+}
+
+.example-header {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: var(--el-color-primary);
+}
+
+.example-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.example-input, .example-output {
+  flex: 1;
+}
+
+.example-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: var(--el-color-info);
+}
+
+@media (min-width: 768px) {
+  .example-content {
+    flex-direction: row;
+  }
+}
+
+.programming-question .question-title {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--el-color-warning-light-5);
+}
+
+.section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* 添加新的样式 */
+.design-header {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.design-content {
+  margin-bottom: 20px;
+}
+
+.design-tips {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: var(--el-color-info-light-9);
+  border-radius: 4px;
+}
+
+.design-tips h4 {
+  margin-top: 0;
+  color: var(--el-color-info);
+}
+
+.design-tips ul {
+  margin-bottom: 0;
+}
+
+.design-tips li {
+  margin-bottom: 5px;
+  color: var(--el-text-color-secondary);
+}
+
+.efficiency-container {
+  padding: 10px;
+}
+
+.efficiency-overview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+/* 结构化建议样式 */
+.structured-suggestion-content {
+  margin-top: 20px;
+}
+
+.suggestion-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.suggestion-summary {
+  font-size: 16px;
+  color: #303133;
+  font-weight: 600;
+  margin: 0;
+  padding: 10px;
+  background-color: #f0f9eb;
+  border-radius: 4px;
+  border-left: 4px solid #67c23a;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.category-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.category-name {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 5px;
+  color: #606266;
+  border-bottom: 1px dashed #dcdfe6;
+  padding-bottom: 5px;
+}
+
+.points-list {
+  padding-left: 20px;
+  margin: 5px 0;
+}
+
+.points-list li {
+  margin-bottom: 5px;
+  line-height: 1.5;
+}
+
+.overall-suggestion {
+  margin-top: 20px;
+}
+
+.overall-suggestion p {
+  line-height: 1.6;
+  text-indent: 2em;
+  margin: 0;
+}
+
+.efficiency-card {
+  padding: 15px;
+  text-align: center;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  background-color: var(--el-fill-color-light);
+}
+
+.card-title {
+  font-size: 16px;
+  color: var(--el-text-color-secondary);
+  margin-bottom: 10px;
+}
+
+.card-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--el-color-primary);
+}
+
+.text-success {
+  color: var(--el-color-success);
+}
+
+.text-primary {
+  color: var(--el-color-primary);
+}
+
+.text-warning {
+  color: var(--el-color-warning);
+}
+
+.text-danger {
+  color: var(--el-color-danger);
+}
+
+.efficiency-details {
+  margin-top: 20px;
+}
+
+.detail-section {
+  padding: 15px;
+  border: 1px solid var(--el-border-color-light);
+  border-radius: 4px;
+  margin-bottom: 15px;
+  background-color: var(--el-fill-color-lighter);
+}
+
+.detail-section h4 {
+  margin-top: 0;
+  color: var(--el-color-primary);
+  border-bottom: 1px solid var(--el-border-color-light);
+  padding-bottom: 10px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.month-chart {
+  margin-top: 15px;
+  padding: 10px;
+}
+
+.optimization-section {
+  margin-top: 20px;
+}
+
+.optimization-section pre,
+.suggestion-content pre,
+.additional-suggestion-content pre {
+  white-space: pre-wrap;
+  margin: 0;
+  font-family: inherit;
+}
+
+.optimization-container .question-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+  .efficiency-overview,
+  .optimization-container .question-info {
+    grid-template-columns: 1fr;
+  }
 }
 </style> 

@@ -375,4 +375,102 @@ public class QuestionGeneratorController {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    /**
+     * 开始在线设计课后练习
+     *
+     * @param id 题目生成任务ID
+     * @return 包含题目内容的响应
+     */
+    @GetMapping("/{id}/design")
+    public ResponseEntity<Map<String, Object>> startDesignQuestion(@PathVariable Long id) {
+        try {
+            Map<String, Object> response = questionGeneratorService.startDesign(id);
+
+            if (response.containsKey("success") && (Boolean) response.get("success")) {
+                return ResponseEntity.ok(response);
+            } else {
+                return ResponseEntity.badRequest().body(response);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "开始设计失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
+    /**
+     * 保存设计中的课后练习内容
+     *
+     * @param id      题目生成任务ID
+     * @param request 包含设计内容的请求
+     * @return 保存结果
+     */
+    @PostMapping("/{id}/design/save")
+    public ResponseEntity<Map<String, Object>> saveDesignContent(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> request) {
+
+        String designContent = request.get("content");
+        if (designContent == null) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", "设计内容不能为空");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Map<String, Object> response = questionGeneratorService.saveDesignContent(id, designContent);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * 完成课后练习设计并计算效率指数
+     *
+     * @param id 题目生成任务ID
+     * @return 包含效率指数的响应
+     */
+    @PostMapping("/{id}/design/finish")
+    public ResponseEntity<Map<String, Object>> finishDesignQuestion(@PathVariable Long id) {
+        Map<String, Object> response = questionGeneratorService.finishDesign(id);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * 获取课后练习设计效率统计数据
+     *
+     * @return 包含效率统计的响应
+     */
+    @GetMapping("/design/efficiency/statistics")
+    public ResponseEntity<Map<String, Object>> getDesignEfficiencyStatistics() {
+        Map<String, Object> response = questionGeneratorService.getEfficiencyStatistics();
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 获取课后练习优化建议
+     *
+     * @param id 题目生成任务ID
+     * @return 包含优化建议的响应
+     */
+    @GetMapping("/{id}/optimization")
+    public ResponseEntity<Map<String, Object>> getQuestionOptimizationSuggestions(@PathVariable Long id) {
+        Map<String, Object> response = questionGeneratorService.getOptimizationSuggestions(id);
+
+        if (response.containsKey("success") && (Boolean) response.get("success")) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

@@ -92,4 +92,44 @@ public interface QuestionGeneratorService {
      * @return 删除成功的题目ID列表
      */
     List<Long> deleteQuestions(List<Long> ids);
+
+    /**
+     * 开始在线设计课后练习
+     * 
+     * @param id 题目生成任务ID
+     * @return 包含题目内容的响应
+     */
+    Map<String, Object> startDesign(Long id);
+
+    /**
+     * 保存设计中的课后练习内容
+     * 
+     * @param id            题目生成任务ID
+     * @param designContent 设计内容
+     * @return 保存结果
+     */
+    Map<String, Object> saveDesignContent(Long id, String designContent);
+
+    /**
+     * 完成课后练习设计并计算效率指数
+     * 
+     * @param id 题目生成任务ID
+     * @return 包含效率指数的响应
+     */
+    Map<String, Object> finishDesign(Long id);
+
+    /**
+     * 获取课后练习设计效率统计数据
+     * 
+     * @return 效率统计数据
+     */
+    Map<String, Object> getEfficiencyStatistics();
+
+    /**
+     * 获取课后练习优化建议
+     * 
+     * @param id 题目生成任务ID
+     * @return 优化建议
+     */
+    Map<String, Object> getOptimizationSuggestions(Long id);
 }

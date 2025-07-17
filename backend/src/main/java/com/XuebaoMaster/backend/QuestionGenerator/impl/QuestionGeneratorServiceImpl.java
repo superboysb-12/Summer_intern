@@ -332,6 +332,308 @@ public class QuestionGeneratorServiceImpl implements QuestionGeneratorService {
         return deletedIds;
     }
 
+    @Override
+    public Map<String, Object> startDesign(Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        logger.info("开始在线设计课后练习, ID: {}", id);
+
+        Optional<QuestionGenerator> optionalEntity = questionGeneratorRepository.findById(id);
+        if (optionalEntity.isEmpty()) {
+            logger.warn("找不到指定的题目生成任务, ID: {}", id);
+            response.put("success", false);
+            response.put("message", "找不到指定的题目生成任务");
+            return response;
+        }
+
+        QuestionGenerator entity = optionalEntity.get();
+        logger.info("找到题目生成任务, ID: {}, 状态: {}", id, entity.getStatus());
+
+        if (!"COMPLETED".equals(entity.getStatus())) {
+            logger.warn("题目尚未生成完成, ID: {}, 当前状态: {}", id, entity.getStatus());
+            response.put("success", false);
+            response.put("message", "题目尚未生成完成，当前状态: " + entity.getStatus());
+            return response;
+        }
+
+        try {
+            // 开始设计时间
+            logger.info("设置设计开始时间, ID: {}", id);
+            entity.setDesignStartTime(java.time.LocalDateTime.now());
+            entity.setDesignDuration(0L);
+
+            try {
+                entity = questionGeneratorRepository.save(entity);
+                logger.info("已保存设计开始时间, ID: {}, 时间: {}", id, entity.getDesignStartTime());
+            } catch (Exception e) {
+                logger.error("保存设计开始时间失败: {}", e.getMessage(), e);
+                response.put("success", false);
+                response.put("message", "数据库操作失败: " + e.getMessage());
+                return response;
+            }
+
+            // 获取题目内容
+            String questionContent = entity.getQuestionJson();
+
+            // 如果已有设计内容，则返回设计内容而不是题目内容
+            if (entity.getDesignContent() != null && !entity.getDesignContent().isEmpty()) {
+                logger.info("使用已有的设计内容, ID: {}, 内容长度: {}", id, entity.getDesignContent().length());
+                response.put("content", entity.getDesignContent());
+            } else {
+                logger.info("初始化设计内容, ID: {}", id);
+                response.put("content", questionContent);
+                // 初始化设计内容
+                entity.setDesignContent(questionContent);
+                try {
+                    entity = questionGeneratorRepository.save(entity);
+                    logger.info("已保存初始设计内容, ID: {}", id);
+                } catch (Exception e) {
+                    logger.error("保存初始设计内容失败: {}", e.getMessage(), e);
+                    // 即使保存失败，也继续返回内容给前端
+                    response.put("warning", "保存初始设计内容到数据库失败，但您仍可以编辑。请确保手动保存您的更改。");
+                }
+            }
+
+            response.put("success", true);
+            response.put("id", entity.getId());
+            response.put("query", entity.getQuery());
+            response.put("questionType", entity.getQuestionType());
+            response.put("designStartTime", entity.getDesignStartTime());
+            logger.info("成功启动设计流程, ID: {}", id);
+
+        } catch (Exception e) {
+            logger.error("读取题目内容失败: {}", e.getMessage(), e);
+            response.put("success", false);
+            response.put("message", "读取题目内容失败: " + e.getMessage());
+        }
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> saveDesignContent(Long id, String designContent) {
+        Map<String, Object> response = new HashMap<>();
+
+        Optional<QuestionGenerator> optionalEntity = questionGeneratorRepository.findById(id);
+        if (optionalEntity.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "找不到指定的题目生成任务");
+            return response;
+        }
+
+        QuestionGenerator entity = optionalEntity.get();
+
+        // 保存设计内容
+        entity.setDesignContent(designContent);
+        questionGeneratorRepository.save(entity);
+
+        response.put("success", true);
+        response.put("message", "设计内容已保存");
+        response.put("id", entity.getId());
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> finishDesign(Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        Optional<QuestionGenerator> optionalEntity = questionGeneratorRepository.findById(id);
+        if (optionalEntity.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "找不到指定的题目生成任务");
+            return response;
+        }
+
+        QuestionGenerator entity = optionalEntity.get();
+        if (entity.getDesignStartTime() == null) {
+            response.put("success", false);
+            response.put("message", "尚未开始设计");
+            return response;
+        }
+
+        // 计算设计时长（秒）
+        java.time.LocalDateTime endTime = java.time.LocalDateTime.now();
+        entity.setDesignEndTime(endTime);
+        long designDurationSeconds = java.time.Duration.between(entity.getDesignStartTime(), endTime).getSeconds();
+        entity.setDesignDuration(designDurationSeconds);
+
+        // 计算效率指数
+        // 公式：基础分(100) - 设计时长分(根据时长计算，最多-50) + 内容质量分(根据内容长度和复杂度计算，最多+20)
+        double baseScore = 100.0;
+        double timeScore = Math.min(50.0, designDurationSeconds / 60.0); // 每分钟减1分，最多减50分
+
+        // 根据设计内容的长度和复杂度估算内容质量分
+        String designContent = entity.getDesignContent();
+        double contentScore = 0.0;
+        if (designContent != null && !designContent.isEmpty()) {
+            // 简单的基于长度和特定关键词的评分
+            contentScore = Math.min(20.0, designContent.length() / 500.0); // 每500字符加1分，最多加20分
+        }
+
+        double efficiencyIndex = baseScore - timeScore + contentScore;
+        entity.setEfficiencyIndex(efficiencyIndex);
+
+        // 生成优化建议
+        StringBuilder suggestions = new StringBuilder();
+        if (timeScore > 30) {
+            suggestions.append("- 课后练习设计时间较长，建议优化设计流程。\n");
+        }
+        if (contentScore < 10) {
+            suggestions.append("- 课后练习内容可以进一步丰富，增加多样性和难度梯度。\n");
+        }
+        suggestions.append("- 考虑增加更多的实践型题目，加强学生的动手能力。\n");
+        suggestions.append("- 可以添加一些开放性问题，培养学生的创造性思维。\n");
+
+        // 保存优化建议
+        entity.setOptimizationSuggestions(suggestions.toString());
+
+        questionGeneratorRepository.save(entity);
+
+        response.put("success", true);
+        response.put("message", "设计已完成并保存");
+        response.put("id", entity.getId());
+        response.put("designDuration", designDurationSeconds);
+        response.put("efficiencyIndex", efficiencyIndex);
+        response.put("optimizationSuggestions", entity.getOptimizationSuggestions());
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getEfficiencyStatistics() {
+        Map<String, Object> response = new HashMap<>();
+
+        // 获取所有已设计过的题目
+        List<QuestionGenerator> designedQuestions = questionGeneratorRepository.findAll().stream()
+                .filter(question -> question.getDesignDuration() != null && question.getDesignDuration() > 0)
+                .collect(Collectors.toList());
+
+        if (designedQuestions.isEmpty()) {
+            response.put("success", true);
+            response.put("message", "暂无课后练习设计效率数据");
+            response.put("hasData", false);
+            return response;
+        }
+
+        // 计算平均设计时长
+        double avgDesignDuration = designedQuestions.stream()
+                .mapToLong(QuestionGenerator::getDesignDuration)
+                .average()
+                .orElse(0);
+
+        // 计算平均效率指数
+        double avgEfficiencyIndex = designedQuestions.stream()
+                .mapToDouble(question -> question.getEfficiencyIndex() != null ? question.getEfficiencyIndex() : 0)
+                .average()
+                .orElse(0);
+
+        // 找出效率最高和最低的题目
+        QuestionGenerator mostEfficient = designedQuestions.stream()
+                .max(Comparator.comparing(q -> q.getEfficiencyIndex() != null ? q.getEfficiencyIndex() : 0))
+                .orElse(null);
+
+        QuestionGenerator leastEfficient = designedQuestions.stream()
+                .min(Comparator
+                        .comparing(q -> q.getEfficiencyIndex() != null ? q.getEfficiencyIndex() : Double.MAX_VALUE))
+                .orElse(null);
+
+        // 按月统计效率趋势
+        Map<String, Double> monthlyEfficiency = new HashMap<>();
+        Map<String, Integer> monthlyCount = new HashMap<>();
+
+        designedQuestions.forEach(question -> {
+            if (question.getDesignEndTime() != null && question.getEfficiencyIndex() != null) {
+                String monthKey = question.getDesignEndTime().getYear() + "-" +
+                        String.format("%02d", question.getDesignEndTime().getMonthValue());
+
+                // 累加效率指数
+                monthlyEfficiency.merge(monthKey, question.getEfficiencyIndex(), Double::sum);
+
+                // 计数
+                monthlyCount.merge(monthKey, 1, Integer::sum);
+            }
+        });
+
+        // 计算每月平均效率
+        Map<String, Double> monthlyAvgEfficiency = new HashMap<>();
+        monthlyEfficiency.forEach((month, sum) -> {
+            int count = monthlyCount.getOrDefault(month, 1); // 避免除以零
+            monthlyAvgEfficiency.put(month, sum / count);
+        });
+
+        response.put("success", true);
+        response.put("hasData", true);
+        response.put("totalDesignedQuestions", designedQuestions.size());
+        response.put("avgDesignDuration", avgDesignDuration); // 单位：秒
+        response.put("avgEfficiencyIndex", avgEfficiencyIndex);
+
+        if (mostEfficient != null) {
+            Map<String, Object> mostEfficientData = new HashMap<>();
+            mostEfficientData.put("id", mostEfficient.getId());
+            mostEfficientData.put("query", mostEfficient.getQuery());
+            mostEfficientData.put("questionType", mostEfficient.getQuestionType());
+            mostEfficientData.put("efficiencyIndex", mostEfficient.getEfficiencyIndex());
+            response.put("mostEfficient", mostEfficientData);
+        }
+
+        if (leastEfficient != null) {
+            Map<String, Object> leastEfficientData = new HashMap<>();
+            leastEfficientData.put("id", leastEfficient.getId());
+            leastEfficientData.put("query", leastEfficient.getQuery());
+            leastEfficientData.put("questionType", leastEfficient.getQuestionType());
+            leastEfficientData.put("efficiencyIndex", leastEfficient.getEfficiencyIndex());
+            response.put("leastEfficient", leastEfficientData);
+        }
+
+        response.put("monthlyEfficiency", monthlyAvgEfficiency);
+
+        return response;
+    }
+
+    @Override
+    public Map<String, Object> getOptimizationSuggestions(Long id) {
+        Map<String, Object> response = new HashMap<>();
+
+        Optional<QuestionGenerator> optionalEntity = questionGeneratorRepository.findById(id);
+        if (optionalEntity.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "找不到指定的题目生成任务");
+            return response;
+        }
+
+        QuestionGenerator entity = optionalEntity.get();
+        if (entity.getEfficiencyIndex() == null) {
+            response.put("success", false);
+            response.put("message", "此题目尚未完成设计或计算效率指数");
+            return response;
+        }
+
+        response.put("success", true);
+        response.put("id", entity.getId());
+        response.put("query", entity.getQuery());
+        response.put("questionType", entity.getQuestionType());
+        response.put("designDuration", entity.getDesignDuration());
+        response.put("efficiencyIndex", entity.getEfficiencyIndex());
+        response.put("optimizationSuggestions", entity.getOptimizationSuggestions());
+
+        // 基于效率指数提供额外的建议
+        StringBuilder additionalSuggestions = new StringBuilder();
+        if (entity.getEfficiencyIndex() < 70) {
+            additionalSuggestions.append("- 建议利用更多模板和参考资料，提高设计效率。\n");
+            additionalSuggestions.append("- 可以考虑使用题库或自动生成工具辅助设计。\n");
+        } else if (entity.getEfficiencyIndex() > 90) {
+            additionalSuggestions.append("- 您的设计效率很高，建议分享您的经验给其他教师。\n");
+            additionalSuggestions.append("- 可以尝试设计更复杂和创新性的题目，进一步提升质量。\n");
+        }
+
+        if (!additionalSuggestions.toString().isEmpty()) {
+            response.put("additionalSuggestions", additionalSuggestions.toString());
+        }
+
+        return response;
+    }
+
     @Async("questionGeneratorTaskExecutor")
     protected void generateQuestionAsync(Long id, String query, Long ragId, String ragName, String questionType) {
         QuestionGenerator entity = questionGeneratorRepository.findById(id).orElse(null);
