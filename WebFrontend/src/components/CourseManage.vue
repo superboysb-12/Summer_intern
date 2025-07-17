@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, User, Files, Notebook } from '@element-plus/icons-vue'
+import { Search, Plus, Edit, Delete, RefreshRight, DataAnalysis, User, Files, Notebook, Link } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import { useRouter } from 'vue-router'
@@ -48,6 +48,13 @@ const homeworkDialogVisible = ref(false)
 const currentCourseId = ref(null)
 const currentCourseName = ref('')
 
+// RAG管理相关变量
+const ragDialogVisible = ref(false)
+const ragList = ref([])
+const availableRags = ref([])
+const ragLoading = ref(false)
+const selectedRag = ref('')
+
 // 打开课程资源管理对话框
 const openCourseFileDialog = (course) => {
   currentCourseId.value = course.courseId
@@ -60,6 +67,110 @@ const openHomeworkDialog = (course) => {
   currentCourseId.value = course.courseId
   currentCourseName.value = course.name
   homeworkDialogVisible.value = true
+}
+
+// 打开RAG管理对话框
+const openRagDialog = async (course) => {
+  currentCourseId.value = course.courseId
+  currentCourseName.value = course.name
+  ragDialogVisible.value = true
+  await getCourseRags()
+  await getAvailableRags()
+}
+
+// 获取课程关联的RAG
+const getCourseRags = async () => {
+  if (!currentCourseId.value) return
+  
+  ragLoading.value = true
+  try {
+    const response = await axios.get(`${BaseUrl}courses/${currentCourseId.value}/rags`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (Array.isArray(response.data)) {
+      ragList.value = response.data
+    } else {
+      ragList.value = []
+    }
+  } catch (error) {
+    console.error('获取课程RAG列表失败:', error)
+    ElMessage.error('获取课程RAG列表失败')
+  } finally {
+    ragLoading.value = false
+  }
+}
+
+// 获取所有可用的RAG
+const getAvailableRags = async () => {
+  try {
+    const response = await axios.get(`${BaseUrl}api/rag`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      // 过滤掉已经关联的RAG
+      const currentRagIds = ragList.value.map(rag => rag.id)
+      availableRags.value = response.data.data.filter(rag => !currentRagIds.includes(rag.id))
+    } else {
+      availableRags.value = []
+    }
+  } catch (error) {
+    console.error('获取可用RAG列表失败:', error)
+    ElMessage.error('获取可用RAG列表失败')
+  }
+}
+
+// 添加RAG到课程
+const addRagToCourse = async () => {
+  if (!selectedRag.value) {
+    ElMessage.warning('请选择要添加的RAG')
+    return
+  }
+  
+  try {
+    await axios.post(`${BaseUrl}courses/${currentCourseId.value}/rags/${selectedRag.value}`, null, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    ElMessage.success('RAG关联成功')
+    selectedRag.value = ''
+    await getCourseRags()
+    await getAvailableRags()
+  } catch (error) {
+    console.error('添加RAG到课程失败:', error)
+    ElMessage.error('添加RAG到课程失败: ' + (error.response?.data?.message || error.message))
+  }
+}
+
+// 从课程移除RAG
+const removeRagFromCourse = async (ragId) => {
+  ElMessageBox.confirm('确认要移除该RAG关联吗？', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await axios.delete(`${BaseUrl}courses/${currentCourseId.value}/rags/${ragId}`, {
+        headers: {
+          'Authorization': `Bearer ${getToken()}`
+        }
+      })
+      
+      ElMessage.success('RAG关联已移除')
+      await getCourseRags()
+      await getAvailableRags()
+    } catch (error) {
+      console.error('移除RAG关联失败:', error)
+      ElMessage.error('移除RAG关联失败: ' + (error.response?.data?.message || error.message))
+    }
+  }).catch(() => {})
 }
 
 // 表单校验规则
@@ -283,82 +394,91 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="course-manage-container">
-    <div class="page-header">
-      <h2>课程管理</h2>
-      <p>管理课程信息，包括创建、编辑和删除课程</p>
+  <div class="container">
+    <div class="page-header mb-lg">
+      <h2 class="text-2xl mb-sm">课程管理</h2>
+      <p class="text-secondary">管理课程信息，包括创建、编辑和删除课程</p>
     </div>
     
     <!-- 搜索工具栏 -->
-    <el-card class="search-card">
-      <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="关键词">
-          <el-input
-            v-model="queryParams.keyword"
-            placeholder="课程名称或描述"
-            clearable
-            @keyup.enter="handleSearch"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
-          <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
+    <el-card class="mb-md">
+      <div class="card-body">
+        <el-form :model="queryParams" ref="queryForm" :inline="true">
+          <el-form-item label="关键词">
+            <el-input
+              v-model="queryParams.keyword"
+              placeholder="课程名称或描述"
+              clearable
+              @keyup.enter="handleSearch"
+            />
+          </el-form-item>
+          <el-form-item>
+            <div class="d-flex gap-sm">
+              <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+              <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
     </el-card>
     
     <!-- 操作工具栏 -->
-    <div class="toolbar">
+    <div class="d-flex justify-between mb-md">
       <el-button type="primary" :icon="Plus" @click="handleAdd">新增课程</el-button>
       <el-button :icon="RefreshRight" @click="refreshList">刷新</el-button>
     </div>
     
     <!-- 课程列表 -->
-    <el-card class="table-card">
-      <el-table
-        v-loading="loading"
-        :data="courseList"
-        border
-        stripe
-        style="width: 100%"
-      >
-        <el-table-column type="index" width="50" align="center" />
-        <el-table-column prop="courseId" label="ID" width="80" align="center" />
-        <el-table-column prop="name" label="课程名称" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="description" label="课程描述" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="createdAt" label="创建时间" min-width="160" align="center">
-          <template #default="scope">
-            {{ formatDate(scope.row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="updatedAt" label="更新时间" min-width="160" align="center">
-          <template #default="scope">
-            {{ formatDate(scope.row.updatedAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="450" fixed="right">
-          <template #default="scope">
-            <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.courseId)">删除</el-button>
-            <el-button type="success" link :icon="DataAnalysis" @click="viewCourseData(scope.row.courseId)">数据查看</el-button>
-            <el-button type="info" link :icon="User" @click="viewEnrollments(scope.row)">选课情况</el-button>
-            <el-button type="warning" link :icon="Files" @click="openCourseFileDialog(scope.row)">课程资源</el-button>
-            <el-button type="primary" link :icon="Notebook" @click="openHomeworkDialog(scope.row)">作业管理</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="getCourseList"
-          @current-change="getCourseList"
-        />
+    <el-card class="mb-lg">
+      <div class="card-body">
+        <el-table
+          v-loading="loading"
+          :data="courseList"
+          border
+          stripe
+          style="width: 100%"
+        >
+          <el-table-column type="index" width="50" align="center" />
+          <el-table-column prop="courseId" label="ID" width="80" align="center" />
+          <el-table-column prop="name" label="课程名称" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="description" label="课程描述" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="createdAt" label="创建时间" min-width="160" align="center">
+            <template #default="scope">
+              {{ formatDate(scope.row.createdAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="updatedAt" label="更新时间" min-width="160" align="center">
+            <template #default="scope">
+              {{ formatDate(scope.row.updatedAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="520" fixed="right">
+            <template #default="scope">
+              <div class="d-flex gap-sm flex-wrap">
+                <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.courseId)">删除</el-button>
+                <el-button type="success" link :icon="DataAnalysis" @click="viewCourseData(scope.row.courseId)">数据查看</el-button>
+                <el-button type="info" link :icon="User" @click="viewEnrollments(scope.row)">选课情况</el-button>
+                <el-button type="warning" link :icon="Files" @click="openCourseFileDialog(scope.row)">课程资源</el-button>
+                <el-button type="primary" link :icon="Notebook" @click="openHomeworkDialog(scope.row)">作业管理</el-button>
+                <el-button type="success" link :icon="Link" @click="openRagDialog(scope.row)">RAG管理</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        
+        <!-- 分页 -->
+        <div class="pagination-container mt-md d-flex justify-end">
+          <el-pagination
+            v-model:current-page="queryParams.pageNum"
+            v-model:page-size="queryParams.pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="getCourseList"
+            @current-change="getCourseList"
+          />
+        </div>
       </div>
     </el-card>
     
@@ -389,7 +509,7 @@ onMounted(() => {
         </el-form-item>
       </el-form>
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitForm(courseFormRef)">确定</el-button>
         </div>
@@ -422,62 +542,111 @@ onMounted(() => {
       :courseName="currentCourseName"
       @refresh="getCourseList"
     />
+    
+    <!-- RAG管理对话框 -->
+    <el-dialog
+      title="RAG知识库管理"
+      v-model="ragDialogVisible"
+      width="700px"
+      append-to-body
+    >
+      <div v-if="currentCourseId">
+        <h3 class="mb-md">{{ currentCourseName }} - RAG知识库关联</h3>
+        
+        <!-- 添加RAG关联部分 -->
+        <div class="mb-lg">
+          <el-card>
+            <template #header>
+              <div class="d-flex justify-between align-center">
+                <h4>添加RAG关联</h4>
+              </div>
+            </template>
+            
+            <div class="d-flex gap-md mb-md">
+              <el-select v-model="selectedRag" placeholder="选择要关联的RAG" style="width: 70%">
+                <el-option
+                  v-for="rag in availableRags"
+                  :key="rag.id"
+                  :label="rag.name"
+                  :value="rag.id"
+                />
+              </el-select>
+              <el-button type="primary" @click="addRagToCourse" :disabled="!selectedRag">添加关联</el-button>
+            </div>
+          </el-card>
+        </div>
+        
+        <!-- 已关联的RAG列表 -->
+        <el-card>
+          <template #header>
+            <div class="d-flex justify-between align-center">
+              <h4>已关联的RAG知识库</h4>
+              <el-button type="primary" :icon="RefreshRight" circle @click="getCourseRags" />
+            </div>
+          </template>
+          
+          <el-table
+            v-loading="ragLoading"
+            :data="ragList"
+            border
+            stripe
+            style="width: 100%"
+          >
+            <el-table-column type="index" width="50" align="center" />
+            <el-table-column prop="id" label="ID" width="80" align="center" />
+            <el-table-column prop="name" label="RAG名称" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="status" label="状态" width="120" align="center">
+              <template #default="scope">
+                <el-tag :type="scope.row.status === 'COMPLETED' ? 'success' : 'warning'">
+                  {{ scope.row.status }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="createdAt" label="创建时间" min-width="160" align="center">
+              <template #default="scope">
+                {{ formatDate(scope.row.createdAt) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="100" fixed="right">
+              <template #default="scope">
+                <el-button type="danger" link :icon="Delete" @click="removeRagFromCourse(scope.row.id)">移除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          
+          <div class="empty-block" v-if="ragList.length === 0 && !ragLoading">
+            <span class="empty-text">暂无关联的RAG知识库</span>
+          </div>
+        </el-card>
+      </div>
+      
+      <template #footer>
+        <div class="d-flex justify-end gap-sm">
+          <el-button @click="ragDialogVisible = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <style scoped>
-  .course-manage-container {
-    padding: 20px 0;
-  }
-  
-  .page-header {
-    margin-bottom: 24px;
-  }
-  
+/* 由于使用了全局样式，此处保留特殊样式覆盖或组件特有样式 */
+@media (max-width: 768px) {
   .page-header h2 {
-    margin: 0;
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: var(--text-lg);
   }
-  
-  .page-header p {
-    margin: 8px 0 0;
-    color: var(--text-secondary);
-    font-size: 14px;
-  }
-  
-  .search-card {
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-  }
-  
-  .toolbar {
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .table-card {
-    border-radius: 8px;
-    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-  }
-  
-  .pagination {
-    margin-top: 20px;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .dialog-footer {
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  @media (max-width: 768px) {
-    .page-header h2 {
-      font-size: 20px;
-    }
-  }
+}
+
+.empty-block {
+  min-height: 60px;
+  text-align: center;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-text {
+  color: #909399;
+}
 </style> 

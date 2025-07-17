@@ -1,19 +1,19 @@
 <template>
-  <div class="teaching-plan-editor-container">
+  <div class="container">
     <!-- 编辑器顶部工具栏 -->
-    <div class="editor-toolbar">
+    <div class="card-header mb-lg">
       <el-row :gutter="20" align="middle">
         <el-col :span="12">
-          <div class="toolbar-left">
-            <h2>教案编辑器</h2>
-            <div class="status-indicator">
+          <div class="flex items-center">
+            <h2 class="mr-md">教案编辑器</h2>
+            <div>
               <el-tag v-if="isEditing" type="warning">正在编辑</el-tag>
               <el-tag v-else-if="isSaved" type="success">已保存</el-tag>
             </div>
           </div>
         </el-col>
         <el-col :span="12">
-          <div class="toolbar-right">
+          <div class="flex justify-end gap-sm">
             <el-button type="primary" @click="saveTeachingPlan" :loading="saving" :disabled="!hasChanges">
               保存
             </el-button>
@@ -29,24 +29,25 @@
     </div>
     
     <!-- 编辑时长显示 -->
-    <div class="edit-time-display">
+    <div class="card bg-secondary radius-md mb-lg">
+      <div class="card-body">
       <el-row>
         <el-col :span="8">
-          <div class="time-block">
-            <div class="time-label">开始时间</div>
-            <div class="time-value">{{ formatDateTime(editStartTime) }}</div>
+            <div class="text-center">
+              <div class="text-tertiary mb-sm">开始时间</div>
+              <div class="text-md font-bold">{{ formatDateTime(editStartTime) }}</div>
           </div>
         </el-col>
         <el-col :span="8">
-          <div class="time-block">
-            <div class="time-label">已编辑时长</div>
-            <div class="time-value">{{ formatDuration(editDuration) }}</div>
+            <div class="text-center">
+              <div class="text-tertiary mb-sm">已编辑时长</div>
+              <div class="text-md font-bold">{{ formatDuration(editDuration) }}</div>
           </div>
         </el-col>
         <el-col :span="8">
-          <div class="time-block" v-if="showEfficiency">
-            <div class="time-label">效率指数</div>
-            <div class="time-value">
+            <div class="text-center" v-if="showEfficiency">
+              <div class="text-tertiary mb-sm">效率指数</div>
+              <div class="text-md font-bold">
               <el-progress 
                 :percentage="efficiencyIndex" 
                 :color="getEfficiencyColor"
@@ -57,13 +58,14 @@
           </div>
         </el-col>
       </el-row>
+      </div>
     </div>
     
     <!-- 编辑器主体 -->
-    <div class="editor-main">
+    <div class="card-body">
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane label="编辑内容" name="edit">
-          <div class="editor-area">
+          <div class="min-h-500">
             <el-input
               v-model="content"
               type="textarea"
@@ -74,8 +76,8 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="预览" name="preview">
-          <div class="preview-area">
-            <div v-html="formattedContent" class="preview-content"></div>
+          <div class="min-h-500 border radius-sm p-md overflow-auto">
+            <div v-html="formattedContent" class="line-height-md"></div>
           </div>
         </el-tab-pane>
       </el-tabs>
@@ -88,7 +90,7 @@
       width="700px"
       append-to-body
     >
-      <div class="efficiency-summary">
+      <div class="mb-xl">
         <el-row :gutter="20">
           <el-col :span="12">
             <el-statistic title="效率指数" :value="efficiencyIndex" :precision="2">
@@ -102,9 +104,11 @@
           </el-col>
         </el-row>
         
-        <div class="optimization-suggestions" v-if="optimizationSuggestions">
-          <h3>优化建议</h3>
-          <div v-html="formattedSuggestions" class="suggestions-content"></div>
+        <div class="mt-lg" v-if="optimizationSuggestions">
+          <h3 class="mb-md">优化建议</h3>
+          <div class="card-body bg-secondary radius-md">
+            <div v-html="formattedSuggestions" class="line-height-md"></div>
+          </div>
         </div>
       </div>
       
@@ -615,81 +619,16 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.teaching-plan-editor-container {
-  padding: 20px;
-}
-
-.editor-toolbar {
-  margin-bottom: 20px;
-}
-
-.toolbar-left {
-  display: flex;
-  align-items: center;
-}
-
-.toolbar-left h2 {
-  margin: 0;
-  margin-right: 15px;
-}
-
-.toolbar-right {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.edit-time-display {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-}
-
-.time-block {
-  text-align: center;
-}
-
-.time-label {
-  font-size: 14px;
-  color: #606266;
-  margin-bottom: 8px;
-}
-
-.time-value {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.editor-area {
+/* 添加自定义样式类 */
+.min-h-500 {
   min-height: 500px;
 }
 
-.preview-area {
-  min-height: 500px;
-  padding: 15px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  overflow-y: auto;
-}
-
-.preview-content {
+.line-height-md {
   line-height: 1.8;
 }
 
-.efficiency-summary {
-  margin-bottom: 30px;
-}
-
-.optimization-suggestions {
-  margin-top: 30px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-.suggestions-content {
-  margin-top: 10px;
-  line-height: 1.6;
+.font-bold {
+  font-weight: bold;
 }
 </style> 

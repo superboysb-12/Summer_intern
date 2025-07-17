@@ -509,10 +509,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="container">
     <!-- 搜索工具栏 -->
-    <div class="search-bar">
-      <el-form :inline="true" :model="queryParams" class="search-form">
+    <el-card class="search-card">
+      <el-form :inline="true" :model="queryParams">
         <el-form-item>
           <el-input
             v-model="queryParams.keyword"
@@ -530,20 +530,25 @@ onBeforeUnmount(() => {
           <el-button @click="resetSearch">重置</el-button>
         </el-form-item>
       </el-form>
-      <div class="action-buttons">
+    </el-card>
+    
+    <!-- 操作工具栏 -->
+    <div class="toolbar">
+      <div class="flex gap-sm flex-wrap">
         <el-button type="primary" :icon="Plus" @click="handleGenerate">生成教案</el-button>
         <el-button type="success" :icon="Histogram" @click="viewEfficiencyStatistics">教学效率统计</el-button>
-        <el-button type="default" :icon="RefreshRight" @click="getTeachingPlanList">刷新</el-button>
+        <el-button :icon="RefreshRight" @click="getTeachingPlanList">刷新</el-button>
       </div>
     </div>
     
     <!-- 教案列表表格 -->
+    <el-card class="table-card">
     <el-table
       v-loading="loading"
       :data="teachingPlanList"
       border
       stripe
-      style="width: 100%; margin-top: 15px;"
+        style="width: 100%;"
     >
       <el-table-column prop="id" label="ID" width="80" />
       <el-table-column prop="prompt" label="提示词" min-width="150" show-overflow-tooltip />
@@ -569,6 +574,7 @@ onBeforeUnmount(() => {
       </el-table-column>
       <el-table-column label="操作" width="200" fixed="right">
         <template #default="{ row }">
+            <div class="flex justify-center gap-sm flex-wrap">
           <el-button 
             v-if="row.status === 'PENDING'" 
             type="info" 
@@ -604,12 +610,13 @@ onBeforeUnmount(() => {
           >
             效率指数
           </el-button>
+            </div>
         </template>
       </el-table-column>
     </el-table>
     
     <!-- 分页控件 -->
-    <div class="pagination-container">
+      <div class="pagination">
       <el-pagination
         v-if="total > 0"
         :current-page="queryParams.pageNum"
@@ -621,6 +628,7 @@ onBeforeUnmount(() => {
         @current-change="val => { queryParams.pageNum = val; getTeachingPlanList() }"
       />
     </div>
+    </el-card>
     
     <!-- 生成教案对话框 -->
     <el-dialog 
@@ -675,7 +683,7 @@ onBeforeUnmount(() => {
           </el-select>
         </el-form-item>
         
-        <div class="form-tips">
+        <div class="card-body bg-secondary radius-md text-sm text-tertiary">
           <p><i class="el-icon-info"></i> 提示：教案生成是异步处理的，可能需要较长时间（约15分钟）才能完成。</p>
           <p v-if="generateForm.useRag"><i class="el-icon-info"></i> 使用RAG可以基于知识图谱生成更加专业的教案。</p>
         </div>
@@ -709,15 +717,15 @@ onBeforeUnmount(() => {
             </el-col>
           </el-row>
           
-          <div class="stats-section" v-if="efficiencyStats.mostEfficient">
-            <h4>效率最高的教案</h4>
-            <p>
-              <span class="label">提示词：</span>
+          <div class="card bg-secondary radius-md p-md mt-lg" v-if="efficiencyStats.mostEfficient">
+            <h4 class="mb-sm">效率最高的教案</h4>
+            <p class="mb-sm">
+              <span class="font-bold text-tertiary mr-sm">提示词：</span>
               <span>{{ efficiencyStats.mostEfficient.prompt }}</span>
             </p>
-            <p>
-              <span class="label">效率指数：</span>
-              <span class="value high">{{ efficiencyStats.mostEfficient.efficiencyIndex.toFixed(2) }}</span>
+            <p class="mb-sm">
+              <span class="font-bold text-tertiary mr-sm">效率指数：</span>
+              <span class="font-bold text-success">{{ efficiencyStats.mostEfficient.efficiencyIndex.toFixed(2) }}</span>
             </p>
             <el-button 
               type="primary" 
@@ -728,15 +736,15 @@ onBeforeUnmount(() => {
             </el-button>
           </div>
           
-          <div class="stats-section" v-if="efficiencyStats.leastEfficient">
-            <h4>效率最低的教案</h4>
-            <p>
-              <span class="label">提示词：</span>
+          <div class="card bg-secondary radius-md p-md mt-lg" v-if="efficiencyStats.leastEfficient">
+            <h4 class="mb-sm">效率最低的教案</h4>
+            <p class="mb-sm">
+              <span class="font-bold text-tertiary mr-sm">提示词：</span>
               <span>{{ efficiencyStats.leastEfficient.prompt }}</span>
             </p>
-            <p>
-              <span class="label">效率指数：</span>
-              <span class="value low">{{ efficiencyStats.leastEfficient.efficiencyIndex.toFixed(2) }}</span>
+            <p class="mb-sm">
+              <span class="font-bold text-tertiary mr-sm">效率指数：</span>
+              <span class="font-bold text-danger">{{ efficiencyStats.leastEfficient.efficiencyIndex.toFixed(2) }}</span>
             </p>
             <el-button 
               type="primary" 
@@ -747,15 +755,15 @@ onBeforeUnmount(() => {
             </el-button>
           </div>
           
-          <div class="stats-chart" v-if="efficiencyStats.monthlyEfficiency">
-            <h4>月度效率指数趋势</h4>
+          <div class="mt-lg" v-if="efficiencyStats.monthlyEfficiency">
+            <h4 class="mb-sm">月度效率指数趋势</h4>
             <div ref="efficiencyChartRef" style="height: 300px"></div>
           </div>
         </div>
         
-        <div v-else class="no-data-message">
+        <div v-else class="flex flex-col items-center justify-center py-xl">
           <el-empty description="暂无教学效率数据" />
-          <p class="tip">编辑并完成至少一份教案后，即可查看效率统计</p>
+          <p class="text-tertiary text-sm text-center mt-sm">编辑并完成至少一份教案后，即可查看效率统计</p>
         </div>
       </div>
     </el-dialog>
@@ -781,13 +789,13 @@ onBeforeUnmount(() => {
             <el-descriptions-item label="编辑时长">{{ formatDuration(currentEfficiency.editDuration) }}</el-descriptions-item>
           </el-descriptions>
           
-          <div class="optimization-section" v-if="currentEfficiency.optimizationSuggestions">
-            <h4>优化建议</h4>
-            <div v-html="formatSuggestions(currentEfficiency.optimizationSuggestions)" class="suggestions"></div>
+          <div class="mt-lg" v-if="currentEfficiency.optimizationSuggestions">
+            <h4 class="mb-md">优化建议</h4>
+            <div v-html="formatSuggestions(currentEfficiency.optimizationSuggestions)" class="card-body bg-secondary radius-md line-height-md"></div>
           </div>
         </div>
         
-        <div v-else class="no-data-message">
+        <div v-else class="flex flex-col items-center justify-center py-lg">
           <p>无法获取效率数据</p>
         </div>
       </div>
@@ -796,100 +804,30 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.app-container {
-  padding: 20px;
+/* 添加特定的自定义样式 */
+.text-success {
+  color: var(--success-color);
 }
 
-.search-bar {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+.text-danger {
+  color: var(--danger-color);
 }
 
-.search-form {
-  display: flex;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.pagination-container {
-  margin-top: 15px;
-  display: flex;
-  justify-content: center;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-
-.form-tips {
-  margin: 10px 0;
-  padding: 8px 12px;
-  background-color: #f4f4f5;
-  border-radius: 4px;
-  color: #666;
-  font-size: 0.9em;
-}
-
-.stats-section {
-  margin-top: 25px;
-  padding: 15px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-}
-
-.stats-chart {
-  margin-top: 25px;
-}
-
-.label {
-  font-weight: bold;
-  color: #606266;
-  margin-right: 10px;
-}
-
-.value {
+.font-bold {
   font-weight: bold;
 }
 
-.value.high {
-  color: #67C23A;
-}
-
-.value.low {
-  color: #F56C6C;
-}
-
-.optimization-section {
-  margin-top: 20px;
-}
-
-.suggestions {
-  padding: 10px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
+.line-height-md {
   line-height: 1.6;
 }
 
-.tip {
-  color: #909399;
-  font-size: 0.9em;
-  text-align: center;
-  margin-top: 10px;
+.py-xl {
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
 }
 
-.no-data-message {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 30px 0;
+.py-lg {
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
 }
 </style> 

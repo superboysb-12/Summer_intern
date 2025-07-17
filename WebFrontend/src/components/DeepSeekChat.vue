@@ -4,6 +4,14 @@ import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, Delete, Download, RefreshRight, Connection, ChatLineSquare } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
+import MarkdownIt from 'markdown-it'
+
+// Initialize markdown parser
+const md = new MarkdownIt({
+  html: true,
+  breaks: true,
+  linkify: true
+})
 
 const store = useCounterStore()
 const BaseUrl = 'http://localhost:8080/'
@@ -33,6 +41,11 @@ const chatHistory = reactive({
   title: '新的对话',
   messages: []
 })
+
+// 渲染markdown内容
+const renderMarkdown = (content) => {
+  return md.render(content);
+}
 
 // 学习帮助助手提示词
 const learningAssistantPrompt = `# 学习帮助助手提示词
@@ -473,24 +486,24 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="deepseek-chat">
+  <div class="deepseek-container d-flex h-full w-full">
     <!-- 左侧边栏 - 聊天历史 -->
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h2>对话历史</h2>
+    <div class="sidebar bg-white border-right">
+      <div class="sidebar-header d-flex justify-between align-center p-md border-bottom">
+        <h2 class="text-md text-bold m-0">对话历史</h2>
         <el-button type="primary" size="small" @click="clearChat" :icon="Plus">新对话</el-button>
       </div>
       
-      <div class="chat-list">
+      <div class="sidebar-content p-sm overflow-auto">
         <div v-for="chat in savedChats" :key="chat.id" 
-             class="chat-item" 
-             :class="{ active: chat.id === chatHistory.id }" 
+             class="sidebar-item d-flex justify-between align-center rounded-md mb-xs p-sm cursor-pointer" 
+             :class="{ 'bg-primary-light border-left-primary': chat.id === chatHistory.id }" 
              @click="loadChat(chat.id)">
-          <div class="chat-item-content">
-            <el-icon><ChatLineSquare /></el-icon>
-            <span class="chat-title">{{ chat.title }}</span>
+          <div class="d-flex align-center gap-xs overflow-hidden">
+            <el-icon class="text-primary"><ChatLineSquare /></el-icon>
+            <span class="text-ellipsis">{{ chat.title }}</span>
           </div>
-          <div class="chat-item-actions">
+          <div class="sidebar-item-actions">
             <el-button type="text" size="small" @click.stop="deleteChat(chat.id)" :icon="Delete"></el-button>
           </div>
         </div>
@@ -498,16 +511,15 @@ onUnmounted(() => {
     </div>
     
     <!-- 主聊天区域 -->
-    <div class="main-content">
+    <div class="main-content d-flex flex-col h-full">
       <!-- 聊天头部 -->
-      <div class="chat-header">
-        <h1>{{ chatHistory.title }}</h1>
-        <div class="header-actions">
+      <div class="main-header sticky-top d-flex justify-between align-center p-md border-bottom bg-white">
+        <h1 class="text-lg text-bold m-0">{{ chatHistory.title }}</h1>
+        <div class="d-flex align-center gap-md">
           <el-switch
             v-model="useRag"
             active-text="启用知识库"
             inactive-text="不使用知识库"
-            class="rag-switch"
           />
           
           <el-select 
@@ -515,7 +527,7 @@ onUnmounted(() => {
             v-model="selectedRag" 
             placeholder="选择知识库" 
             size="small"
-            class="rag-select">
+            class="w-180px">
             <el-option
               v-for="item in ragList"
               :key="item.id"
@@ -531,40 +543,46 @@ onUnmounted(() => {
       </div>
       
       <!-- 聊天消息区域 -->
-      <div class="chat-messages">
-        <div v-if="displayedMessages.length === 0" class="empty-chat">
-          <div class="empty-chat-content">
-            <el-icon :size="64"><ChatLineSquare /></el-icon>
-            <h2>开始一个新的对话</h2>
-            <p>使用DeepSeek AI作为你的学习助手</p>
+      <div class="chat-messages flex-1 p-lg overflow-auto bg-secondary">
+        <div v-if="displayedMessages.length === 0" class="d-flex justify-center align-center h-full">
+          <div class="empty-state text-center p-xl bg-white rounded-lg shadow-sm">
+            <el-icon :size="64" class="text-primary mb-sm"><ChatLineSquare /></el-icon>
+            <h2 class="text-lg text-bold mb-xs">开始一个新的对话</h2>
+            <p class="text-tertiary">使用DeepSeek AI作为你的学习助手</p>
           </div>
         </div>
         
         <template v-else>
-          <div v-for="(message, index) in displayedMessages" :key="index" class="message" :class="message.role">
-            <div class="message-header">
-              <span class="role-badge">{{ message.role === 'user' ? '我' : 'DeepSeek AI' }}</span>
+          <div v-for="(message, index) in displayedMessages" 
+               :key="index" 
+               class="message-wrapper mb-lg" 
+               :class="{ 'justify-end': message.role === 'user' }">
+            <div class="message-container" :class="{ 'user': message.role === 'user', 'assistant': message.role === 'assistant' }">
+              <div class="message-header d-flex align-center mb-xs px-sm">
+                <span class="message-role">{{ message.role === 'user' ? '我' : 'DeepSeek AI' }}</span>
             </div>
-            <div class="message-content" :class="{ 'loading': message.isLoading }">
-              <div v-if="message.isLoading" class="loading-indicator">
+              <div class="message-content p-lg rounded-lg bg-white" :class="{ 'bg-primary-light': message.role === 'user', 'loading': message.isLoading }">
+                <div v-if="message.isLoading" class="loading-indicator d-flex justify-center p-sm">
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
               </div>
-              <div v-else v-html="message.content.replace(/\n/g, '<br>')"></div>
+              <div v-else v-html="renderMarkdown(message.content)"></div>
+              </div>
             </div>
           </div>
         </template>
       </div>
       
       <!-- 输入区域 -->
-      <div class="chat-input">
+      <div class="chat-input d-flex gap-md p-md border-top bg-white sticky-bottom">
         <el-input
           v-model="currentMessage"
           type="textarea"
           :rows="3"
           placeholder="输入您的问题..."
           resize="none"
+          class="flex-1"
           @keydown.enter.exact.prevent="sendMessage"
         />
         <el-button 
@@ -572,7 +590,7 @@ onUnmounted(() => {
           @click="sendMessage" 
           :loading="loading"
           :disabled="!currentMessage.trim()"
-          class="send-button">
+          class="h-auto">
           发送
         </el-button>
       </div>
@@ -581,7 +599,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-.deepseek-chat {
+.deepseek-container {
   display: flex;
   height: 100%;
   width: 100%;
@@ -590,24 +608,22 @@ onUnmounted(() => {
   background-color: #f8fafc;
 }
 
-/* 左侧边栏样式 */
 .sidebar {
   width: 280px;
-  background-color: #fff;
-  border-right: 1px solid #eaeef2;
-  display: flex;
-  flex-direction: column;
   height: 100%;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   z-index: 2;
+  background-color: #f0f2f5;
+  border-right: 1px solid #dfe3e8;
 }
 
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid #eaeef2;
+  border-bottom: 1px solid #dfe3e8;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background-color: #ffffff;
 }
 
 .sidebar-header h2 {
@@ -618,14 +634,14 @@ onUnmounted(() => {
   letter-spacing: -0.02em;
 }
 
-.chat-list {
+.sidebar-content {
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+  -webkit-overflow-scrolling: touch;
 }
 
-.chat-item {
+.sidebar-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -634,31 +650,32 @@ onUnmounted(() => {
   margin-bottom: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  background-color: rgba(255, 255, 255, 0.7);
 }
 
-.chat-item:hover {
-  background-color: #f2f5f8;
+.sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 1);
   transform: translateY(-1px);
 }
 
-.chat-item.active {
+.sidebar-item.active {
   background-color: #ecf4fe;
   border-left: 3px solid #3e7bfa;
 }
 
-.chat-item-content {
+.sidebar-item-content {
   display: flex;
   align-items: center;
   gap: 10px;
   overflow: hidden;
 }
 
-.chat-item-content .el-icon {
+.sidebar-item-content .el-icon {
   color: #3e7bfa;
   font-size: 18px;
 }
 
-.chat-title {
+.sidebar-title {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -666,25 +683,26 @@ onUnmounted(() => {
   font-weight: 500;
 }
 
-.chat-item-actions {
+.sidebar-item-actions {
   opacity: 0;
   transition: opacity 0.2s ease;
 }
 
-.chat-item:hover .chat-item-actions {
+.sidebar-item:hover .sidebar-item-actions {
   opacity: 1;
 }
 
-/* 主内容区域样式 */
 .main-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   height: 100%;
   position: relative;
+  background-color: #ffffff;
+  border-left: 1px solid #eaeef2;
 }
 
-.chat-header {
+.main-header {
   padding: 16px 24px;
   border-bottom: 1px solid #eaeef2;
   display: flex;
@@ -695,9 +713,10 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 1;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
-.chat-header h1 {
+.main-header h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
@@ -719,16 +738,15 @@ onUnmounted(() => {
   width: 180px;
 }
 
-/* 聊天消息区域 */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 30px;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
   background-image: radial-gradient(circle at 25px 25px, rgba(0, 0, 0, 0.02) 2%, transparent 0%), 
                     radial-gradient(circle at 75px 75px, rgba(0, 0, 0, 0.02) 2%, transparent 0%);
   background-size: 100px 100px;
-  -webkit-overflow-scrolling: touch; /* 增强iOS滚动体验 */
+  -webkit-overflow-scrolling: touch;
 }
 
 .empty-chat {
@@ -772,8 +790,8 @@ onUnmounted(() => {
   margin-top: 0;
 }
 
-.message {
-  margin-bottom: 28px;
+.message-wrapper {
+  display: flex;
   max-width: 85%;
   animation: message-appear 0.3s ease-out forwards;
 }
@@ -789,29 +807,20 @@ onUnmounted(() => {
   }
 }
 
-.message.user {
-  margin-left: auto;
+.message-container {
+  max-width: 100%;
 }
 
-.message.assistant {
-  margin-right: auto;
-}
-
-.message-header {
-  margin-bottom: 8px;
-  padding: 0 12px;
-}
-
-.role-badge {
-  font-size: 13px;
+.message-role {
+  font-size: var(--text-sm);
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.role-badge::before {
+.message-role::before {
   content: "";
   display: inline-block;
   width: 8px;
@@ -819,50 +828,89 @@ onUnmounted(() => {
   border-radius: 50%;
 }
 
-.message.user .role-badge::before {
-  background-color: #3e7bfa;
+.user .message-role::before {
+  background-color: var(--primary);
 }
 
-.message.assistant .role-badge::before {
-  background-color: #10b981;
+.assistant .message-role::before {
+  background-color: var(--success);
 }
 
 .message-content {
-  padding: 16px 20px;
-  border-radius: 12px;
-  background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  font-size: 15px;
+  box-shadow: var(--shadow-sm);
+  font-size: var(--text-sm);
   line-height: 1.6;
   transition: transform 0.2s ease;
+  border-radius: 18px;
+  padding: 16px 20px !important;
 }
 
 .message-content:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
 }
 
-.message.user .message-content {
-  background-color: #ecf4fe;
-  border: 1px solid #dae7fd;
-  border-top-right-radius: 4px;
+.user .message-content {
+  border-top-right-radius: 4px !important;
+  background-color: #5b9dfa !important;
+  color: white;
+  box-shadow: 0 2px 8px rgba(91, 157, 250, 0.25);
 }
 
-.message.assistant .message-content {
-  background-color: #fff;
+.assistant .message-content {
+  border-top-left-radius: 4px !important;
+  background-color: #ffffff !important;
   border: 1px solid #eaeef2;
-  border-top-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .message-content.loading {
   background-color: #f4f5f6;
 }
 
+/* Markdown styling for messages */
+.message-content :deep(p) {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.message-content :deep(pre) {
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.assistant .message-content :deep(pre) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.user .message-content :deep(pre) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.message-content :deep(code) {
+  font-family: monospace;
+}
+
+.message-content :deep(ul), .message-content :deep(ol) {
+  padding-left: 20px;
+  margin: 0.5em 0;
+}
+
+.message-content :deep(blockquote) {
+  border-left: 4px solid #dfe3e8;
+  padding-left: 10px;
+  margin-left: 0;
+  color: #6b7280;
+}
+
+.user .message-content :deep(blockquote) {
+  border-left-color: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .loading-indicator {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  justify-content: center;
   height: 24px;
 }
 
@@ -870,7 +918,8 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #3e7bfa;
+  background-color: var(--primary);
+  margin: 0 2px;
   animation: dot-pulse 1.5s infinite ease-in-out;
 }
 
@@ -893,7 +942,6 @@ onUnmounted(() => {
   }
 }
 
-/* 输入区域 */
 .chat-input {
   padding: 20px 24px;
   border-top: 1px solid #eaeef2;
@@ -904,7 +952,7 @@ onUnmounted(() => {
   backdrop-filter: blur(8px);
   position: sticky;
   bottom: 0;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .chat-input .el-input {
@@ -948,24 +996,24 @@ onUnmounted(() => {
 }
 
 /* 滚动条样式 */
-.chat-messages::-webkit-scrollbar, 
-.chat-list::-webkit-scrollbar {
+.sidebar-content::-webkit-scrollbar,
+.chat-messages::-webkit-scrollbar {
   width: 6px;
 }
 
-.chat-messages::-webkit-scrollbar-track, 
-.chat-list::-webkit-scrollbar-track {
+.sidebar-content::-webkit-scrollbar-track,
+.chat-messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.chat-messages::-webkit-scrollbar-thumb, 
-.chat-list::-webkit-scrollbar-thumb {
+.sidebar-content::-webkit-scrollbar-thumb,
+.chat-messages::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 6px;
 }
 
-.chat-messages::-webkit-scrollbar-thumb:hover, 
-.chat-list::-webkit-scrollbar-thumb:hover {
+.sidebar-content::-webkit-scrollbar-thumb:hover,
+.chat-messages::-webkit-scrollbar-thumb:hover {
   background-color: rgba(0, 0, 0, 0.2);
 }
 </style>

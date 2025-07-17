@@ -453,30 +453,34 @@ onMounted(() => {
     @update:modelValue="handleClose"
     destroy-on-close
   >
-    <div class="homework-manage-container">
+    <div class="container">
       <!-- Filter section -->
-      <div class="filter-section">
-        <el-form :inline="true" :model="queryParams">
-          <el-form-item label="作业状态">
-            <el-select v-model="queryParams.status" placeholder="选择状态" clearable>
-              <el-option
-                v-for="item in statusOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form-item>
-          
-          <el-form-item>
-            <el-button type="primary" @click="applyFilter">筛选</el-button>
-            <el-button @click="resetFilter">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <el-card class="mb-md">
+        <div class="card-body">
+          <el-form :inline="true" :model="queryParams">
+            <el-form-item label="作业状态">
+              <el-select v-model="queryParams.status" placeholder="选择状态" clearable>
+                <el-option
+                  v-for="item in statusOptions"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            
+            <el-form-item>
+              <div class="d-flex gap-sm">
+                <el-button type="primary" @click="applyFilter">筛选</el-button>
+                <el-button @click="resetFilter">重置</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-card>
       
       <!-- Toolbar -->
-      <div class="toolbar">
+      <div class="d-flex justify-between mb-md">
         <div>
           <el-button type="primary" :icon="Plus" @click="openAddHomeworkDialog" v-if="isTeacher || isAdmin">
             布置作业
@@ -490,79 +494,86 @@ onMounted(() => {
       </div>
       
       <!-- Homework list -->
-      <el-table
-        v-loading="loading"
-        :data="homeworkList"
-        border
-        style="width: 100%"
-      >
-        <el-table-column type="index" width="50" align="center" />
-        <el-table-column prop="title" label="作业标题" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="description" label="作业描述" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="status" label="状态" width="100" align="center">
-          <template #default="scope">
-            <el-tag :type="getStatusDisplay(scope.row.status).type">
-              {{ getStatusDisplay(scope.row.status).text }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="dueDate" label="截止日期" width="180" align="center">
-          <template #default="scope">
-            {{ formatDate(scope.row.dueDate) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="createdAt" label="创建时间" width="180" align="center">
-          <template #default="scope">
-            {{ formatDate(scope.row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="340" fixed="right" align="center">
-          <template #default="scope">
-            <div class="operation-buttons">
-              <el-button type="primary" link :icon="Edit" @click="openEditHomeworkDialog(scope.row)" v-if="isTeacher || isAdmin">编辑</el-button>
-              
-              <el-button 
-                v-if="scope.row.status !== 'PUBLISHED' && (isTeacher || isAdmin)" 
-                type="success" 
-                link 
-                :icon="Bell" 
-                @click="updateHomeworkStatus(scope.row, 'PUBLISHED')"
-              >
-                发布
-              </el-button>
-              
-              <el-button 
-                v-if="scope.row.status !== 'CLOSED' && (isTeacher || isAdmin)" 
-                type="info" 
-                link 
-                :icon="Bell" 
-                @click="updateHomeworkStatus(scope.row, 'CLOSED')"
-              >
-                关闭
-              </el-button>
-              
-              <el-button 
-                type="primary" 
-                link 
-                :icon="Document" 
-                @click="loadSubmissions(scope.row)"
-                v-if="isTeacher || isAdmin"
-              >
-                查看提交
-              </el-button>
-              
-              <el-button type="danger" link :icon="Delete" @click="deleteHomework(scope.row.id)" v-if="isTeacher || isAdmin">删除</el-button>
+      <el-card class="mb-lg">
+        <div class="card-body">
+          <el-table
+            v-loading="loading"
+            :data="homeworkList"
+            border
+            style="width: 100%"
+          >
+            <el-table-column type="index" width="50" align="center" />
+            <el-table-column prop="title" label="作业标题" min-width="150" show-overflow-tooltip />
+            <el-table-column prop="description" label="作业描述" min-width="200" show-overflow-tooltip />
+            <el-table-column prop="status" label="状态" width="100" align="center">
+              <template #default="scope">
+                <el-tag :type="getStatusDisplay(scope.row.status).type">
+                  {{ getStatusDisplay(scope.row.status).text }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column prop="dueDate" label="截止日期" width="180" align="center">
+              <template #default="scope">
+                {{ formatDate(scope.row.dueDate) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="createdAt" label="创建时间" width="180" align="center">
+              <template #default="scope">
+                {{ formatDate(scope.row.createdAt) }}
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="340" fixed="right" align="center">
+              <template #default="scope">
+                <div class="d-flex justify-center gap-sm flex-wrap">
+                  <el-button type="primary" link :icon="Edit" @click="openEditHomeworkDialog(scope.row)" v-if="isTeacher || isAdmin">编辑</el-button>
+                  
+                  <el-button 
+                    v-if="scope.row.status !== 'PUBLISHED' && (isTeacher || isAdmin)" 
+                    type="success" 
+                    link 
+                    :icon="Bell" 
+                    @click="updateHomeworkStatus(scope.row, 'PUBLISHED')"
+                  >
+                    发布
+                  </el-button>
+                  
+                  <el-button 
+                    v-if="scope.row.status !== 'CLOSED' && (isTeacher || isAdmin)" 
+                    type="info" 
+                    link 
+                    :icon="Bell" 
+                    @click="updateHomeworkStatus(scope.row, 'CLOSED')"
+                  >
+                    关闭
+                  </el-button>
+                  
+                  <el-button 
+                    type="primary" 
+                    link 
+                    :icon="Document" 
+                    @click="loadSubmissions(scope.row)"
+                    v-if="isTeacher || isAdmin"
+                  >
+                    查看提交
+                  </el-button>
+                  
+                  <el-button type="danger" link :icon="Delete" @click="deleteHomework(scope.row.id)" v-if="isTeacher || isAdmin">删除</el-button>
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          
+          <!-- Empty state -->
+          <el-empty v-if="homeworkList.length === 0 && !loading" description="暂无作业">
+            <div class="d-flex justify-center gap-sm" v-if="isTeacher || isAdmin">
+              <el-button type="primary" @click="openAddHomeworkDialog">布置作业</el-button>
             </div>
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <!-- Empty state -->
-      <el-empty v-if="homeworkList.length === 0 && !loading" description="暂无作业">
-        <div class="empty-state-buttons" v-if="isTeacher || isAdmin">
-          <el-button type="primary" @click="openAddHomeworkDialog">布置作业</el-button>
+          </el-empty>
+          
+          <!-- 分页 (如需添加) -->
+          <!-- <div class="pagination-container mt-md">...</div> -->
         </div>
-      </el-empty>
+      </el-card>
     </div>
     
     <!-- Add/Edit homework dialog -->
@@ -614,7 +625,7 @@ onMounted(() => {
       </el-form>
       
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="homeworkDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitHomeworkForm(homeworkFormRef)">确定</el-button>
         </div>
@@ -629,108 +640,110 @@ onMounted(() => {
       append-to-body
       destroy-on-close
     >
-      <div class="submissions-container" v-loading="submissionLoading">
-        <div class="submissions-header" v-if="currentHomework">
-          <h3>作业详情</h3>
-          <div class="homework-info">
-            <p><strong>标题：</strong> {{ currentHomework.title }}</p>
-            <p><strong>描述：</strong> {{ currentHomework.description || '无描述' }}</p>
-            <p><strong>截止日期：</strong> {{ formatDate(currentHomework.dueDate) || '无截止日期' }}</p>
-            <p><strong>状态：</strong> {{ getStatusDisplay(currentHomework.status).text }}</p>
+      <div class="container" v-loading="submissionLoading">
+        <div class="mb-lg" v-if="currentHomework">
+          <h3 class="text-xl mb-sm">作业详情</h3>
+          <div class="bg-light-secondary p-md radius-md">
+            <p class="mb-sm"><strong>标题：</strong> {{ currentHomework.title }}</p>
+            <p class="mb-sm"><strong>描述：</strong> {{ currentHomework.description || '无描述' }}</p>
+            <p class="mb-sm"><strong>截止日期：</strong> {{ formatDate(currentHomework.dueDate) || '无截止日期' }}</p>
+            <p class="mb-sm"><strong>状态：</strong> {{ getStatusDisplay(currentHomework.status).text }}</p>
           </div>
         </div>
         
-        <div class="submissions-list">
-          <h3>提交列表 ({{ submissionList.length }})</h3>
+        <div class="mb-lg">
+          <h3 class="text-xl mb-md">提交列表 ({{ submissionList.length }})</h3>
           
-          <el-table
-            :data="submissionList"
-            border
-            style="width: 100%"
-          >
-            <el-table-column type="expand">
-              <template #default="props">
-                <div class="submission-detail">
-                  <div class="submission-content" v-if="props.row.content">
-                    <h4>提交内容</h4>
-                    <div class="content-text">{{ props.row.content }}</div>
+          <div class="table-responsive">
+            <el-table
+              :data="submissionList"
+              border
+              style="width: 100%"
+            >
+              <el-table-column type="expand">
+                <template #default="props">
+                  <div class="bg-light-secondary p-md radius-md">
+                    <div class="mb-lg" v-if="props.row.content">
+                      <h4 class="text-md mb-sm text-secondary">提交内容</h4>
+                      <div class="bg-light p-md radius-sm">{{ props.row.content }}</div>
+                    </div>
+                    
+                    <div v-if="props.row.status === 'GRADED'">
+                      <h4 class="text-md mb-sm text-secondary">教师评分与反馈</h4>
+                      <p class="mb-sm"><strong>分数：</strong> {{ props.row.score }}</p>
+                      <p class="mb-sm"><strong>反馈：</strong> {{ props.row.feedback || '无反馈' }}</p>
+                    </div>
                   </div>
-                  
-                  <div class="submission-feedback" v-if="props.row.status === 'GRADED'">
-                    <h4>教师评分与反馈</h4>
-                    <p><strong>分数：</strong> {{ props.row.score }}</p>
-                    <p><strong>反馈：</strong> {{ props.row.feedback || '无反馈' }}</p>
+                </template>
+              </el-table-column>
+              
+              <el-table-column prop="studentName" label="学生" width="120" show-overflow-tooltip>
+                <template #default="scope">
+                  {{ scope.row.studentName || `学生ID: ${scope.row.studentId}` }}
+                </template>
+              </el-table-column>
+              
+              <el-table-column label="提交时间" width="180" align="center">
+                <template #default="scope">
+                  {{ formatDate(scope.row.submissionDate) }}
+                </template>
+              </el-table-column>
+              
+              <el-table-column label="状态" width="120" align="center">
+                <template #default="scope">
+                  <el-tag :type="getSubmissionStatusDisplay(scope.row.status).type">
+                    {{ getSubmissionStatusDisplay(scope.row.status).text }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              
+              <el-table-column label="迟交" width="80" align="center">
+                <template #default="scope">
+                  <el-tag type="danger" v-if="scope.row.isLate">是</el-tag>
+                  <el-tag type="success" v-else>否</el-tag>
+                </template>
+              </el-table-column>
+              
+              <el-table-column label="分数" width="80" align="center">
+                <template #default="scope">
+                  {{ scope.row.score !== null ? scope.row.score : '-' }}
+                </template>
+              </el-table-column>
+              
+              <el-table-column label="操作" min-width="180" align="center">
+                <template #default="scope">
+                  <div class="d-flex justify-center gap-sm">
+                    <el-button 
+                      type="primary" 
+                      link 
+                      :icon="Edit" 
+                      @click="openGradeDialog(scope.row)"
+                      v-if="isTeacher || isAdmin"
+                    >
+                      评分
+                    </el-button>
+                    
+                    <el-button 
+                      type="info" 
+                      link 
+                      :icon="Download" 
+                      @click="downloadSubmissionFile(scope.row)"
+                      v-if="scope.row.fileId"
+                    >
+                      下载文件
+                    </el-button>
                   </div>
-                </div>
-              </template>
-            </el-table-column>
-            
-            <el-table-column prop="studentName" label="学生" width="120" show-overflow-tooltip>
-              <template #default="scope">
-                {{ scope.row.studentName || `学生ID: ${scope.row.studentId}` }}
-              </template>
-            </el-table-column>
-            
-            <el-table-column label="提交时间" width="180" align="center">
-              <template #default="scope">
-                {{ formatDate(scope.row.submissionDate) }}
-              </template>
-            </el-table-column>
-            
-            <el-table-column label="状态" width="120" align="center">
-              <template #default="scope">
-                <el-tag :type="getSubmissionStatusDisplay(scope.row.status).type">
-                  {{ getSubmissionStatusDisplay(scope.row.status).text }}
-                </el-tag>
-              </template>
-            </el-table-column>
-            
-            <el-table-column label="迟交" width="80" align="center">
-              <template #default="scope">
-                <el-tag type="danger" v-if="scope.row.isLate">是</el-tag>
-                <el-tag type="success" v-else>否</el-tag>
-              </template>
-            </el-table-column>
-            
-            <el-table-column label="分数" width="80" align="center">
-              <template #default="scope">
-                {{ scope.row.score !== null ? scope.row.score : '-' }}
-              </template>
-            </el-table-column>
-            
-            <el-table-column label="操作" min-width="180" align="center">
-              <template #default="scope">
-                <div class="submission-buttons">
-                  <el-button 
-                    type="primary" 
-                    link 
-                    :icon="Edit" 
-                    @click="openGradeDialog(scope.row)"
-                    v-if="isTeacher || isAdmin"
-                  >
-                    评分
-                  </el-button>
-                  
-                  <el-button 
-                    type="info" 
-                    link 
-                    :icon="Download" 
-                    @click="downloadSubmissionFile(scope.row)"
-                    v-if="scope.row.fileId"
-                  >
-                    下载文件
-                  </el-button>
-                </div>
-              </template>
-            </el-table-column>
-          </el-table>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
           
           <el-empty v-if="submissionList.length === 0 && !submissionLoading" description="暂无提交记录" />
         </div>
       </div>
       
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="submissionsDialogVisible = false">关闭</el-button>
           <el-button type="primary" @click="loadSubmissions(currentHomework)">刷新提交列表</el-button>
         </div>
@@ -745,11 +758,11 @@ onMounted(() => {
       append-to-body
       destroy-on-close
     >
-      <div v-if="currentSubmission" class="grade-form">
-        <div class="student-info">
-          <p><strong>学生：</strong> {{ currentSubmission.studentName || `学生ID: ${currentSubmission.studentId}` }}</p>
-          <p><strong>提交时间：</strong> {{ formatDate(currentSubmission.submissionDate) }}</p>
-          <p v-if="currentSubmission.isLate" class="late-warning"><strong>注意：</strong> 该提交已逾期</p>
+      <div v-if="currentSubmission">
+        <div class="bg-light-secondary p-md radius-md mb-md">
+          <p class="mb-sm"><strong>学生：</strong> {{ currentSubmission.studentName || `学生ID: ${currentSubmission.studentId}` }}</p>
+          <p class="mb-sm"><strong>提交时间：</strong> {{ formatDate(currentSubmission.submissionDate) }}</p>
+          <p v-if="currentSubmission.isLate" class="mb-sm text-danger"><strong>注意：</strong> 该提交已逾期</p>
         </div>
         
         <el-form :model="gradeForm" label-width="80px">
@@ -769,7 +782,7 @@ onMounted(() => {
       </div>
       
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="gradeDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitGrade">提交评分</el-button>
         </div>
@@ -779,134 +792,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.homework-manage-container {
-  padding: 0;
-}
-
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.toolbar {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
+/* 使用全局样式，仅保留特殊样式 */
 .role-debug {
-  margin-left: 10px;
-  font-size: 14px;
-  color: #e6a23c; /* Warning color */
+  margin-left: var(--spacing-sm);
+  font-size: var(--text-sm);
+  color: var(--warning-color);
 }
 
-.empty-state-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
+.text-danger {
+  color: var(--danger-color);
 }
 
-.operation-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
-
-.submissions-container {
-  padding: 0;
-}
-
-.submissions-header {
-  margin-bottom: 20px;
-}
-
-.submissions-header h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: var(--text-primary);
-}
-
-.homework-info {
-  padding: 12px;
-  background-color: #f2f6fc;
-  border-radius: 4px;
-}
-
-.homework-info p {
-  margin: 8px 0;
-  color: var(--text-secondary);
-}
-
-.submissions-list h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 18px;
-  color: var(--text-primary);
-}
-
-.submission-detail {
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-.submission-content {
-  margin-bottom: 16px;
-}
-
-.submission-content h4,
-.submission-feedback h4 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-}
-
-.content-text {
-  padding: 8px 12px;
-  background-color: white;
-  border: 1px solid #ebeef5;
-  border-radius: 4px;
-  white-space: pre-wrap;
-}
-
-.submission-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.grade-form {
-  padding: 0;
-}
-
-.student-info {
-  margin-bottom: 20px;
-  padding: 12px;
-  background-color: #f2f6fc;
-  border-radius: 4px;
-}
-
-.student-info p {
-  margin: 8px 0;
-  color: var(--text-secondary);
-}
-
-.late-warning {
-  color: #f56c6c;
-  font-weight: 500;
-}
-
-/* Responsive styles */
-@media (max-width: 768px) {
-  .el-form-item {
-    margin-bottom: 10px;
-  }
-  
-  .toolbar {
-    flex-direction: column;
-    gap: 10px;
-  }
+.table-responsive {
+  overflow-x: auto;
 }
 </style> 

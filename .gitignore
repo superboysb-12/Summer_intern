@@ -1,0 +1,11 @@
+/work_flow/kg_rag_service/doc
+/work_flow/kg_rag_service/util/__pycache__
+/work_flow/kg_rag_service/bge-small-zh-v1.5
+/work_flow/kg_rag_service/bge-small-zh-v1.5
+/backend/uploads
+/datasetGenerate/__pycache__
+datasetGenerate/query_extraction.log
+/work_flow/kg_rag_service/bge-small-zh-v1.5
+/datasetGenerate/RawData
+datasetGenerate/pipeline.log
+/work_flow/kg_rag_service/bge-small-zh-v1.5

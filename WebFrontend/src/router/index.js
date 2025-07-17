@@ -21,6 +21,7 @@ const RAGManage = () => import('../components/RAGManage.vue')
 const DeepSeekChat = () => import('../components/DeepSeekChat.vue')
 const TeachingPlanGenerator = () => import('../components/TeachingPlanGenerator.vue')
 const TeachingPlanEditor = () => import('../components/TeachingPlanEditor.vue')
+const QuestionGenerator = () => import('../components/QuestionGenerator.vue')
 const UtilityTools = () => import('../components/UtilityTools.vue')
 
 // 学生专属组件
@@ -137,6 +138,14 @@ const routes = [
                 }
             },
             {
+                path: 'question-generator',
+                component: QuestionGenerator,
+                meta: {
+                    title: '系统管理 - 题目生成',
+                    roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
+                }
+            },
+            {
                 path: 'deepseek',
                 component: DeepSeekChat,
                 meta: {
@@ -184,6 +193,15 @@ const routes = [
                 meta: {
                     title: '系统管理 - 通知管理',
                     roles: [ROLES.ADMIN]  // 仅管理员可访问
+                }
+            },
+            // 添加私信路由
+            {
+                path: 'private-messages',
+                component: () => import('../components/PrivateMessaging.vue'),
+                meta: {
+                    title: '系统管理 - 私信',
+                    roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]  // 所有角色可访问
                 }
             },
             // 使用统计

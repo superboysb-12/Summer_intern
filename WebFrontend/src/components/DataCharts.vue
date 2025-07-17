@@ -551,9 +551,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="data-charts-container">
+  <div class="container">
     <!-- 面包屑导航 -->
-    <div class="breadcrumb-container">
+    <div class="breadcrumb-container d-flex justify-between align-center mb-md">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item :to="{ path: '/manage' }">
@@ -566,55 +566,56 @@ onUnmounted(() => {
       </el-button>
     </div>
     
-    <div class="page-header">
+    <div class="page-header mb-lg">
       <h2>{{ itemName }} - 图表分析</h2>
       <p>详细的{{ getDataTypeText() }}数据图表分析</p>
     </div>
     
-    <div class="filter-bar">
-      <div class="date-range-picker">
-        <span class="filter-label">日期范围：</span>
-        <el-date-picker
-          v-model="dateRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          format="YYYY-MM-DD"
-          @change="handleDateRangeChange"
-        />
+    <div class="card bg-white mb-lg">
+      <div class="card-body">
+        <div class="d-flex justify-between align-center">
+          <span class="text-md">日期范围：</span>
+          <el-date-picker
+            v-model="dateRange"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            format="YYYY-MM-DD"
+            @change="handleDateRangeChange"
+          />
+        </div>
       </div>
     </div>
     
-    <div class="chart-grid">
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <span>{{ dataType === 'user' ? '活跃度趋势' : '用户活跃度趋势' }}</span>
+    <div class="grid-2 gap-lg">
+      <div class="card bg-white">
+        <div class="card-header d-flex justify-between align-center">
+          <span class="text-md text-bold">{{ dataType === 'user' ? '活跃度趋势' : '用户活跃度趋势' }}</span>
             <el-button text>导出</el-button>
           </div>
-        </template>
+        <div class="card-body">
         <div v-loading="chartLoading" class="chart-container">
           <div id="userActivityChart" class="chart-inner"></div>
+          </div>
         </div>
-      </el-card>
+      </div>
       
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <span>成绩对比分析</span>
+      <div class="card bg-white">
+        <div class="card-header d-flex justify-between align-center">
+          <span class="text-md text-bold">成绩对比分析</span>
             <el-button text>导出</el-button>
           </div>
-        </template>
+        <div class="card-body">
         <div v-loading="chartLoading" class="chart-container">
           <div id="scoreComparisonChart" class="chart-inner"></div>
+          </div>
         </div>
-      </el-card>
+      </div>
       
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <span>
+      <div class="card bg-white">
+        <div class="card-header d-flex justify-between align-center">
+          <span class="text-md text-bold">
               {{ 
                 dataType === 'course' ? '课程完成进度' : 
                 dataType === 'class' ? '学习完成进度' : 
@@ -623,116 +624,37 @@ onUnmounted(() => {
             </span>
             <el-button text>导出</el-button>
           </div>
-        </template>
+        <div class="card-body">
         <div v-loading="chartLoading" class="chart-container">
           <div id="courseProgressChart" class="chart-inner"></div>
+          </div>
         </div>
-      </el-card>
+      </div>
       
-      <el-card class="chart-card">
-        <template #header>
-          <div class="card-header">
-            <span>每周活动分析</span>
+      <div class="card bg-white">
+        <div class="card-header d-flex justify-between align-center">
+          <span class="text-md text-bold">每周活动分析</span>
             <el-button text>导出</el-button>
           </div>
-        </template>
+        <div class="card-body">
         <div v-loading="chartLoading" class="chart-container">
           <div id="weeklyActivityChart" class="chart-inner"></div>
+          </div>
         </div>
-      </el-card>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 图表分析页面样式 */
-.data-charts-container {
-  padding: 20px;
-}
-
-.breadcrumb-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  background-color: white;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.page-header p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.filter-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  background-color: white;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.filter-label {
-  color: #4b5563;
-  margin-right: 8px;
-}
-
-.chart-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-.chart-card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease;
-  height: 400px;
-}
-
-.chart-card:hover {
-  transform: translateY(-5px);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .chart-container {
-  height: 330px;
   width: 100%;
+  height: 300px;
   position: relative;
 }
 
 .chart-inner {
   width: 100%;
   height: 100%;
-}
-
-/* 响应式设计 */
-@media (max-width: 1200px) {
-  .chart-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style> 

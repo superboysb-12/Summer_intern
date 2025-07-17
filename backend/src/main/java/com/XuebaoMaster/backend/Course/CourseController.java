@@ -1,5 +1,7 @@
 package com.XuebaoMaster.backend.Course;
 
+import com.XuebaoMaster.backend.RAG.Course.CourseRagMappingService;
+import com.XuebaoMaster.backend.RAG.RAG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -7,7 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import com.XuebaoMaster.backend.StudentCourse.StudentCourseService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/courses")
@@ -18,6 +22,9 @@ public class CourseController {
 
     @Autowired
     private StudentCourseService studentCourseService;
+
+    @Autowired
+    private CourseRagMappingService courseRagMappingService;
 
     @GetMapping
     public ResponseEntity<List<Course>> getAllCourses() {
@@ -102,5 +109,92 @@ public class CourseController {
     public ResponseEntity<List<Course>> getCoursesByTeacherId(@PathVariable Long teacherId) {
         // 使用新添加的方法获取教师课程列表
         return ResponseEntity.ok(courseService.getCoursesByTeacherId(teacherId));
+    }
+
+    /**
+     * 获取课程关联的所有RAG资源
+     * 
+     * @param courseId 课程ID
+     * @return RAG列表
+     */
+    @GetMapping("/{courseId}/rags")
+    public ResponseEntity<?> getCourseRAGs(@PathVariable Long courseId) {
+        try {
+            List<RAG> rags = courseRagMappingService.findRagsByCourseId(courseId);
+            return ResponseEntity.ok(rags);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "获取课程关联RAG失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * 将RAG关联到课程
+     * 
+     * @param courseId 课程ID
+     * @param ragId    RAG ID
+     * @return 操作结果
+     */
+    @PostMapping("/{courseId}/rags/{ragId}")
+    public ResponseEntity<?> associateRAGWithCourse(@PathVariable Long courseId, @PathVariable Long ragId) {
+        try {
+            if (courseRagMappingService.mappingExists(courseId, ragId)) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "该RAG已与课程关联");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            courseRagMappingService.createMapping(courseId, ragId);
+
+            Map<String, String> success = new HashMap<>();
+            success.put("message", "RAG成功关联到课程");
+            return ResponseEntity.ok(success);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "关联RAG到课程失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * 解除RAG与课程的关联
+     * 
+     * @param courseId 课程ID
+     * @param ragId    RAG ID
+     * @return 操作结果
+     */
+    @DeleteMapping("/{courseId}/rags/{ragId}")
+    public ResponseEntity<?> disassociateRAGFromCourse(@PathVariable Long courseId, @PathVariable Long ragId) {
+        try {
+            if (!courseRagMappingService.mappingExists(courseId, ragId)) {
+                Map<String, String> error = new HashMap<>();
+                error.put("message", "该RAG未与课程关联");
+                return ResponseEntity.badRequest().body(error);
+            }
+
+            courseRagMappingService.deleteMappingByCourseAndRag(courseId, ragId);
+
+            Map<String, String> success = new HashMap<>();
+            success.put("message", "RAG成功从课程移除");
+            return ResponseEntity.ok(success);
+        } catch (Exception e) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "从课程移除RAG失败: " + e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
+    }
+
+    /**
+     * 检查RAG是否与课程关联
+     * 
+     * @param courseId 课程ID
+     * @param ragId    RAG ID
+     * @return 是否关联
+     */
+    @GetMapping("/{courseId}/rags/{ragId}/exists")
+    public ResponseEntity<Boolean> checkRAGAssociation(@PathVariable Long courseId, @PathVariable Long ragId) {
+        boolean exists = courseRagMappingService.mappingExists(courseId, ragId);
+        return ResponseEntity.ok(exists);
     }
 }

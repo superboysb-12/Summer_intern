@@ -261,78 +261,87 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="class-manage-container">
-    <div class="page-header">
-      <h2>班级管理</h2>
-      <p>管理系统班级信息，包括创建、编辑和删除班级</p>
+  <div class="container">
+    <div class="page-header mb-lg">
+      <h2 class="text-2xl mb-sm">班级管理</h2>
+      <p class="text-secondary">管理学生班级信息，包括添加、编辑和删除班级</p>
     </div>
     
     <!-- 搜索工具栏 -->
-    <el-card class="search-card">
-      <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="关键词">
-          <el-input
-            v-model="queryParams.keyword"
-            placeholder="班级名称"
-            clearable
-            @keyup.enter="handleSearch"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
-          <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
+    <el-card class="mb-md">
+      <div class="card-body">
+        <el-form :model="queryParams" ref="queryForm" :inline="true">
+          <el-form-item label="关键词">
+            <el-input
+              v-model="queryParams.keyword"
+              placeholder="班级名称"
+              clearable
+              @keyup.enter="handleSearch"
+            />
+          </el-form-item>
+          <el-form-item>
+            <div class="d-flex gap-sm">
+              <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+              <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
     </el-card>
     
     <!-- 操作工具栏 -->
-    <div class="toolbar">
+    <div class="d-flex justify-between mb-md">
       <el-button type="primary" :icon="Plus" @click="handleAdd">新增班级</el-button>
+      <el-button :icon="RefreshRight" @click="refreshList">刷新</el-button>
     </div>
     
     <!-- 班级表格 -->
-    <el-card class="table-card">
-      <el-table
-        v-loading="loading"
-        :data="classList"
-        border
-        stripe
-        style="width: 100%"
-      >
-        <el-table-column type="index" width="50" />
-        <el-table-column prop="className" label="班级名称" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="students.length" label="学生数量" min-width="100" />
-        <el-table-column prop="createdAt" label="创建时间" min-width="180" show-overflow-tooltip>
-          <template #default="scope">
-            {{ formatDate(scope.row.createdAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="updatedAt" label="更新时间" min-width="180" show-overflow-tooltip>
-          <template #default="scope">
-            {{ formatDate(scope.row.updatedAt) }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="320" fixed="right">
-          <template #default="scope">
-            <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
-            <el-button type="success" link :icon="DataAnalysis" @click="viewClassData(scope.row.id)">数据查看</el-button>
-            <el-button type="info" link :icon="Reading" @click="viewClassEnrollments(scope.row)">选课情况</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="getClassList"
-          @current-change="getClassList"
-        />
+    <el-card class="mb-lg">
+      <div class="card-body">
+        <el-table
+          v-loading="loading"
+          :data="classList"
+          border
+          stripe
+          style="width: 100%"
+        >
+          <el-table-column type="index" width="50" />
+          <el-table-column prop="className" label="班级名称" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="students.length" label="学生数量" min-width="100" />
+          <el-table-column prop="createdAt" label="创建时间" min-width="180" show-overflow-tooltip>
+            <template #default="scope">
+              {{ formatDate(scope.row.createdAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="updatedAt" label="更新时间" min-width="180" show-overflow-tooltip>
+            <template #default="scope">
+              {{ formatDate(scope.row.updatedAt) }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="320" fixed="right">
+            <template #default="scope">
+              <div class="d-flex gap-sm">
+                <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
+                <el-button type="success" link :icon="DataAnalysis" @click="viewClassData(scope.row.id)">数据查看</el-button>
+                <el-button type="info" link :icon="Reading" @click="viewClassEnrollments(scope.row)">选课情况</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        
+        <!-- 分页 -->
+        <div class="pagination-container mt-md d-flex justify-end">
+          <el-pagination
+            v-model:current-page="queryParams.pageNum"
+            v-model:page-size="queryParams.pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="getClassList"
+            @current-change="getClassList"
+          />
+        </div>
       </div>
     </el-card>
     
@@ -354,7 +363,7 @@ onMounted(() => {
         </el-form-item>
       </el-form>
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitForm(classFormRef)">确定</el-button>
         </div>
@@ -373,74 +382,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.class-manage-container {
-  padding: 20px 0;
-}
-
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.page-header p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.search-card {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-.toolbar {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.table-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .el-form-item {
-    margin-bottom: 10px;
-  }
-  
-  .toolbar {
-    flex-direction: column;
-  }
-  
-  .pagination {
-    justify-content: center;
-  }
-}
-
-.statistics-card {
-  margin-bottom: 20px;
-}
-
+/* 使用全局样式，仅保留特殊样式 */
 .statistics-content {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .stat-item {
@@ -449,20 +396,14 @@ onMounted(() => {
 }
 
 .stat-label {
-  font-size: 14px;
-  color: #606266;
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: var(--text-xl);
   font-weight: bold;
-  color: #303133;
+  color: var(--text-primary);
   margin-top: 5px;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 </style> 

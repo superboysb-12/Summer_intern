@@ -1,7 +1,9 @@
 package com.XuebaoMaster.backend.RAG;
 
+import com.XuebaoMaster.backend.Course.Course;
 import com.XuebaoMaster.backend.File.FileEntity;
 import com.XuebaoMaster.backend.File.FileService;
+import com.XuebaoMaster.backend.RAG.Course.CourseRagMappingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,9 @@ public class RAGController {
 
     @Autowired
     private FileService fileService;
+
+    @Autowired
+    private CourseRagMappingService courseRagMappingService;
 
     /**
      * 创建新RAG（手动添加）
@@ -291,6 +296,70 @@ public class RAGController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.ok(RAGResponse.error("批量修复知识图谱路径失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 获取与指定课程关联的所有RAG
+     */
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<?> getRAGsByCourseId(@PathVariable Long courseId) {
+        try {
+            List<RAG> rags = courseRagMappingService.findRagsByCourseId(courseId);
+            return ResponseEntity.ok(RAGResponse.success("获取成功", rags));
+        } catch (Exception e) {
+            return ResponseEntity.ok(RAGResponse.error("获取课程RAG失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 为课程添加关联的RAG
+     */
+    @PostMapping("/course/{courseId}/add/{ragId}")
+    public ResponseEntity<?> addRAGToCourse(@PathVariable Long courseId, @PathVariable Long ragId) {
+        try {
+            // 检查映射是否已存在
+            if (courseRagMappingService.mappingExists(courseId, ragId)) {
+                return ResponseEntity.ok(RAGResponse.error("该RAG已与课程关联"));
+            }
+
+            courseRagMappingService.createMapping(courseId, ragId);
+            return ResponseEntity.ok(RAGResponse.success("RAG成功关联到课程"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(RAGResponse.error("关联RAG到课程失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 从课程中移除关联的RAG
+     */
+    @DeleteMapping("/course/{courseId}/remove/{ragId}")
+    public ResponseEntity<?> removeRAGFromCourse(@PathVariable Long courseId, @PathVariable Long ragId) {
+        try {
+            // 检查映射是否存在
+            if (!courseRagMappingService.mappingExists(courseId, ragId)) {
+                return ResponseEntity.ok(RAGResponse.error("该RAG未与课程关联"));
+            }
+
+            courseRagMappingService.deleteMappingByCourseAndRag(courseId, ragId);
+            return ResponseEntity.ok(RAGResponse.success("RAG成功从课程移除"));
+        } catch (Exception e) {
+            return ResponseEntity.ok(RAGResponse.error("从课程移除RAG失败: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * 检查RAG是否与课程关联
+     */
+    @GetMapping("/course/{courseId}/has-rag/{ragId}")
+    public ResponseEntity<?> checkCourseHasRAG(@PathVariable Long courseId, @PathVariable Long ragId) {
+        try {
+            boolean exists = courseRagMappingService.mappingExists(courseId, ragId);
+            Map<String, Boolean> result = new HashMap<>();
+            result.put("exists", exists);
+            return ResponseEntity.ok(RAGResponse.success("检查成功", result));
+        } catch (Exception e) {
+            return ResponseEntity.ok(RAGResponse.error("检查关联失败: " + e.getMessage()));
         }
     }
 }

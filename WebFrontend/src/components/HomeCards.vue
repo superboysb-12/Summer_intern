@@ -207,13 +207,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="home-container">
-    <div class="welcome-section">
-      <h1>欢迎使用学习系统</h1>
-      <p>{{ userInfo.username }}，祝您使用愉快</p>
-        </div>
+  <div class="container">
+    <div class="text-center mb-lg">
+      <h1 class="text-2xl mb-sm">欢迎使用学习系统</h1>
+      <p class="text-md text-secondary">{{ userInfo.username }}，祝您使用愉快</p>
+    </div>
 
-    <div class="cards-grid">
+    <div class="linear-cards">
       <el-card
         v-for="(card, index) in cards"
         :key="index"
@@ -221,97 +221,116 @@ onMounted(() => {
         class="card-item"
         @click="handleCardClick(card.route)"
       >
-        <div class="card-content" :style="{ '--card-color': card.color }">
-          <div class="card-icon">
-            <el-icon :size="36">
+        <div class="d-flex align-center" :style="{ '--card-color': card.color }">
+          <div class="card-icon mr-md">
+            <el-icon :size="40">
               <component :is="card.icon" />
             </el-icon>
           </div>
-          <div class="card-text">
-            <h3>{{ card.title }}</h3>
-            <p>{{ card.description }}</p>
+          <div>
+            <h3 class="text-lg mb-xs">{{ card.title }}</h3>
+            <p class="text-sm text-secondary m-0">{{ card.description }}</p>
           </div>
-          </div>
-        </el-card>
-          </div>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.home-container {
-  padding: 20px;
-}
-
-.welcome-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.welcome-section h1 {
-  font-size: 28px;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.welcome-section p {
-  font-size: 16px;
-  color: var(--text-secondary);
-}
-
-.cards-grid {
+.linear-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .card-item {
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-  height: 100%;
+  transition: transform 0.2s;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 8px;
+}
+
+.card-item :deep(.el-card__body) {
+  padding: 20px;
 }
 
 .card-item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.card-content {
-  display: flex;
-  align-items: center;
-  color: var(--text-primary);
 }
 
 .card-icon {
   background-color: var(--card-color);
   color: white;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
   flex-shrink: 0;
+  margin-right: 20px;
 }
 
-.card-text {
-  flex-grow: 1;
+.text-center {
+  text-align: center;
 }
 
-.card-text h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+.mb-lg {
+  margin-bottom: 2rem;
 }
 
-.card-text p {
+.mb-sm {
+  margin-bottom: 0.5rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.text-md {
+  font-size: 1rem;
+}
+
+.text-secondary {
+  color: #666;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.mr-md {
+  margin-right: 1rem;
+}
+
+.text-lg {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.mb-xs {
+  margin-bottom: 0.25rem;
+}
+
+.text-sm {
+  font-size: 0.9rem;
+}
+
+.m-0 {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
 }
 
-/* 响应式布局 */
 @media (max-width: 768px) {
-  .cards-grid {
+  .linear-cards {
     grid-template-columns: 1fr;
   }
 }

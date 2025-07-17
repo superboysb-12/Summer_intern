@@ -417,17 +417,17 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="file-manage-container">
+  <div class="container">
     <!-- 头部区域 -->
-    <div class="manage-header">
-      <div class="manage-title">
-        <h2>文件管理</h2>
+    <div class="flex justify-between items-center mb-lg">
+      <div>
+        <h2 class="text-xl">文件管理</h2>
       </div>
-      <div class="manage-actions">
+      <div class="flex gap-sm">
         <el-input
           v-model="queryParams.keyword"
           placeholder="搜索文件或文件夹"
-          class="search-input"
+          style="width: 300px;"
           clearable
           @clear="resetSearch"
         >
@@ -446,7 +446,7 @@ onMounted(() => {
     </div>
     
     <!-- 路径导航 -->
-    <div class="path-navigation">
+    <div class="card bg-secondary radius-md mb-lg flex justify-between items-center p-md">
       <el-breadcrumb separator="/">
         <el-breadcrumb-item>
           <a @click.prevent="openFolder({path: '/'})">根目录</a>
@@ -467,6 +467,7 @@ onMounted(() => {
     </div>
 
     <!-- 文件列表 -->
+    <el-card class="table-card">
     <el-table
       v-loading="loading"
       :data="fileList"
@@ -475,11 +476,11 @@ onMounted(() => {
     >
       <el-table-column label="名称" min-width="180">
         <template #default="scope">
-          <div class="file-item">
+            <div class="flex items-center gap-sm">
             <el-icon v-if="scope.row.directory"><Folder /></el-icon>
             <el-icon v-else><Document /></el-icon>
             <span 
-              class="file-name" 
+                class="cursor-pointer hover-primary text-overflow"
               @click="scope.row.directory ? openFolder(scope.row) : handlePreview(scope.row)"
             >
               {{ scope.row.fileName }}
@@ -512,13 +513,14 @@ onMounted(() => {
       
       <el-table-column label="操作" min-width="140" fixed="right">
         <template #default="scope">
-          <div class="action-buttons">
-            <div class="action-row" v-if="!scope.row.directory">
+            <div class="flex flex-col gap-xs" style="min-width: 120px;">
+              <div class="flex justify-start gap-sm" v-if="!scope.row.directory">
               <el-button 
                 type="primary" 
                 link 
                 @click="handlePreview(scope.row)" 
                 :icon="Search"
+                  class="button-sm"
               >
                 预览
               </el-button>
@@ -528,17 +530,19 @@ onMounted(() => {
                 link 
                 @click="handleDownload(scope.row)" 
                 :icon="Download"
+                  class="button-sm"
               >
                 下载
               </el-button>
             </div>
             
-            <div class="action-row">
+              <div class="flex justify-start gap-sm">
               <el-button 
                 type="primary" 
                 link 
                 @click="handleRename(scope.row)" 
                 :icon="Edit"
+                  class="button-sm"
               >
                 重命名
               </el-button>
@@ -548,6 +552,7 @@ onMounted(() => {
                 link 
                 @click="handleDelete(scope.row)" 
                 :icon="Delete"
+                  class="button-sm"
               >
                 删除
               </el-button>
@@ -556,6 +561,7 @@ onMounted(() => {
         </template>
       </el-table-column>
     </el-table>
+    </el-card>
 
     <!-- 上传文件对话框 -->
     <el-dialog
@@ -571,46 +577,48 @@ onMounted(() => {
         </el-form-item>
         
         <el-form-item label="文件选择">
-          <div class="upload-drop-zone" @drop.prevent="handleFileDrop" @dragover.prevent>
-            <div class="upload-icon-container">
-              <el-icon class="upload-icon"><Upload /></el-icon>
+          <div class="border-dashed border-2 border-tertiary bg-secondary radius-md p-lg text-center cursor-pointer transition-normal hover-border-primary hover-bg-light" 
+               @drop.prevent="handleFileDrop" @dragover.prevent>
+            <div class="flex flex-col items-center justify-center">
+              <el-icon class="text-4xl text-primary mb-md"><Upload /></el-icon>
               <p>拖放文件到此处或 <el-button type="primary" link @click="triggerFileInput">点击选择文件</el-button></p>
-              <p class="upload-tip">支持多个文件上传</p>
+              <p class="text-xs text-tertiary mt-sm">支持多个文件上传</p>
             </div>
             <input 
               type="file" 
               ref="fileInput"
               @change="handleFileChange" 
               multiple
-              class="hidden-file-input"
+              style="display: none;"
             />
           </div>
           
-          <div v-if="uploadForm.files.length > 0" class="selected-files-panel">
-            <div class="selected-files-header">
-              <h4>已选择 {{ uploadForm.files.length }} 个文件</h4>
+          <div v-if="uploadForm.files.length > 0" class="border radius-md overflow-hidden mt-md">
+            <div class="flex justify-between items-center p-md bg-secondary border-b">
+              <h4 class="text-sm text-tertiary m-0">已选择 {{ uploadForm.files.length }} 个文件</h4>
               <el-button type="danger" link @click="clearSelectedFiles">清空</el-button>
             </div>
             <el-scrollbar height="200px">
-              <div class="file-list">
-                <div v-for="(file, index) in uploadForm.files" :key="index" class="file-item-preview">
-                  <div class="file-preview-icon">
-                    <el-icon v-if="file.type.startsWith('image/')" class="preview-type-icon"><Picture /></el-icon>
-                    <el-icon v-else-if="file.type.includes('pdf')" class="preview-type-icon"><Document /></el-icon>
-                    <el-icon v-else-if="file.type.includes('word')" class="preview-type-icon"><Document /></el-icon>
-                    <el-icon v-else-if="file.type.includes('excel') || file.type.includes('sheet')" class="preview-type-icon"><Document /></el-icon>
-                    <el-icon v-else class="preview-type-icon"><Document /></el-icon>
+              <div class="p-sm">
+                <div v-for="(file, index) in uploadForm.files" :key="index" 
+                     class="flex items-center p-sm radius-sm relative hover-bg-secondary transition-normal">
+                  <div class="flex justify-center items-center w-40px h-40px radius-sm bg-tertiary mr-md">
+                    <el-icon v-if="file.type.startsWith('image/')" class="text-xl text-tertiary"><Picture /></el-icon>
+                    <el-icon v-else-if="file.type.includes('pdf')" class="text-xl text-tertiary"><Document /></el-icon>
+                    <el-icon v-else-if="file.type.includes('word')" class="text-xl text-tertiary"><Document /></el-icon>
+                    <el-icon v-else-if="file.type.includes('excel') || file.type.includes('sheet')" class="text-xl text-tertiary"><Document /></el-icon>
+                    <el-icon v-else class="text-xl text-tertiary"><Document /></el-icon>
                   </div>
-                  <div class="file-info">
-                    <div class="file-name-preview">{{ file.name }}</div>
-                    <div class="file-size-preview">{{ formatFileSize(file.size) }}</div>
+                  <div class="flex-1 overflow-hidden">
+                    <div class="text-overflow">{{ file.name }}</div>
+                    <div class="text-xs text-tertiary mt-xs">{{ formatFileSize(file.size) }}</div>
                   </div>
                   <el-button 
                     type="danger" 
                     circle 
                     size="small" 
                     @click="removeFile(index)"
-                    class="remove-file-btn"
+                    class="opacity-0 hover-show"
                   >
                     <el-icon><Delete /></el-icon>
                   </el-button>
@@ -673,12 +681,12 @@ onMounted(() => {
       destroy-on-close
       @closed="cleanupPreview"
     >
-      <div class="preview-container" v-loading="isPreviewLoading">
+      <div class="flex justify-center items-center h-70vh overflow-auto" v-loading="isPreviewLoading">
         <!-- 图片预览 -->
         <img 
           v-if="previewContentType === 'image'" 
           :src="previewUrl" 
-          class="preview-image"
+          class="max-w-full max-h-full object-contain"
           alt="预览图片"
         />
         
@@ -686,23 +694,23 @@ onMounted(() => {
         <iframe 
           v-else-if="previewContentType === 'pdf'" 
           :src="previewUrl" 
-          class="preview-iframe"
+          class="w-full h-full border-none"
         ></iframe>
         
         <!-- 文本预览 -->
-        <pre v-else-if="previewContentType === 'text'" class="preview-text">{{ previewData }}</pre>
+        <pre v-else-if="previewContentType === 'text'" class="w-full h-full overflow-auto whitespace-pre-wrap font-mono p-md m-0 bg-secondary radius-md">{{ previewData }}</pre>
         
         <!-- Blob URL预览 -->
-        <div v-else-if="previewContentType === 'blob'" class="preview-fallback">
+        <div v-else-if="previewContentType === 'blob'" class="text-center p-lg">
           <p>尝试预览 (如果浏览器支持此格式):</p>
-          <iframe :src="previewUrl" class="preview-iframe"></iframe>
-          <el-button type="primary" @click="handleDownload(currentPreviewFile)" style="margin-top: 10px">
+          <iframe :src="previewUrl" class="w-full h-full border-none"></iframe>
+          <el-button type="primary" @click="handleDownload(currentPreviewFile)" class="mt-md">
             下载文件
           </el-button>
         </div>
         
         <!-- 不支持预览 -->
-        <div v-else class="preview-unsupported">
+        <div v-else class="text-center p-lg">
           <p>无法预览此类型的文件，请下载后查看。</p>
           <el-button type="primary" @click="handleDownload(currentPreviewFile)">
             下载文件
@@ -730,282 +738,112 @@ function formatFileSize(bytes) {
 </script>
 
 <style scoped>
-.file-manage-container {
-  padding: 20px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+/* 自定义工具类 */
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.manage-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.manage-title h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-}
-
-.manage-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.search-input {
-  width: 300px;
-}
-
-.path-navigation {
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.file-name {
-  cursor: pointer;
-}
-
-.file-name:hover {
-  color: #409eff;
+.hover-primary:hover {
+  color: var(--primary-color);
   text-decoration: underline;
 }
 
-.file-input {
-  width: 100%;
+.cursor-pointer {
+  cursor: pointer;
 }
 
-.selected-files {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #f5f7fa;
-  border-radius: 4px;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.selected-files p {
-  margin-top: 0;
-  font-weight: bold;
-}
-
-.selected-files ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.preview-container {
-  width: 100%;
-  height: 70vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: auto;
-}
-
-.preview-iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.preview-text {
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  white-space: pre-wrap;
-  font-family: monospace;
-  padding: 10px;
-  margin: 0;
-  background-color: #f5f5f5;
-  border-radius: 4px;
-}
-
-.preview-fallback {
-  text-align: center;
-  padding: 20px;
-}
-
-.preview-unsupported {
-  text-align: center;
-  padding: 20px;
-}
-
-.action-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 120px;
-}
-
-.action-row {
-  display: flex;
-  justify-content: flex-start;
-  gap: 8px;
-  width: 100%;
-}
-
-.action-row .el-button {
-  margin-left: 0;
+.button-sm {
   padding: 2px 4px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.action-row .el-button + .el-button {
-  margin-left: 0;
-}
-
-.action-row .el-button [class*="el-icon"] + span {
+.button-sm [class*="el-icon"] + span {
   margin-left: 2px;
 }
 
-.upload-dialog :deep(.el-dialog__body) {
-  padding: 20px 30px;
+.border-dashed {
+  border-style: dashed;
 }
 
-.upload-drop-zone {
-  border: 2px dashed #dcdfe6;
-  border-radius: 8px;
-  background-color: #f9fafc;
-  padding: 30px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
+.border-2 {
+  border-width: 2px;
 }
 
-.upload-drop-zone:hover {
-  border-color: #409eff;
+.border-tertiary {
+  border-color: var(--border-color);
+}
+
+.border-b {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.text-4xl {
+  font-size: 48px;
+}
+
+.hover-border-primary:hover {
+  border-color: var(--primary-color);
+}
+
+.hover-bg-secondary:hover {
+  background-color: var(--bg-secondary);
+}
+
+.hover-bg-light:hover {
   background-color: rgba(64, 158, 255, 0.05);
 }
 
-.upload-icon-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.upload-icon {
-  font-size: 48px;
-  color: #409eff;
-  margin-bottom: 15px;
-}
-
-.upload-tip {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 5px;
-}
-
-.hidden-file-input {
-  display: none;
-}
-
-.selected-files-panel {
-  margin-top: 15px;
-  border: 1px solid #ebeef5;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.selected-files-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  background-color: #f5f7fa;
-  border-bottom: 1px solid #ebeef5;
-}
-
-.selected-files-header h4 {
-  margin: 0;
-  font-size: 14px;
-  color: #606266;
-}
-
-.file-list {
-  padding: 10px;
-}
-
-.file-item-preview {
-  display: flex;
-  align-items: center;
-  padding: 8px 10px;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-  position: relative;
-}
-
-.file-item-preview:hover {
-  background-color: #f5f7fa;
-}
-
-.file-preview-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  background-color: #f0f2f5;
-  margin-right: 12px;
-}
-
-.preview-type-icon {
+.text-xl {
   font-size: 24px;
-  color: #909399;
 }
 
-.file-info {
-  flex: 1;
-  overflow: hidden;
+.w-full {
+  width: 100%;
 }
 
-.file-name-preview {
-  font-size: 14px;
-  color: #303133;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.h-full {
+  height: 100%;
 }
 
-.file-size-preview {
-  font-size: 12px;
-  color: #909399;
-  margin-top: 4px;
+.h-70vh {
+  height: 70vh;
 }
 
-.remove-file-btn {
+.w-40px {
+  width: 40px;
+}
+
+.h-40px {
+  height: 40px;
+}
+
+.font-mono {
+  font-family: monospace;
+}
+
+.whitespace-pre-wrap {
+  white-space: pre-wrap;
+}
+
+.opacity-0 {
   opacity: 0;
-  transition: opacity 0.2s;
 }
 
-.file-item-preview:hover .remove-file-btn {
+.hover-show {
+  transition: opacity var(--transition-normal);
+}
+
+.flex:hover .hover-show {
   opacity: 1;
+}
+
+.mt-xs {
+  margin-top: 4px;
 }
 </style> 

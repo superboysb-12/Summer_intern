@@ -48,6 +48,10 @@ export const useCounterStore = defineStore('counter', () => {
   }
 
   const getUserInfo = () => {
+    if (!userInfo.value || Object.keys(userInfo.value).length === 0) {
+      // 确保即使没有用户信息也返回一个有效的对象，包含默认 ID 和角色
+      return { id: null, username: 'Guest', userRole: 'STUDENT' }
+    }
     return userInfo.value
   }
 

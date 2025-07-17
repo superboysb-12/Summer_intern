@@ -9,6 +9,7 @@ import com.XuebaoMaster.backend.LoginRecord.LoginRecordService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -21,7 +22,7 @@ public class UserController {
 
     @Autowired
     private JwtUtil jwtUtil;
-    
+
     @Autowired
     private LoginRecordService loginRecordService;
 
@@ -43,7 +44,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
         User authenticatedUser = userService.login(user);
-        
+
         // JWT
         final String token = jwtUtil.generateToken(new org.springframework.security.core.userdetails.User(
                 authenticatedUser.getUsername(),
@@ -59,12 +60,28 @@ public class UserController {
     }
 
     /**
+     * 获取所有用户，可以通过角色参数过滤
      * 
-     * @return
+     * @param role 用户角色，可选参数
+     * @return 用户列表
      */
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String role) {
+        List<User> users = userService.getAllUsers();
+
+        // 如果指定了角色参数，进行过滤
+        if (role != null && !role.isEmpty()) {
+            try {
+                User.UserRoleType roleType = User.UserRoleType.valueOf(role.toUpperCase());
+                users = users.stream()
+                        .filter(user -> user.getUserRole() == roleType)
+                        .collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                // 如果角色参数无效，忽略过滤
+            }
+        }
+
+        return ResponseEntity.ok(users);
     }
 
     /**

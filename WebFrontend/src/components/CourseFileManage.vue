@@ -541,9 +541,9 @@ onMounted(() => {
     @update:modelValue="handleClose"
     destroy-on-close
   >
-    <div class="course-file-manage-container">
+    <div class="container">
       <!-- 过滤器 -->
-      <div class="filter-section">
+      <el-card class="search-card">
         <el-form :inline="true" :model="queryParams">
           <el-form-item label="资源类型">
             <el-select v-model="queryParams.resourceType" placeholder="选择资源类型" clearable>
@@ -569,11 +569,11 @@ onMounted(() => {
             <el-button @click="resetFilter">重置</el-button>
           </el-form-item>
         </el-form>
-      </div>
+      </el-card>
       
       <!-- 操作工具栏 -->
       <div class="toolbar">
-        <div>
+        <div class="flex gap-sm flex-wrap">
           <el-button type="primary" :icon="Plus" @click="openLinkFileDialog" v-if="isTeacher || isAdmin">
             关联文件
           </el-button>
@@ -583,7 +583,7 @@ onMounted(() => {
           <el-button type="info" :icon="Link" @click="openFolderLinkDialog" v-if="isTeacher || isAdmin">
             关联文件夹
           </el-button>
-          <el-text type="info" v-if="!isTeacher && !isAdmin" class="role-debug">
+          <el-text type="info" v-if="!isTeacher && !isAdmin" class="text-warning text-sm ml-sm">
             注意: 您当前角色 "{{ userInfo.value.userRole || '未知' }}" 没有文件管理权限
             <el-button link type="primary" @click="refreshUserInfo">刷新权限</el-button>
           </el-text>
@@ -592,6 +592,7 @@ onMounted(() => {
       </div>
       
       <!-- 文件列表 -->
+      <el-card class="table-card">
       <el-table
         v-loading="loading"
         :data="courseFiles"
@@ -600,11 +601,11 @@ onMounted(() => {
       >
         <el-table-column label="文件名" min-width="200">
           <template #default="scope">
-            <div class="file-item">
+              <div class="flex items-center gap-sm">
               <el-icon :size="20">
                 <component :is="getFileTypeIcon(scope.row.fileId)" />
               </el-icon>
-              <span class="file-name">{{ getFileName(scope.row.fileId) }}</span>
+                <span class="text-overflow">{{ getFileName(scope.row.fileId) }}</span>
             </div>
           </template>
         </el-table-column>
@@ -639,6 +640,7 @@ onMounted(() => {
         
         <el-table-column label="操作" width="220" fixed="right">
           <template #default="scope">
+              <div class="flex justify-center gap-sm flex-wrap">
             <el-button type="primary" link :icon="Download" @click="downloadFile(scope.row.fileId)">
               下载
             </el-button>
@@ -657,18 +659,20 @@ onMounted(() => {
                 取消关联
               </el-button>
             </template>
+              </div>
           </template>
         </el-table-column>
       </el-table>
       
       <!-- 空状态 -->
       <el-empty v-if="courseFiles.length === 0 && !loading" description="暂无关联文件">
-        <div class="empty-state-buttons" v-if="isTeacher || isAdmin">
+          <div class="flex justify-center gap-sm flex-wrap" v-if="isTeacher || isAdmin">
           <el-button type="primary" @click="openLinkFileDialog">关联文件</el-button>
           <el-button type="success" @click="openBatchLinkDialog">批量关联</el-button>
           <el-button type="info" @click="openFolderLinkDialog">关联文件夹</el-button>
         </div>
       </el-empty>
+      </el-card>
     </div>
     
     <!-- 关联文件对话框 -->
@@ -697,10 +701,10 @@ onMounted(() => {
               :label="file.fileName"
               :value="file.id"
             >
-              <div class="file-option">
+              <div class="flex items-center gap-sm">
                 <el-icon><Document /></el-icon>
                 <span>{{ file.fileName }}</span>
-                <span class="file-size">({{ formatFileSize(file.id) }})</span>
+                <span class="text-tertiary text-xs">({{ formatFileSize(file.id) }})</span>
               </div>
             </el-option>
           </el-select>
@@ -763,7 +767,7 @@ onMounted(() => {
         </el-form-item>
         
         <el-form-item label="选择文件">
-          <div class="file-selection-container">
+          <div class="border radius-sm overflow-auto" style="max-height: 300px;">
             <el-table
               :data="allFiles"
               border
@@ -817,7 +821,7 @@ onMounted(() => {
               :label="folder.fileName"
               :value="folder.id"
             >
-              <div class="file-option">
+              <div class="flex items-center gap-sm">
                 <el-icon><Folder /></el-icon>
                 <span>{{ folder.fileName }}</span>
               </div>
@@ -852,77 +856,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.course-file-manage-container {
-  padding: 0;
-}
-
-.filter-section {
-  margin-bottom: 20px;
-}
-
-.toolbar {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.file-name {
+/* 使用全局样式，仅保留特殊样式 */
+.text-overflow {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.file-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.text-xs {
+  font-size: var(--text-xs);
 }
 
-.file-size {
-  color: #909399;
-  font-size: 12px;
-}
-
-.file-selection-container {
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  padding: 0;
-  max-height: 300px;
-  overflow: auto;
-}
-
-.role-debug {
-  margin-left: 10px;
-  font-size: 14px;
-  color: #e6a23c; /* 警告颜色 */
-}
-
-.empty-state-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* 响应式样式 */
-@media (max-width: 768px) {
-  .el-form-item {
-    margin-bottom: 10px;
-  }
-  
-  .toolbar {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .empty-state-buttons {
-    flex-direction: column;
-  }
+.text-warning {
+  color: var(--warning-color);
 }
 </style> 

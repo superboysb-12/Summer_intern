@@ -321,79 +321,88 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="user-manage-container">
-    <div class="page-header">
-      <h2>用户管理</h2>
-      <p>管理系统用户信息，包括管理员、教师和学生</p>
+  <div class="container">
+    <div class="page-header mb-lg">
+      <h2 class="text-2xl mb-sm">用户管理</h2>
+      <p class="text-secondary">管理系统用户信息，包括管理员、教师和学生</p>
     </div>
     
     <!-- 搜索工具栏 -->
-    <el-card class="search-card">
-      <el-form :model="queryParams" ref="queryForm" :inline="true">
-        <el-form-item label="关键词">
-          <el-input
-            v-model="queryParams.keyword"
-            placeholder="用户名/姓名/学号"
-            clearable
-            @keyup.enter="handleSearch"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
-          <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
-        </el-form-item>
-      </el-form>
+    <el-card class="mb-md">
+      <div class="card-body">
+        <el-form :model="queryParams" ref="queryForm" :inline="true">
+          <el-form-item label="关键词">
+            <el-input
+              v-model="queryParams.keyword"
+              placeholder="用户名/姓名/学号"
+              clearable
+              @keyup.enter="handleSearch"
+            />
+          </el-form-item>
+          <el-form-item>
+            <div class="d-flex gap-sm">
+              <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
+              <el-button :icon="RefreshRight" @click="resetSearch">重置</el-button>
+            </div>
+          </el-form-item>
+        </el-form>
+      </div>
     </el-card>
     
     <!-- 操作工具栏 -->
-    <div class="toolbar">
+    <div class="d-flex justify-between mb-md">
       <el-button type="primary" :icon="Plus" @click="handleAdd">新增用户</el-button>
+      <el-button :icon="RefreshRight" @click="refreshList">刷新</el-button>
     </div>
     
     <!-- 用户表格 -->
-    <el-card class="table-card">
-      <el-table
-        v-loading="loading"
-        :data="userList"
-        border
-        stripe
-        style="width: 100%"
-      >
-        <el-table-column type="index" width="50" />
-        <el-table-column prop="username" label="用户名" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="name" label="姓名" min-width="100" show-overflow-tooltip />
-        <el-table-column prop="studentNumber" label="学号" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="userRole" label="角色" min-width="80">
-          <template #default="scope">
-            <el-tag :type="scope.row.userRole === 'ADMIN' ? 'danger' : scope.row.userRole === 'TEACHER' ? 'warning' : 'success'">
-              {{ formatRole(scope.row.userRole) }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="email" label="邮箱" min-width="150" show-overflow-tooltip />
-        <el-table-column prop="phone" label="手机号" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="schoolClass.className" label="班级" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="createdAt" label="创建时间" min-width="180" show-overflow-tooltip />
-        <el-table-column label="操作" width="260" fixed="right">
-          <template #default="scope">
-            <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
-            <el-button type="success" link :icon="DataAnalysis" @click="viewUserData(scope.row.id)">数据查看</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      
-      <!-- 分页 -->
-      <div class="pagination">
-        <el-pagination
-          v-model:current-page="queryParams.pageNum"
-          v-model:page-size="queryParams.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="total"
-          @size-change="getUserList"
-          @current-change="getUserList"
-        />
+    <el-card class="mb-lg">
+      <div class="card-body">
+        <el-table
+          v-loading="loading"
+          :data="userList"
+          border
+          stripe
+          style="width: 100%"
+        >
+          <el-table-column type="index" width="50" />
+          <el-table-column prop="username" label="用户名" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="name" label="姓名" min-width="100" show-overflow-tooltip />
+          <el-table-column prop="studentNumber" label="学号" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="userRole" label="角色" min-width="80">
+            <template #default="scope">
+              <el-tag :type="scope.row.userRole === 'ADMIN' ? 'danger' : scope.row.userRole === 'TEACHER' ? 'warning' : 'success'">
+                {{ formatRole(scope.row.userRole) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="email" label="邮箱" min-width="150" show-overflow-tooltip />
+          <el-table-column prop="phone" label="手机号" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="schoolClass.className" label="班级" min-width="120" show-overflow-tooltip />
+          <el-table-column prop="createdAt" label="创建时间" min-width="180" show-overflow-tooltip />
+          <el-table-column label="操作" width="260" fixed="right">
+            <template #default="scope">
+              <div class="d-flex gap-sm">
+                <el-button type="primary" link :icon="Edit" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button type="danger" link :icon="Delete" @click="handleDelete(scope.row.id)">删除</el-button>
+                <el-button type="success" link :icon="DataAnalysis" @click="viewUserData(scope.row.id)">数据查看</el-button>
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        
+        <!-- 分页 -->
+        <div class="pagination-container mt-md d-flex justify-end">
+          <el-pagination
+            v-model:current-page="queryParams.pageNum"
+            v-model:page-size="queryParams.pageSize"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total"
+            @size-change="getUserList"
+            @current-change="getUserList"
+          />
+        </div>
       </div>
     </el-card>
     
@@ -461,7 +470,7 @@ onMounted(() => {
         </el-form-item>
       </el-form>
       <template #footer>
-        <div class="dialog-footer">
+        <div class="d-flex justify-end gap-sm">
           <el-button @click="dialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitForm(userFormRef)">确定</el-button>
         </div>
@@ -471,62 +480,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.user-manage-container {
-  padding: 20px 0;
-}
-
-.page-header {
-  margin-bottom: 24px;
-}
-
-.page-header h2 {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.page-header p {
-  margin: 8px 0 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.search-card {
-  margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-.toolbar {
-  margin-bottom: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.table-card {
-  border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-}
-
-.pagination {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .el-form-item {
-    margin-bottom: 10px;
-  }
-  
-  .toolbar {
-    flex-direction: column;
-  }
-  
-  .pagination {
-    justify-content: center;
-  }
-}
+/* 移除重复样式，使用全局样式变量 */
 </style>
