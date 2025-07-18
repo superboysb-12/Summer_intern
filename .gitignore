@@ -9,3 +9,4 @@ datasetGenerate/query_extraction.log
 /datasetGenerate/RawData
 datasetGenerate/pipeline.log
 /work_flow/kg_rag_service/bge-small-zh-v1.5
+datasetGenerate/test_output.jsonl.jsonl

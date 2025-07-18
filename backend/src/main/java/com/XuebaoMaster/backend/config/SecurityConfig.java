@@ -41,7 +41,6 @@ public class SecurityConfig {
                 .csrf().disable()
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**", "/users/register", "/users/login").permitAll()
-                        .requestMatchers("/api/homework-questions/**").authenticated() // 明确允许已认证用户访问homework-questions接口
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

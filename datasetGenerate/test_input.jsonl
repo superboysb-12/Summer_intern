@@ -1,0 +1,415 @@
+{"query": "TensorFlow.js"} 
+{"query": "TensorFlow Lite在移动设备上的应用场景"}
+{"query": "如何使用TensorFlow.js进行图像识别"}
+{"query": "嵌入式Python开发常用的库"}
+{"query": "TensorFlow.js与TensorFlow的主要区别"}
+{"query": "在浏览器中运行机器学习模型的优势"}
+{"query": "TensorFlow Lite模型转换方法"}
+{"query": "Python在物联网设备中的应用"}
+{"query": "TensorFlow.js的性能优化技巧"}
+{"query": "嵌入式系统中的Python与C++交互"}{"query": "TensorFlow.js features"}
+{"query": "TensorFlow.js vs Python TensorFlow"}
+{"query": "TensorFlow.js GPU acceleration"}
+{"query": "TensorFlow.js advantages"}
+{"query": "TensorFlow.js architecture"}
+{"query": "TensorFlow.js core concepts"}
+{"query": "TensorFlow.js Layers API vs Core API"}
+{"query": "TensorFlow.js tensor construction"}
+{"query": "TensorFlow print tensor values"}
+{"query": "TensorFlow shape inference"}
+{"query": "TensorFlow create tensor example"}
+{"query": "TensorFlow.js variable initialization"}
+{"query": "TensorFlow.js assign method"}
+{"query": "TensorFlow.js operations on tensors"}
+{"query": "tensor2d in TensorFlow"}
+{"query": "JavaScript tensor operations"}
+{"query": "TensorFlow.js 2D array"}
+{"query": "tensor addition in TensorFlow"}
+{"query": "tf.tensor2d operations"}
+{"query": "JavaScript TensorFlow examples"}
+{"query": "TensorFlow.js sequential model example"}
+{"query": "TensorFlow.js memory management dispose tidy"}
+{"query": "TensorFlow.js tf.tidy usage"}
+{"query": "GPU memory management in TensorFlow.js"}
+{"query": "dispose vs tf.tidy in TensorFlow.js"}
+{"query": "tf.tidy memory management"}
+{"query": "TensorFlow memory leak prevention"}
+{"query": "tf.tidy usage example"}
+{"query": "TensorFlow.js environment setup"}
+{"query": "TensorFlow.js script tag vs NPM"}
+{"query": "loading TensorFlow.js in HTML"}
+{"query": "TensorFlow.js setup in HTML"}
+{"query": "how to add tf.min.js to HTML"}
+{"query": "TensorFlow.js browser usage"}
+{"query": "TensorFlow.js basic usage"}
+{"query": "F12 developer tools for debugging"}
+{"query": "Node.js setup for TensorFlow.js"}
+{"query": "test question naming conventions"}
+{"query": "question version format"}
+{"query": "educational assessment standards"}
+{"query": "TensorFlow.js test question"}
+{"query": "index.js entry point"}
+{"query": "package.json setup"}
+{"query": "how to link index.js in HTML"}
+{"query": "basic TensorFlow.js example code"}
+{"query": "tf.tensor creation in TensorFlow.js"}
+{"query": "package.json configuration"}
+{"query": "JavaScript development dependencies"}
+{"query": "Node.js project setup"}
+{"query": "TensorFlow.js test"}
+{"query": "MIT license for TensorFlow.js"}
+{"query": "Node.js engines requirement"}
+{"query": "TensorFlow.js version 7.9.0"}
+{"query": "TensorFlow.js dependencies"}
+{"query": "JavaScript machine learning libraries"}
+{"query": "parcel build configuration"}
+{"query": "cross-env NODE_ENV usage"}
+{"query": "yalc link local packages"}
+{"query": "Babel 7.0.0 release notes"}
+{"query": "@babel/plugin-transform-runtime usage"}
+{"query": "Babel plugin version compatibility"}
+{"query": "Babel preset env version 7.1.0"}
+{"query": "Babel preset env npm package"}
+{"query": "Babel preset env configuration"}
+{"query": "clang-format version 1.6.1"}
+{"query": "clang-format configuration"}
+{"query": "clang-format usage"}
+{"query": "cross-env package usage"}
+{"query": "cross-env version 1.2.2"}
+{"query": "what is cross-env"}
+{"query": "parcel-bundler npm package"}
+{"query": "parcel-bundler version 5.1.6"}
+{"query": "what is parcel-bundler"}
+{"query": "yarn install dependencies"}
+{"query": "yarn package manager"}
+{"query": "yarn version 1.0.0-pre.22"}
+{"query": "babel-preset-env warning"}
+{"query": "lockfile not found npm"}
+{"query": "resolving npm packages"}
+{"query": "Browserslist 2 compatibility issues"}
+{"query": "Browserslist reading errors"}
+{"query": "Browserslist version 2 problems"}
+{"query": "fsevents package info"}
+{"query": "Fetching packages in 3.0 config"}
+{"query": "3.0 config tools usage"}
+{"query": "win32 platform compatibility"}
+{"query": "fsevents module error"}
+{"query": "incompatible module win32"}
+{"query": "tensorflow tfjs compatibility issues"}
+{"query": "tensorflow tfjs-data dependency error"}
+{"query": "npm dependency exclusion warning"}
+{"query": "peer dependency seedrandom"}
+{"query": "npm unmet peer dependency"}
+{"query": "seedrandom version conflict"}
+{"query": "package building process"}
+{"query": "lockfile in package management"}
+{"query": "saved lockfile meaning"}
+{"query": "yarn watch command"}
+{"query": "yarn run development server"}
+{"query": "yarn watch usage"}
+{"query": "parcel index.html command"}
+{"query": "parcel development server setup"}
+{"query": "how to open a URL in browser"}
+{"query": "view browser results"}
+{"query": "Figure 7-3 running results"}
+{"query": "TensorFlow.js linear regression tutorial"}
+{"query": "predict car MPG with machine learning"}
+{"query": "browser-based model training TensorFlow.js"}
+{"query": "how to load TensorFlow.js from cdn.jsdelivr.net"}
+{"query": "tfjs-vis browser visualization tools"}
+{"query": "create HTML file for TensorFlow.js tutorial"}
+{"query": "TensorFlow JavaScript library"}
+{"query": "tf.min.js CDN"}
+{"query": "TensorFlow 2.0.0 script"}
+{"query": "tfjs data visualization scatterplot"}
+{"query": "async data loading in JavaScript"}
+{"query": "Horsepower vs MPG dataset analysis"}
+{"query": "TensorFlow.js sequential vs model"}
+{"query": "tf.layers.dense inputShape units"}
+{"query": "TensorFlow.js model visualization"}
+{"query": "TensorFlow.js data preprocessing"}
+{"query": "tf.tidy() memory management"}
+{"query": "min-max scaling normalization TensorFlow"}
+{"query": "TensorFlow model.fit() usage"}
+{"query": "TensorFlow-vis visualization callbacks"}
+{"query": "model.predict() un-normalize data"}
+{"query": "CNN Tensorflow.js手写数字识别"}
+{"query": "手写数字分类器训练"}
+{"query": "测试数据评估模型准确性"}
+{"query": "Tensorflow.js mnist example GitHub"}
+{"query": "mnist project file structure"}
+{"query": "yarn build Tensorflow.js project"}
+{"query": "create index.html and index.js files"}
+{"query": "tfjs-examples mnist data.js"}
+{"query": "HTML file structure example"}
+{"query": "TensorFlow.js tutorial"}
+{"query": "TensorFlow.js basics"}
+{"query": "TensorFlow.js script URL"}
+{"query": "tf.min.js download"}
+{"query": "TensorFlow.js latest version"}
+{"query": "MNIST dataset preprocessing in JavaScript"}
+{"query": "tfjs-vis display MNIST images"}
+{"query": "CORS solution for local ML development"}
+{"query": "MNIST dataset neural network structure"}
+{"query": "convolutional neural network layers explained"}
+{"query": "TensorFlow sequential model configuration"}
+{"query": "model training in TensorFlow.js"}
+{"query": "batch size impact on model training"}
+{"query": "MNIST dataset validation set usage"}
+{"query": "TensorFlow.js model evaluation"}
+{"query": "hand gesture recognition with TensorFlow.js"}
+{"query": "confusion matrix in machine learning"}
+{"query": "TensorFlow.js predict car fuel efficiency"}
+{"query": "TensorFlow.js handwritten digit recognition"}
+{"query": "TensorFlow.js model deployment in browser"}
+{"query": "TensorFlow Lite features"}
+{"query": "TensorFlow Lite mobile deep learning"}
+{"query": "TensorFlow Lite vs TensorFlow"}
+{"query": "TensorFlow Lite history"}
+{"query": "TF Lite vs TF Mobile"}
+{"query": "TensorFlow Lite optimization for edge devices"}
+{"query": "TensorFlow Lite applications"}
+{"query": "TFLite for mobile OCR"}
+{"query": "TFLite in IoT devices"}
+{"query": "TensorFlow Lite architecture"}
+{"query": "TensorFlow Lite for IoT devices"}
+{"query": "device-side machine learning inference"}
+{"query": "TensorFlow Lite model conversion"}
+{"query": "TensorFlow Lite hardware acceleration"}
+{"query": "TFLite model conversion process"}
+{"query": "TensorFlow to TFLite converter"}
+{"query": "TFLite interpreter hardware acceleration"}
+{"query": "TensorFlow Lite converter Python API"}
+{"query": "TFLite model optimization techniques"}
+{"query": "post-training quantization in TensorFlow Lite"}
+{"query": "FlatBuffers TFLite model format"}
+{"query": "TFLite schema.fbs structure"}
+{"query": "memory efficiency in TFLite models"}
+{"query": "TensorFlow Lite interpreter features"}
+{"query": "TFLite memory allocation strategy"}
+{"query": "TFLite API languages supported"}
+{"query": "TensorFlow Lite development workflow"}
+{"query": "convert model to TensorFlow Lite"}
+{"query": "TensorFlow Lite model optimization"}
+{"query": "TensorFlow Hub pre-trained models"}
+{"query": "MobileNet TensorFlow Lite"}
+{"query": "FlatBuffer format advantages"}
+{"query": "tflite_convert command line parameters"}
+{"query": "SavedModel file path directory"}
+{"query": "TensorFlow 1.x SavedModel"}
+{"query": "Keras model file specification"}
+{"query": "tf.keras model生成HDF5文件路径"}
+{"query": "TensorFlow SavedModel导出方法"}
+{"query": "Keras H5模型转换示例"}
+{"query": "TensorFlow Lite converter API"}
+{"query": "convert SavedModel to TensorFlow Lite"}
+{"query": "convert Keras model to TensorFlow Lite"}
+{"query": "TensorFlow Lite interpreter API"}
+{"query": "GPU acceleration in TensorFlow Lite"}
+{"query": "MobileNet image classification speed"}
+{"query": "TensorFlow Lite GPU Delegates"}
+{"query": "TensorFlow Lite Android AAR"}
+{"query": "TensorFlow Lite Raspberry Pi deployment"}
+{"query": "post-training quantization TensorFlow Lite"}
+{"query": "quantization-aware training benefits"}
+{"query": "TensorFlow Lite花卉识别"}
+{"query": "MobileNets_v2 Android实现"}
+{"query": "迁移学习图像识别模型"}
+{"query": "MobileNet V2迁移学习 for花卉分类"}
+{"query": "ImageDataGenerator图像数据预处理"}
+{"query": "花卉数据集划分训练集验证集"}
+{"query": "MobileNetV2 transfer learning"}
+{"query": "Keras flow_from_directory example"}
+{"query": "ImageDataGenerator batch shape"}
+{"query": "MobileNet V2 transfer learning"}
+{"query": "include_top=False in MobileNet V2"}
+{"query": "GlobalAveragePooling2D for feature extraction"}
+{"query": "tf.keras GlobalAveragePooling2D"}
+{"query": "categorical crossentropy loss function"}
+{"query": "Adam optimizer in tf.keras"}
+{"query": "MobileNet V2 fine tuning"}
+{"query": "conv2d and dropout layers in Keras"}
+{"query": "convert TensorFlow model to TFLite"}
+{"query": "Android TensorFlow Lite model deployment"}
+{"query": "MobileNet V2 flower classification"}
+{"query": "Android Studio TensorFlow Lite example"}
+{"query": "Android Studio open existing project"}
+{"query": "TensorFlow Lite model file setup"}
+{"query": "build.gradle dependencies for TensorFlow Lite"}
+{"query": "TensorFlow Lite GPU implementation"}
+{"query": "nightly version TensorFlow Lite"}
+{"query": "TensorFlow Lite GPU dependency"}
+{"query": "TensorFlow Lite support library"}
+{"query": "nightly version dependencies"}
+{"query": "Gradle implementation for TensorFlow Lite"}
+{"query": "aaptOptions noCompress tflite"}
+{"query": "Android Studio proxy setup"}
+{"query": "Gradle repositories mirror China"}
+{"query": "TensorFlow Lite interpreter initialization"}
+{"query": "Android TensorFlow Lite image classification"}
+{"query": "PoseNet model for pose estimation"}
+{"query": "MobileNet model optimization Android"}
+{"query": "FlatBuffers vs Protocol Buffer"}
+{"query": "TFLiteConverter Python API"}
+{"query": "TFLiteConverter from saved model"}
+{"query": "convert saved model to TFLite"}
+{"query": "SavedModel to TFLite conversion"}
+{"query": "TensorFlow Lite converter"}
+{"query": "convert SavedModel to TFLite"}
+{"query": "save TensorFlow Lite model"}
+{"query": "convert Keras to TFLite"}
+{"query": "write TFLite model to file"}
+{"query": "tf.keras Sequential model example"}
+{"query": "Dense layers in tf.keras"}
+{"query": "compile model with sgd optimizer"}
+{"query": "model.fit in machine learning"}
+{"query": "training data for linear regression"}
+{"query": "epochs in neural networks"}
+{"query": "tf.saved_model.save usage"}
+{"query": "SavedModel in TensorFlow"}
+{"query": "export Keras model as SavedModel"}
+{"query": "TFLiteConverter from Keras model"}
+{"query": "convert Keras model to TFLite"}
+{"query": "TensorFlow Lite model inference"}
+{"query": "MobileNet V2 for flower recognition"}
+{"query": "GlobalAveragePooling2D layer usage"}
+{"query": "MobileNetV2 model architecture"}
+{"query": "fine-tuning pretrained models"}
+{"query": "transfer learning with MobileNetV2"}
+{"query": "number of layers in base model"}
+{"query": "base model layers count"}
+{"query": "how to check model layers in Python"}
+{"query": "fine tuning in neural networks"}
+{"query": "fine_tune_at parameter usage"}
+{"query": "how to set fine_tune_at in deep learning"}
+{"query": "MobileNet V2 fine-tuning layers"}
+{"query": "TensorFlow Lite Android deployment"}
+{"query": "树莓派 Python 环境配置"}
+{"query": "检查树莓派 Python 版本"}
+{"query": "树莓派 Python 开发环境"}
+{"query": "Python 2.7 end of life"}
+{"query": "Raspberry Pi Python installation"}
+{"query": "Python version on Raspberry Pi"}
+{"query": "Python 3.9.2 version"}
+{"query": "check preinstalled Python version"}
+{"query": "Python version compatibility"}
+{"query": "upgrade Raspberry Pi system"}
+{"query": "change Raspberry Pi software source"}
+{"query": "install specific Python version"}
+{"query": "Python源码包下载"}
+{"query": "Python依赖安装"}
+{"query": "Python官网下载"}
+{"query": "Python 3.9.2 source code compilation"}
+{"query": "install Python to /opt/python"}
+{"query": "Python source code directory size"}
+{"query": "Python 3.9 installation directory"}
+{"query": "usr bin Python path"}
+{"query": "default Python installation locations"}
+{"query": "Python module compilation error"}
+{"query": "make install soft link"}
+{"query": "Python module dependencies"}
+{"query": "how to start Python after creating a link"}
+{"query": "Python link creation and execution"}
+{"query": "launching Python from a link"}
+{"query": "how to create a python symlink in /usr/bin"}
+{"query": "python 3.9.2 symlink setup"}
+{"query": "linux create python symbolic link"}
+{"query": "pip3 installation"}
+{"query": "Python pip soft link"}
+{"query": "pip3 official integration"}
+{"query": "JupyterLab installation guide"}
+{"query": "JupyterLab vs Jupyter Notebook"}
+{"query": "pip install JupyterLab"}
+{"query": "pip install --no-cache-dir error"}
+{"query": "jupyter notebook config file location"}
+{"query": "jupyter lab access password setup"}
+{"query": "Jupyter lab remote access"}
+{"query": "Raspberry Pi Jupyter setup"}
+{"query": "Jupyter lab port 8888"}
+{"query": "Jupyter Lab interface"}
+{"query": "Jupyter Lab features"}
+{"query": "Jupyter Lab usage"}
+{"query": "树莓派 GPIO 功能"}
+{"query": "树莓派 GPIO 编程"}
+{"query": "树莓派 GPIO 安全使用"}
+{"query": "Raspberry Pi GPIO pin numbering schemes"}
+{"query": "Wiring Pi library functions and installation"}
+{"query": "BCM vs physical pin numbering in Raspberry Pi"}
+{"query": "Python控制树莓派GPIO"}
+{"query": "树莓派点亮LED电路"}
+{"query": "GPIO21控制LED灯"}
+{"query": "LED current limiting resistor calculation"}
+{"query": "Raspberry Pi GPIO control tutorial"}
+{"query": "BCM vs Broadcom GPIO pin modes"}
+{"query": "GPIO控制LED闪烁"}
+{"query": "树莓派按键控制LED电路"}
+{"query": "四脚按键开关工作原理"}
+{"query": "switch debouncing"}
+{"query": "button bounce effect"}
+{"query": "electrical contact bounce"}
+{"query": "RPI.GPIO edge detection"}
+{"query": "switch debouncing in Python"}
+{"query": "wait_for_edge vs add_event_detect"}
+{"query": "NVIDIA Jetson Nano development environment setup"}
+{"query": "Jetson Nano specifications and features"}
+{"query": "Jetson Nano vs Raspberry Pi 4 comparison"}
+{"query": "Jetson Nano接口功能说明"}
+{"query": "Jetson Nano深度学习框架支持"}
+{"query": "Jetson Nano电源和存储要求"}
+{"query": "Jetson Nano CSI camera interface"}
+{"query": "how to flash Jetson Nano microSD card"}
+{"query": "Jetson Nano VNC setup"}
+{"query": "Jetson Nano install TensorFlow GPU"}
+{"query": "VNC Viewer login Jetson Nano"}
+{"query": "Jetson Nano OpenCV CUDA support"}
+{"query": "Jetson Nano OpenCV manual installation"}
+{"query": "OpenCV compile with CUDA support"}
+{"query": "OpenCV dependencies installation Jetson Nano"}
+{"query": "Jetson Nano CSI camera setup"}
+{"query": "face recognition with OpenCV on Jetson Nano"}
+{"query": "Haar cascade classifier for face detection"}
+{"query": "Haar cascade classifier parameters"}
+{"query": "OpenCV CSI camera GStreamer setup"}
+{"query": "Face Recognition library API steps"}
+{"query": "花卉识别 图像识别"}
+{"query": "TensorFlow Lite 架构"}
+{"query": "边缘计算 图像识别"}
+{"query": "TensorFlow Lite model conversion process"}
+{"query": "TFLite interpreter hardware acceleration"}
+{"query": "flower recognition CNN architecture"}
+{"query": "TensorFlow image_dataset_from_directory"}
+{"query": "training validation split Keras"}
+{"query": "image dataset batch size"}
+{"query": "Conv2D and MaxPooling2D in TensorFlow"}
+{"query": "TensorFlow Lite model deployment"}
+{"query": "image classification with TensorFlow"}
+{"query": "sunflower identification"}
+{"query": "types of sunflowers"}
+{"query": "sunflower image classification"}
+{"query": "TensorFlow version check"}
+{"query": "TensorFlow confidence score"}
+{"query": "TensorFlow code version"}
+{"query": "API version changes"}
+{"query": "API function compatibility"}
+{"query": "version 2.3.0 API updates"}
+{"query": "Jetson Nano 开发环境安装"}
+{"query": "TensorFlow Lite 花卉识别"}
+{"query": "TensorFlow dataset normalization"}
+{"query": "lambda function for image normalization"}
+{"query": "normalization_layer in TensorFlow"}
+{"query": "TensorFlow Conv2D model example"}
+{"query": "Keras Sequential CNN architecture"}
+{"query": "Jetson Nano image classification"}
+{"query": "TFLite image preprocessing"}
+{"query": "TensorFlow Lite inference API"}
+{"query": "TensorFlow Lite mobile platforms"}
+{"query": "TensorFlow Lite model execution steps"}
+{"query": "load TFLite model in Python"}
+{"query": "interpreter.get_input_details() usage"}
+{"query": "interpret TFLite model output"}
+{"query": "get_tensor function in programming"}
+{"query": "what does get_tensor return"}
+{"query": "tensor data copy in programming"}
+{"query": "TensorFlow get_tensor example"}
+{"query": "TensorFlow softmax confidence score"}
+{"query": "TensorFlow version 2.3.0 API changes"}

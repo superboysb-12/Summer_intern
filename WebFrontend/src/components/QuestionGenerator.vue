@@ -850,6 +850,257 @@ watch(
     getQuestionList()
   }
 )
+
+// 练习相关的状态变量
+const practiceDialogVisible = ref(false)
+const practiceLoading = ref(false)
+const currentPractice = ref(null)
+const userAnswer = ref('')
+const practiceResult = ref(null)
+const practiceGrading = ref(false)
+
+// 处理练习题目
+const handlePractice = (row) => {
+  if (!row || row.status !== 'COMPLETED') {
+    ElMessage.warning('只能练习已完成生成的题目')
+    return
+  }
+  
+  try {
+    practiceLoading.value = true
+    currentPractice.value = null
+    userAnswer.value = ''
+    practiceResult.value = null
+    
+    // 获取题目详情
+    axios.get(`${BaseUrl}api/question-generator/${row.id}`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    }).then(response => {
+      if (response.data && response.data.success) {
+        currentPractice.value = response.data
+        practiceDialogVisible.value = true
+      } else {
+        ElMessage.error(response.data?.message || '获取题目详情失败')
+      }
+    }).catch(error => {
+      console.error('获取题目详情失败:', error)
+      ElMessage.error('获取题目详情失败: ' + (error.response?.data?.message || error.message))
+    }).finally(() => {
+      practiceLoading.value = false
+    })
+  } catch (error) {
+    practiceLoading.value = false
+    console.error('处理练习失败:', error)
+    ElMessage.error('处理练习失败: ' + error.message)
+  }
+}
+
+// 提交练习答案
+const submitPractice = async () => {
+  if (!currentPractice.value) return
+  
+  const question = renderQuestion(currentPractice.value.questionJson)
+  if (!question) return
+  
+  const questionType = question.type
+  
+  // 验证用户是否提供了答案
+  if (!userAnswer.value || userAnswer.value.trim() === '') {
+    ElMessage.warning('请先输入答案')
+    return
+  }
+  
+  practiceGrading.value = true
+  practiceResult.value = null
+  
+  try {
+    // 根据题型判断答案
+    if (questionType === '选择题') {
+      // 选择题：直接比较答案
+      const isCorrect = userAnswer.value.trim().toUpperCase() === question.answer.trim().toUpperCase()
+      practiceResult.value = {
+        correct: isCorrect,
+        score: isCorrect ? 100 : 0,
+        feedback: isCorrect ? 
+          '回答正确！' : 
+          `回答错误。正确答案是: ${question.answer}${question.explanation ? '\n解析: ' + question.explanation : ''}`
+      }
+    } else if (questionType === '判断题') {
+      // 判断题：直接比较答案
+      const userChoice = userAnswer.value.trim()
+      const correctAnswer = question.answer.trim()
+      const isCorrect = (userChoice === '正确' || userChoice === '对' || userChoice === 'true' || userChoice === 'True') && correctAnswer === '正确' ||
+                       (userChoice === '错误' || userChoice === '错' || userChoice === 'false' || userChoice === 'False') && correctAnswer === '错误'
+      
+      practiceResult.value = {
+        correct: isCorrect,
+        score: isCorrect ? 100 : 0,
+        feedback: isCorrect ? 
+          '回答正确！' : 
+          `回答错误。正确答案是: ${question.answer}${question.explanation ? '\n解析: ' + question.explanation : ''}`
+      }
+    } else if (questionType === '问答题' || questionType === '编程题') {
+      // 问答题或编程题：使用大模型API进行评估
+      await gradeWithAI(questionType, question)
+    } else {
+      ElMessage.warning('不支持的题目类型')
+      practiceGrading.value = false
+      return
+    }
+  } catch (error) {
+    console.error('提交答案出错:', error)
+    ElMessage.error('提交答案失败: ' + (error.response?.data?.message || error.message))
+  } finally {
+    practiceGrading.value = false
+  }
+}
+
+// 使用大模型API进行答案评分
+const gradeWithAI = async (questionType, question) => {
+  try {
+    // 构建系统提示词
+    let systemPrompt
+    
+    if (questionType === '问答题') {
+      systemPrompt = `你是一位专业的教育评分助手，负责评判学生的问答题回答。
+请基于以下信息，给出评分和详细反馈：
+- 问题: ${question.question}
+- 关键点: ${JSON.stringify(question.key_points || [])}
+- 参考答案: ${question.answer || '无'}
+- 学生回答: ${userAnswer.value}
+
+请严格按照以下JSON格式输出你的评分，不要包含任何其他文本：
+{
+  "score": 分数（0-100的整数，表示得分），
+  "feedback": "详细反馈，包括优点和不足，以及改进建议",
+  "keyPointsCovered": ["学生回答中涵盖的关键点列表"],
+  "keyPointsMissed": ["学生回答中缺失的关键点列表"]
+}
+
+评分标准：
+- 90-100分：回答全面准确，涵盖了所有关键点，表述清晰逻辑严密
+- 75-89分：回答较为准确，涵盖了大部分关键点，可能存在小的不足
+- 60-74分：回答基本准确，涵盖了部分关键点，但有明显不足
+- 40-59分：回答部分正确，但关键点覆盖不足，存在概念混淆或错误
+- 0-39分：回答大部分不正确，几乎没有涵盖关键点，存在严重错误
+
+请确保输出是有效的JSON格式，可以直接被JSON.parse()解析。`
+
+    } else if (questionType === '编程题') {
+      systemPrompt = `你是一位专业的编程教育评分助手，负责评判学生的编程题解答。
+请基于以下信息，给出评分和详细反馈：
+- 题目: ${question.title || ''}
+- 题目描述: ${question.description || ''}
+- 参考代码: ${question.reference_code || '无'}
+- 学生代码: ${userAnswer.value}
+
+请严格按照以下JSON格式输出你的评分，不要包含任何其他文本：
+{
+  "score": 分数（0-100的整数，表示得分），
+  "feedback": "详细反馈，包括优点和不足，以及改进建议",
+  "correctness": "代码正确性分析",
+  "efficiency": "代码效率分析",
+  "readability": "代码可读性分析"
+}
+
+评分标准：
+- 90-100分：代码完全正确，高效，具有良好的可读性和适当的注释
+- 75-89分：代码基本正确，比较高效，可读性好
+- 60-74分：代码能够解决问题，但效率不高或可读性一般
+- 40-59分：代码有部分错误，但整体思路基本正确
+- 0-39分：代码存在严重错误，无法解决问题
+
+请确保输出是有效的JSON格式，可以直接被JSON.parse()解析。`
+    }
+
+    // 用户消息
+    const userMessage = `请评分这个${questionType === '问答题' ? '问答题回答' : '编程题解答'}`
+
+    // 准备API调用的消息
+    const apiMessages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userMessage }
+    ]
+
+    // 调用DeepSeekChat API
+    const aiResponse = await axios.post(`${BaseUrl}api/deepseek/chat`, 
+      { messages: apiMessages },
+      { headers: { 'Authorization': `Bearer ${getToken()}` } }
+    )
+              
+    if (aiResponse.data && aiResponse.data.choices && aiResponse.data.choices.length > 0) {
+      const aiMessage = aiResponse.data.choices[0].message
+      try {
+        // 获取内容
+        let contentToProcess = aiMessage.content
+        
+        // 处理可能带有的Markdown代码块
+        const jsonBlockRegex = /```json\s*([\s\S]*?)\s*```/
+        const markdownMatch = jsonBlockRegex.exec(contentToProcess)
+        
+        if (markdownMatch && markdownMatch[1]) {
+          // 如果找到了json代码块，则提取其中的内容
+          contentToProcess = markdownMatch[1].trim()
+        }
+        
+        // 解析JSON响应
+        const gradingResult = JSON.parse(contentToProcess)
+        
+        // 设置结果
+        practiceResult.value = {
+          ...gradingResult,
+          aiGenerated: true
+        }
+        
+      } catch (jsonError) {
+        console.error('JSON解析失败:', jsonError)
+        practiceResult.value = {
+          score: 0,
+          feedback: '评分系统出现错误，无法解析结果。原始响应: ' + aiMessage.content,
+          error: true
+        }
+      }
+    } else {
+      practiceResult.value = {
+        score: 0,
+        feedback: '评分系统出现错误，无法获取评分结果。',
+        error: true
+      }
+    }
+  } catch (error) {
+    console.error('AI评分失败:', error)
+    practiceResult.value = {
+      score: 0,
+      feedback: '评分系统出现错误: ' + (error.message || '未知错误'),
+      error: true
+    }
+  }
+}
+
+// 重置练习
+const resetPractice = () => {
+  userAnswer.value = ''
+  practiceResult.value = null
+}
+
+// 根据分数返回颜色
+const getScoreColor = (score) => {
+  if (score >= 90) return '#67C23A' // 成功
+  if (score >= 75) return '#409EFF' // 主色
+  if (score >= 60) return '#E6A23C' // 警告
+  return '#F56C6C' // 危险
+}
+
+// 根据分数返回等级
+const getScoreLevel = (score) => {
+  if (score >= 90) return '优秀'
+  if (score >= 75) return '良好'
+  if (score >= 60) return '及格'
+  if (score >= 40) return '需要改进'
+  return '不及格'
+}
 </script>
 
 <template>
@@ -952,6 +1203,14 @@ watch(
             :disabled="scope.row.status !== 'COMPLETED'"
           >
             设计
+          </el-button>
+          <el-button
+            type="success"
+            link
+            @click="handlePractice(scope.row)"
+            :disabled="scope.row.status !== 'COMPLETED'"
+          >
+            练习
           </el-button>
           <el-button
             type="primary"
@@ -1677,6 +1936,259 @@ watch(
         </div>
       </template>
     </el-dialog>
+    
+    <!-- 练习对话框 -->
+    <el-dialog
+      v-model="practiceDialogVisible"
+      title="题目练习"
+      width="70%"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div v-loading="practiceLoading" class="practice-container">
+        <!-- 题目信息 -->
+        <div v-if="currentPractice" class="question-info">
+          <div class="info-item">
+            <span class="info-label">检索词:</span>
+            <span class="info-value">{{ currentPractice.query }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">题目类型:</span>
+            <span class="info-value">{{ formatQuestionType(currentPractice.questionType) }}</span>
+          </div>
+        </div>
+        
+        <el-divider content-position="center">题目内容</el-divider>
+        
+        <!-- 题目内容 -->
+        <div class="question-content" v-if="currentPractice && currentPractice.questionJson">
+          <!-- 选择题练习 -->
+          <div v-if="renderQuestion(currentPractice.questionJson).type === '选择题'" class="choice-question">
+            <div class="question-title">
+              <span class="question-type-tag">【选择题】</span>
+              {{ renderQuestion(currentPractice.questionJson).question }}
+            </div>
+            <div class="options-container">
+              <div 
+                v-for="(option, key) in renderQuestion(currentPractice.questionJson).options" 
+                :key="key"
+                class="option-item"
+                :class="{'selected-option': userAnswer === key && !practiceResult}"
+                @click="userAnswer = key"
+              >
+                <span class="option-key">{{ key }}.</span>
+                <span class="option-content">{{ option }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 判断题练习 -->
+          <div v-else-if="renderQuestion(currentPractice.questionJson).type === '判断题'" class="true-false-question">
+            <div class="question-title">
+              <span class="question-type-tag judge-tag">【判断题】</span>
+              {{ renderQuestion(currentPractice.questionJson).statement }}
+            </div>
+            <div class="judge-options">
+              <div 
+                class="judge-option"
+                :class="{'selected-option': userAnswer === '正确' && !practiceResult}"
+                @click="userAnswer = '正确'"
+              >
+                <span class="judge-icon">✓</span>正确
+              </div>
+              <div 
+                class="judge-option"
+                :class="{'selected-option': userAnswer === '错误' && !practiceResult}"
+                @click="userAnswer = '错误'"
+              >
+                <span class="judge-icon">✗</span>错误
+              </div>
+            </div>
+          </div>
+          
+          <!-- 问答题练习 -->
+          <div v-else-if="renderQuestion(currentPractice.questionJson).type === '问答题'" class="qa-question">
+            <div class="question-title">
+              <span class="question-type-tag qa-tag">【问答题】</span>
+              {{ renderQuestion(currentPractice.questionJson).question }}
+            </div>
+            <el-input
+              v-model="userAnswer"
+              type="textarea"
+              :rows="8"
+              placeholder="请在此处输入您的答案"
+              :disabled="!!practiceResult"
+            />
+          </div>
+          
+          <!-- 编程题练习 -->
+          <div v-else-if="renderQuestion(currentPractice.questionJson).type === '编程题'" class="programming-question">
+            <div class="question-title">
+              <span class="question-type-tag programming-tag">【编程题】</span>
+              {{ renderQuestion(currentPractice.questionJson).title }}
+            </div>
+            
+            <div class="section">
+              <div class="section-title">题目描述：</div>
+              <div class="section-content" v-html="formatExplanation(renderQuestion(currentPractice.questionJson).description)"></div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentPractice.questionJson).input_format">
+              <div class="section-title">输入格式：</div>
+              <pre class="code-block">{{ renderQuestion(currentPractice.questionJson).input_format }}</pre>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentPractice.questionJson).output_format">
+              <div class="section-title">输出格式：</div>
+              <div class="section-content">{{ renderQuestion(currentPractice.questionJson).output_format }}</div>
+            </div>
+            
+            <div class="section" v-if="renderQuestion(currentPractice.questionJson).examples && renderQuestion(currentPractice.questionJson).examples.length > 0">
+              <div class="section-title">示例：</div>
+              <div v-for="(example, index) in renderQuestion(currentPractice.questionJson).examples" :key="index" class="example-item">
+                <div class="example-header">示例 {{ index + 1 }}：</div>
+                <div class="example-content">
+                  <div class="example-input">
+                    <div class="example-label">输入：</div>
+                    <pre class="code-block">{{ example.input }}</pre>
+                  </div>
+                  <div class="example-output">
+                    <div class="example-label">输出：</div>
+                    <pre class="code-block">{{ example.output }}</pre>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <el-input
+              v-model="userAnswer"
+              type="textarea"
+              :rows="12"
+              placeholder="请在此处编写您的代码"
+              :disabled="!!practiceResult"
+              class="code-editor"
+              spellcheck="false"
+            />
+          </div>
+          
+          <!-- 不支持的题型 -->
+          <div v-else class="unsupported-question">
+            <el-alert
+              title="不支持的题目类型"
+              type="warning"
+              description="当前题目类型不支持在线练习"
+              :closable="false"
+              show-icon
+            />
+          </div>
+        </div>
+        
+        <!-- 评分结果 -->
+        <div v-if="practiceResult" class="practice-result">
+          <el-divider content-position="center">评分结果</el-divider>
+          
+          <!-- 选择题/判断题结果 -->
+          <div v-if="renderQuestion(currentPractice?.questionJson)?.type === '选择题' || renderQuestion(currentPractice?.questionJson)?.type === '判断题'" class="basic-result">
+            <el-result
+              :icon="practiceResult.correct ? 'success' : 'error'"
+              :title="practiceResult.correct ? '回答正确！' : '回答错误'"
+              :sub-title="practiceResult.correct ? '太棒了！' : '请继续努力！'"
+            >
+              <template #extra>
+                <div class="result-details">
+                  <div class="result-item">
+                    <span class="result-label">你的答案:</span>
+                    <span class="result-value">{{ userAnswer }}</span>
+                  </div>
+                  <div v-if="!practiceResult.correct" class="result-item">
+                    <span class="result-label">正确答案:</span>
+                    <span class="result-value">{{ renderQuestion(currentPractice.questionJson).answer }}</span>
+                  </div>
+                  <div v-if="!practiceResult.correct && renderQuestion(currentPractice.questionJson).explanation" class="result-item">
+                    <div class="result-label">解析:</div>
+                    <div class="result-value" v-html="formatExplanation(renderQuestion(currentPractice.questionJson).explanation)"></div>
+                  </div>
+                </div>
+              </template>
+            </el-result>
+          </div>
+          
+          <!-- AI评分结果 (问答题/编程题) -->
+          <div v-else-if="practiceResult.aiGenerated" class="ai-result">
+            <div class="score-section">
+              <el-progress
+                type="dashboard"
+                :percentage="practiceResult.score"
+                :color="getScoreColor(practiceResult.score)"
+                :status="practiceResult.score >= 60 ? 'success' : 'exception'"
+              />
+              <div class="score-label">{{ getScoreLevel(practiceResult.score) }}</div>
+            </div>
+            
+            <el-divider content-position="center">详细反馈</el-divider>
+            
+            <div class="feedback-section">
+              <div class="feedback-content" v-html="formatExplanation(practiceResult.feedback)"></div>
+              
+              <!-- 问答题关键点分析 -->
+              <div v-if="practiceResult.keyPointsCovered && practiceResult.keyPointsMissed" class="key-points-analysis">
+                <div class="covered-points">
+                  <h4>已涵盖的关键点</h4>
+                  <ul>
+                    <li v-for="(point, index) in practiceResult.keyPointsCovered" :key="index">{{ point }}</li>
+                  </ul>
+                </div>
+                <div class="missed-points">
+                  <h4>未涵盖的关键点</h4>
+                  <ul>
+                    <li v-for="(point, index) in practiceResult.keyPointsMissed" :key="index">{{ point }}</li>
+                  </ul>
+                </div>
+              </div>
+              
+              <!-- 编程题详细分析 -->
+              <div v-if="practiceResult.correctness || practiceResult.efficiency || practiceResult.readability" class="code-analysis">
+                <el-collapse>
+                  <el-collapse-item title="代码正确性" name="correctness">
+                    <div v-html="formatExplanation(practiceResult.correctness)"></div>
+                  </el-collapse-item>
+                  <el-collapse-item title="代码效率" name="efficiency">
+                    <div v-html="formatExplanation(practiceResult.efficiency)"></div>
+                  </el-collapse-item>
+                  <el-collapse-item title="代码可读性" name="readability">
+                    <div v-html="formatExplanation(practiceResult.readability)"></div>
+                  </el-collapse-item>
+                </el-collapse>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 错误结果 -->
+          <div v-else-if="practiceResult.error" class="error-result">
+            <el-alert
+              title="评分出错"
+              type="error"
+              :description="practiceResult.feedback"
+              :closable="false"
+              show-icon
+            />
+          </div>
+        </div>
+      </div>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="practiceDialogVisible = false">关闭</el-button>
+          <el-button type="info" @click="resetPractice" v-if="practiceResult">重新作答</el-button>
+          <el-button 
+            type="primary" 
+            @click="submitPractice" 
+            :loading="practiceGrading" 
+            :disabled="!userAnswer || practiceGrading || practiceResult"
+          >提交答案</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -2239,6 +2751,108 @@ watch(
   .efficiency-overview,
   .optimization-container .question-info {
     grid-template-columns: 1fr;
+  }
+}
+
+/* 练习相关样式 */
+.practice-container {
+  padding: 20px;
+}
+
+.selected-option {
+  border-color: var(--el-color-primary) !important;
+  background-color: var(--el-color-primary-light-9) !important;
+}
+
+.practice-result {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: var(--el-fill-color-light);
+  border-radius: 4px;
+}
+
+.basic-result .result-details {
+  text-align: left;
+  margin-top: 20px;
+}
+
+.result-item {
+  margin-bottom: 10px;
+}
+
+.result-label {
+  font-weight: bold;
+  margin-right: 10px;
+  color: var(--el-text-color-secondary);
+}
+
+.ai-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.score-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.score-label {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.feedback-section {
+  width: 100%;
+  text-align: left;
+}
+
+.feedback-content {
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: var(--el-fill-color-lighter);
+  border-radius: 4px;
+}
+
+.key-points-analysis {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.covered-points, .missed-points {
+  flex: 1;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.covered-points {
+  background-color: var(--el-color-success-light-9);
+}
+
+.missed-points {
+  background-color: var(--el-color-warning-light-9);
+}
+
+.covered-points h4, .missed-points h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.code-analysis {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.code-editor {
+  font-family: 'Consolas', 'Monaco', 'Andale Mono', 'Ubuntu Mono', 'Monaco', 'Menlo', 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+  .key-points-analysis {
+    flex-direction: column;
   }
 }
 </style> 
