@@ -29,6 +29,7 @@ const StudentCourses = () => import('../components/student/StudentCourses.vue')
 const StudentAssignments = () => import('../components/student/StudentAssignments.vue')
 const StudentResources = () => import('../components/student/StudentResources.vue')
 const StudentRecords = () => import('../components/student/StudentRecords.vue')
+const DoHomeworkQuestions = () => import('../components/student/DoHomeworkQuestions.vue')
 
 // 角色权限常量
 const ROLES = {
@@ -267,6 +268,15 @@ const routes = [
             requiresAuth: true,
             title: '教案在线编辑',
             roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
+        }
+    },
+    {
+        path: '/do-homework/:homeworkId',
+        component: DoHomeworkQuestions,
+        meta: {
+            requiresAuth: true,
+            title: '作业做题',
+            roles: [ROLES.STUDENT]  // 仅学生可访问
         }
     }
 ]

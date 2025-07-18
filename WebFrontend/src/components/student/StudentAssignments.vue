@@ -4,8 +4,10 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Search, RefreshRight, Reading, Upload, Edit, Delete } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../../stores/counter'
+import { useRouter } from 'vue-router'
 
 const store = useCounterStore()
+const router = useRouter()
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
 const userInfo = ref(store.getUserInfo())
@@ -299,6 +301,13 @@ const openSubmitDialog = (homework) => {
   }
   
   submitDialogVisible.value = true
+}
+
+// 打开做题对话框
+const openDoHomeworkDialog = (homework) => {
+  currentHomework.value = homework
+  // 跳转到做题页面
+  router.push({ path: `/do-homework/${homework.id}` })
 }
 
 // 获取文件名
@@ -668,6 +677,17 @@ onMounted(() => {
         <el-table-column label="操作" fixed="right" min-width="180" align="center">
         <template #default="scope">
             <div class="operation-buttons">
+              <!-- 做题按钮 -->
+              <el-button 
+                type="success" 
+                link 
+                :icon="Reading" 
+                @click="openDoHomeworkDialog(scope.row)"
+                :disabled="scope.row.status === 'CLOSED'"
+              >
+                做题
+              </el-button>
+              
               <!-- 提交按钮 -->
               <el-button 
                 type="primary" 

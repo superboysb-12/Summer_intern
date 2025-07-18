@@ -34,6 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final List<String> permitAllPaths = Arrays.asList(
             "/users/register",
             "/users/login",
+            "/api/auth/**",
             "/api/files/**");
 
     @Override

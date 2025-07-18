@@ -47,6 +47,25 @@ const gradeForm = reactive({
   feedback: ''
 })
 
+// 题目关联管理
+const questionsDialogVisible = ref(false)
+const currentHomeworkForQuestions = ref(null)
+const homeworkQuestions = ref([])
+const loadingQuestions = ref(false)
+
+// 搜索题目相关
+const searchQuestionQuery = ref('')
+const searchResults = ref([])
+const searchLoading = ref(false)
+const selectedQuestions = ref([])
+const addingQuestions = ref(false)
+
+// 添加题目表单
+const newQuestionForm = reactive({
+  questionOrder: 1,
+  scoreWeight: 1
+})
+
 // Query parameters
 const queryParams = reactive({
   status: ''
@@ -375,6 +394,228 @@ const submitGrade = async () => {
   }
 }
 
+// 加载作业关联的题目列表
+const loadHomeworkQuestions = async (homework) => {
+  loadingQuestions.value = true
+  currentHomeworkForQuestions.value = homework
+  questionsDialogVisible.value = true
+  
+  try {
+    // 获取作业关联的题目列表
+    const response = await axios.get(`${BaseUrl}api/homework-questions/homework/${homework.id}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    
+    if (response.data && response.data.success) {
+      homeworkQuestions.value = response.data.homeworkQuestions || []
+      
+      // 加载每个题目的详细信息
+      for (const item of homeworkQuestions.value) {
+        await loadQuestionDetails(item)
+      }
+      
+      // 按题目顺序排序
+      homeworkQuestions.value.sort((a, b) => a.questionOrder - b.questionOrder)
+    } else {
+      homeworkQuestions.value = []
+      ElMessage.warning('获取作业题目失败: ' + (response.data?.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('获取作业题目失败:', error)
+    ElMessage.error('获取作业题目失败: ' + (error.response?.data?.message || error.message))
+    homeworkQuestions.value = []
+  } finally {
+    loadingQuestions.value = false
+  }
+}
+
+// 加载题目详情
+const loadQuestionDetails = async (homeworkQuestion) => {
+  try {
+    // 注意：确保API路径正确
+    const response = await axios.get(`${BaseUrl}api/question-generator/${homeworkQuestion.questionId}`, {
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    
+    if (response.data) {
+      // 处理两种可能的响应格式
+      const questionData = response.data.success ? response.data : response.data;
+      homeworkQuestion.questionDetails = questionData;
+      
+      // 解析问题JSON获取题目类型和内容
+      if (questionData.questionJson) {
+        try {
+          const parsedJson = JSON.parse(questionData.questionJson);
+          homeworkQuestion.questionContent = parsedJson.questionText || '无题目内容';
+          homeworkQuestion.questionType = questionData.questionType || '未知类型';
+        } catch (e) {
+          console.error('解析题目JSON失败:', e);
+          homeworkQuestion.questionContent = '无法解析题目内容';
+        }
+      } else {
+        // 如果没有questionJson字段，尝试使用其他字段
+        homeworkQuestion.questionContent = questionData.query || questionData.content || '无题目内容';
+        homeworkQuestion.questionType = questionData.questionType || '未知类型';
+      }
+    }
+  } catch (error) {
+    console.error(`获取题目 ${homeworkQuestion.questionId} 详情失败:`, error);
+    homeworkQuestion.questionContent = '获取题目详情失败';
+  }
+}
+
+// 搜索题目
+const searchQuestions = async () => {
+  // 允许空关键词搜索（加载所有题目）
+  if (!searchQuestionQuery.value.trim()) {
+    // 不再显示警告，允许空关键词搜索
+    // ElMessage.warning('请输入搜索关键词')
+    // return
+  }
+  
+  searchLoading.value = true
+  try {
+    // 调用题目搜索API，使用query参数搜索题目
+    const response = await axios.get(`${BaseUrl}api/question-generator/list`, {
+      params: {
+        query: searchQuestionQuery.value.trim() // 即使为空也发送请求
+      },
+      headers: { 'Authorization': `Bearer ${getToken()}` }
+    })
+    
+    if (response.data && Array.isArray(response.data)) {
+      // 直接使用返回的数组
+      searchResults.value = response.data || []
+      
+      // 过滤掉已经添加的题目
+      const existingQuestionIds = homeworkQuestions.value.map(q => q.questionId)
+      searchResults.value = searchResults.value.filter(q => !existingQuestionIds.includes(q.id))
+    } else if (response.data && response.data.success && Array.isArray(response.data.questions)) {
+      // 如果返回的是 { success: true, questions: [...] } 格式 - 后端实际返回的格式
+      searchResults.value = response.data.questions || []
+      
+      // 过滤掉已经添加的题目
+      const existingQuestionIds = homeworkQuestions.value.map(q => q.questionId)
+      searchResults.value = searchResults.value.filter(q => !existingQuestionIds.includes(q.id))
+    } else if (response.data && response.data.success && Array.isArray(response.data.data)) {
+      // 如果返回的是 { success: true, data: [...] } 格式
+      searchResults.value = response.data.data || []
+      
+      // 过滤掉已经添加的题目
+      const existingQuestionIds = homeworkQuestions.value.map(q => q.questionId)
+      searchResults.value = searchResults.value.filter(q => !existingQuestionIds.includes(q.id))
+    } else {
+      searchResults.value = []
+      ElMessage.warning('获取题目列表失败: ' + (response.data?.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('搜索题目失败:', error)
+    ElMessage.error('搜索题目失败: ' + (error.response?.data?.message || error.message))
+    searchResults.value = []
+  } finally {
+    searchLoading.value = false
+  }
+}
+
+// 添加选中的题目到作业
+const addSelectedQuestionsToHomework = async () => {
+  if (selectedQuestions.value.length === 0) {
+    ElMessage.warning('请选择要添加的题目')
+    return
+  }
+  
+  addingQuestions.value = true
+  try {
+    // 准备批量添加的题目列表
+    const questions = selectedQuestions.value.map((question, index) => ({
+      questionId: question.id,
+      questionOrder: homeworkQuestions.value.length + index + 1, // 从当前最大顺序号开始
+      scoreWeight: newQuestionForm.scoreWeight
+    }))
+    
+    // 调用批量添加API
+    const response = await axios.post(
+      `${BaseUrl}api/homework-questions/${currentHomeworkForQuestions.value.id}/batch-add`,
+      { questions },
+      { headers: { 'Authorization': `Bearer ${getToken()}` } }
+    )
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('添加题目成功')
+      // 重新加载题目列表
+      await loadHomeworkQuestions(currentHomeworkForQuestions.value)
+      
+      // 清空选择
+      selectedQuestions.value = []
+      searchResults.value = []
+      searchQuestionQuery.value = ''
+    } else {
+      ElMessage.error('添加题目失败: ' + (response.data?.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('添加题目失败:', error)
+    ElMessage.error('添加题目失败: ' + (error.response?.data?.message || error.message))
+  } finally {
+    addingQuestions.value = false
+  }
+}
+
+// 从作业中移除题目
+const removeQuestionFromHomework = async (homeworkQuestion) => {
+  try {
+    await ElMessageBox.confirm('确认从作业中移除此题目?', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    
+    const response = await axios.delete(
+      `${BaseUrl}api/homework-questions/${currentHomeworkForQuestions.value.id}/questions/${homeworkQuestion.questionId}`,
+      { headers: { 'Authorization': `Bearer ${getToken()}` } }
+    )
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('移除题目成功')
+      // 更新本地题目列表
+      homeworkQuestions.value = homeworkQuestions.value.filter(q => q.id !== homeworkQuestion.id)
+      // 重新加载题目列表以确保顺序等信息正确
+      await loadHomeworkQuestions(currentHomeworkForQuestions.value)
+    } else {
+      ElMessage.error('移除题目失败: ' + (response.data?.message || '未知错误'))
+    }
+  } catch (error) {
+    if (error !== 'cancel') {
+      console.error('移除题目失败:', error)
+      ElMessage.error('移除题目失败: ' + (error.response?.data?.message || error.message))
+    }
+  }
+}
+
+// 更新题目顺序和权重
+const updateHomeworkQuestion = async (homeworkQuestion) => {
+  try {
+    const response = await axios.put(
+      `${BaseUrl}api/homework-questions/${homeworkQuestion.id}`,
+      {
+        questionOrder: homeworkQuestion.questionOrder,
+        scoreWeight: homeworkQuestion.scoreWeight
+      },
+      { headers: { 'Authorization': `Bearer ${getToken()}` } }
+    )
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('更新题目成功')
+      // 重新排序本地列表
+      homeworkQuestions.value.sort((a, b) => a.questionOrder - b.questionOrder)
+    } else {
+      ElMessage.error('更新题目失败: ' + (response.data?.message || '未知错误'))
+    }
+  } catch (error) {
+    console.error('更新题目失败:', error)
+    ElMessage.error('更新题目失败: ' + (error.response?.data?.message || error.message))
+  }
+}
+
 // Format date
 const formatDate = (dateString) => {
   if (!dateString) return '-'
@@ -408,6 +649,18 @@ const getSubmissionStatusDisplay = (status) => {
     default:
       return { text: status, type: 'info' }
   }
+}
+
+// 获取题目类型显示
+const getQuestionTypeDisplay = (type) => {
+  const types = {
+    '选择题': { text: '选择题', type: 'success' },
+    '填空题': { text: '填空题', type: 'warning' },
+    '问答题': { text: '问答题', type: 'info' },
+    '编程题': { text: '编程题', type: 'danger' }
+  }
+  
+  return types[type] || { text: type || '未知类型', type: 'default' }
 }
 
 // Apply filter
@@ -555,6 +808,16 @@ onMounted(() => {
                     v-if="isTeacher || isAdmin"
                   >
                     查看提交
+                  </el-button>
+
+                  <el-button 
+                    type="success" 
+                    link 
+                    :icon="Document" 
+                    @click="loadHomeworkQuestions(scope.row)"
+                    v-if="isTeacher || isAdmin"
+                  >
+                    题目管理
                   </el-button>
                   
                   <el-button type="danger" link :icon="Delete" @click="deleteHomework(scope.row.id)" v-if="isTeacher || isAdmin">删除</el-button>
@@ -785,6 +1048,161 @@ onMounted(() => {
         <div class="d-flex justify-end gap-sm">
           <el-button @click="gradeDialogVisible = false">取消</el-button>
           <el-button type="primary" @click="submitGrade">提交评分</el-button>
+        </div>
+      </template>
+    </el-dialog>
+
+    <!-- 题目管理对话框 -->
+    <el-dialog
+      v-model="questionsDialogVisible"
+      :title="`题目管理 - ${currentHomeworkForQuestions?.title || '作业'}`"
+      width="90%"
+      append-to-body
+      destroy-on-close
+    >
+      <div class="container" v-loading="loadingQuestions">
+        <!-- 作业题目列表 -->
+        <div class="mb-lg">
+          <h3 class="text-xl mb-md d-flex justify-between">
+            <span>已关联题目 ({{ homeworkQuestions.length }})</span>
+            <div>
+              <el-button type="primary" size="small" @click="searchQuestions()">
+                添加题目
+              </el-button>
+            </div>
+          </h3>
+          
+          <el-table
+            :data="homeworkQuestions"
+            border
+            style="width: 100%"
+            row-key="id"
+            v-if="homeworkQuestions.length > 0"
+          >
+            <el-table-column label="序号" width="80" align="center">
+              <template #default="scope">
+                <el-input-number 
+                  v-model="scope.row.questionOrder" 
+                  :min="1" 
+                  size="small" 
+                  controls-position="right"
+                  @change="updateHomeworkQuestion(scope.row)"
+                />
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="questionId" label="题目ID" width="100" align="center" />
+            
+            <el-table-column prop="questionType" label="题型" width="120" align="center">
+              <template #default="scope">
+                <el-tag :type="getQuestionTypeDisplay(scope.row.questionType).type">
+                  {{ getQuestionTypeDisplay(scope.row.questionType).text }}
+                </el-tag>
+              </template>
+            </el-table-column>
+
+            <el-table-column prop="questionContent" label="题目内容" min-width="300" show-overflow-tooltip>
+              <template #default="scope">
+                <div class="mb-sm">{{ scope.row.questionContent || '加载中...' }}</div>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="权重" width="120" align="center">
+              <template #default="scope">
+                <el-input-number 
+                  v-model="scope.row.scoreWeight" 
+                  :min="1" 
+                  :max="10" 
+                  size="small" 
+                  controls-position="right"
+                  @change="updateHomeworkQuestion(scope.row)"
+                />
+              </template>
+            </el-table-column>
+
+            <el-table-column label="操作" width="120" align="center" fixed="right">
+              <template #default="scope">
+                <el-button type="danger" link :icon="Delete" @click="removeQuestionFromHomework(scope.row)">
+                  移除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+
+          <el-empty v-else description="暂无关联题目，请添加题目" />
+        </div>
+
+        <!-- 搜索题目 -->
+        <div class="mb-lg" v-if="!loadingQuestions">
+          <el-divider>添加题目</el-divider>
+          
+          <div class="d-flex gap-md mb-md align-items-center">
+            <el-input
+              v-model="searchQuestionQuery"
+              placeholder="请输入题目关键词进行搜索"
+              prefix-icon="search"
+              class="flex-1"
+              clearable
+            />
+            <el-button type="primary" :icon="Search" @click="searchQuestions" :loading="searchLoading">
+              搜索题目
+            </el-button>
+          </div>
+
+          <!-- 搜索结果 -->
+          <div v-if="searchResults.length > 0" class="mb-md">
+            <h4 class="mb-sm">搜索结果 ({{ searchResults.length }})</h4>
+
+            <el-table
+              :data="searchResults"
+              border
+              style="width: 100%"
+              @selection-change="selectedQuestions = $event"
+            >
+              <el-table-column type="selection" width="55" />
+              
+              <el-table-column prop="id" label="题目ID" width="100" align="center" />
+              
+              <el-table-column prop="questionType" label="题型" width="120" align="center">
+                <template #default="scope">
+                  <el-tag :type="getQuestionTypeDisplay(scope.row.questionType).type">
+                    {{ getQuestionTypeDisplay(scope.row.questionType).text }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+
+              <el-table-column prop="query" label="题目关键词" width="150" show-overflow-tooltip />
+              
+              <el-table-column label="题目内容" min-width="300" show-overflow-tooltip>
+                <template #default="scope">
+                  <div v-if="scope.row.questionJson">
+                    {{ JSON.parse(scope.row.questionJson).questionText || '无题目内容' }}
+                  </div>
+                  <div v-else>无题目内容</div>
+                </template>
+              </el-table-column>
+            </el-table>
+
+            <div class="d-flex gap-md mt-md justify-end">
+              <div class="d-flex align-items-center">
+                <span class="mr-sm">题目权重：</span>
+                <el-input-number v-model="newQuestionForm.scoreWeight" :min="1" :max="10" size="small" />
+              </div>
+              
+              <el-button type="primary" @click="addSelectedQuestionsToHomework" :disabled="selectedQuestions.length === 0" :loading="addingQuestions">
+                添加选中题目 ({{ selectedQuestions.length }})
+              </el-button>
+            </div>
+          </div>
+
+          <el-empty v-else-if="searchQuestionQuery && !searchLoading" description="未找到匹配的题目" />
+        </div>
+      </div>
+      
+      <template #footer>
+        <div class="d-flex justify-end gap-sm">
+          <el-button @click="questionsDialogVisible = false">关闭</el-button>
+          <el-button type="primary" @click="loadHomeworkQuestions(currentHomeworkForQuestions)">刷新题目列表</el-button>
         </div>
       </template>
     </el-dialog>
