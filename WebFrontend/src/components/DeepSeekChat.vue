@@ -1,10 +1,11 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import { ElMessage, ElLoading } from 'element-plus'
 import { Plus, Delete, Download, RefreshRight, Connection, ChatLineSquare } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../stores/counter'
 import MarkdownIt from 'markdown-it'
+import { useRoute, useRouter } from 'vue-router'
 
 // Initialize markdown parser
 const md = new MarkdownIt({
@@ -14,6 +15,8 @@ const md = new MarkdownIt({
 })
 
 const store = useCounterStore()
+const route = useRoute()
+const router = useRouter()
 const BaseUrl = 'http://localhost:8080/'
 const getToken = () => localStorage.getItem('token')
 
@@ -461,6 +464,22 @@ const scrollToBottom = () => {
 }
 
 // 页面加载时获取RAG列表并加载保存的对话
+
+// 监听路由参数以预填充问题
+watch(() => route.query.prompt, (newPrompt) => {
+  if (newPrompt && typeof newPrompt === 'string') {
+    // 创建一个新的对话
+    clearChat()
+    currentMessage.value = newPrompt
+    // 从 URL 中移除 prompt 查询参数，避免刷新时重复填充
+    nextTick(() => {
+      const newQuery = { ...route.query }
+      delete newQuery.prompt
+      router.replace({ query: newQuery })
+    })
+  }
+}, { immediate: true })
+
 onMounted(() => {
   getRAGList()
   loadUserConversations()
@@ -562,12 +581,13 @@ onUnmounted(() => {
                 <span class="message-role">{{ message.role === 'user' ? '我' : 'DeepSeek AI' }}</span>
             </div>
               <div class="message-content p-lg rounded-lg bg-white" :class="{ 'bg-primary-light': message.role === 'user', 'loading': message.isLoading }">
-                <div v-if="message.isLoading" class="loading-indicator d-flex justify-center p-sm">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-              </div>
-              <div v-else v-html="renderMarkdown(message.content)"></div>
+                <div v-if="message.isLoading" class="loading-indicator d-flex justify-center align-center p-sm">
+                  <span style="margin-right: 10px; color: var(--text-tertiary);">AI 正在思考中...</span>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                  <div class="dot"></div>
+                </div>
+                <div v-else v-html="renderMarkdown(message.content)"></div>
               </div>
             </div>
           </div>
@@ -792,8 +812,11 @@ onUnmounted(() => {
 
 .message-wrapper {
   display: flex;
-  max-width: 85%;
   animation: message-appear 0.3s ease-out forwards;
+}
+
+.message-wrapper.justify-end {
+  justify-content: flex-end;
 }
 
 @keyframes message-appear {
@@ -808,7 +831,7 @@ onUnmounted(() => {
 }
 
 .message-container {
-  max-width: 100%;
+  max-width: 85%;
 }
 
 .message-role {
@@ -826,6 +849,10 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
+}
+
+.user .message-header {
+  justify-content: flex-end;
 }
 
 .user .message-role::before {
@@ -879,6 +906,8 @@ onUnmounted(() => {
   padding: 10px;
   border-radius: 8px;
   overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .assistant .message-content :deep(pre) {

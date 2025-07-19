@@ -1,13 +1,15 @@
 <script setup>
 import { ref, computed, onMounted, reactive, nextTick, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCounterStore } from '../../stores/counter'
-import { Calendar, Plus, Check, Search, Document, Download, DocumentDelete, Timer, User, DataAnalysis, Link, ArrowLeft, ArrowRight, Reading } from '@element-plus/icons-vue'
+import { Calendar, Plus, Check, Search, Document, Download, DocumentDelete, Timer, User, DataAnalysis, Link, ArrowLeft, ArrowRight, Reading, ChatLineSquare } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import axios from 'axios'
 import * as echarts from 'echarts'
 
 const store = useCounterStore()
 const userInfo = store.getUserInfo()
+const router = useRouter()
 const loading = ref(false)
 const courses = ref([])
 const error = ref(null)
@@ -973,6 +975,24 @@ const isKnowledgePointLearned = (index) => {
   return learnedPoints.value.includes(index)
 }
 
+// 问问AI关于当前知识点
+const askAIAboutKnowledgePoint = () => {
+  if (!currentKnowledgePoint.value) {
+    ElMessage.warning('当前没有选中的知识点')
+    return
+  }
+
+  const knowledgeText = formatTripleText(currentKnowledgePoint.value)
+  const prompt = `你好，请详细解释一下这个知识点：\n\n\`\`\`\n${knowledgeText}\n\`\`\`\n\n请说明它的定义、相关概念以及一个具体的例子来帮助我理解。`
+
+  router.push({
+    path: '/manage/deepseek',
+    query: {
+      prompt: prompt
+    }
+  })
+}
+
 // ==================== 问题生成相关 ====================
 const generateQuestionDialogVisible = ref(false)
 const generateQuestionForm = reactive({
@@ -1697,6 +1717,9 @@ const submitGenerateQuestion = async () => {
                   </el-button>
                   <el-button type="success" @click="handleGenerateQuestion">
                     <el-icon><Plus /></el-icon> 生成题目
+                  </el-button>
+                  <el-button type="primary" @click="askAIAboutKnowledgePoint">
+                    <el-icon><ChatLineSquare /></el-icon> 问问AI
                   </el-button>
                 </div>
                 

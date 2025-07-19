@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, reactive, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Search, RefreshRight, Reading, Upload, Edit, Delete } from '@element-plus/icons-vue'
+import { Search, RefreshRight, Reading, Upload, Edit, Delete, ChatLineSquare } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useCounterStore } from '../../stores/counter'
 import { useRouter } from 'vue-router'  // 导入路由器
@@ -609,6 +609,29 @@ const viewHomeworkQuestions = async (homework) => {
   }
 }
 
+// 新增：向AI提问关于知识点
+const askAboutKnowledgePoint = () => {
+  const question = currentQuestion.value;
+  if (!question || !question.questionJson) {
+    ElMessage.warning('无法获取当前题目的详细信息。');
+    return;
+  }
+
+  // 格式化JSON以便阅读
+  const formattedJson = formatJson(question.questionJson);
+  
+  const prompt = `你好，我正在学习，遇到了一个问题，想请教你一下。这是我遇到的题目的详细信息，你能根据这些信息，帮我讲解一下其中涉及的关键知识点吗？\n\n题目信息：\n\`\`\`json\n${formattedJson}\n\`\`\``;
+  
+  router.push({
+    // 修正路由路径
+    path: '/manage/deepseek',
+    query: {
+      prompt: prompt
+    }
+  });
+};
+
+
 // --- 做题相关函数 ---
 
 const currentQuestion = computed(() => {
@@ -1139,7 +1162,13 @@ onMounted(() => {
             <template #header>
               <div class="question-card-header">
                 <span>第 {{ currentQuestionIndex + 1 }} 题 / 共 {{ currentHomeworkQuestions.length }} 题</span>
-                <el-tag effect="plain">{{ currentQuestion.questionType }}</el-tag>
+                <div>
+                  <el-button type="primary" link @click="askAboutKnowledgePoint">
+                    <el-icon><ChatLineSquare /></el-icon>
+                    问问AI
+                  </el-button>
+                  <el-tag effect="plain" style="margin-left: 10px;">{{ currentQuestion.questionType }}</el-tag>
+                </div>
               </div>
             </template>
             
@@ -1459,6 +1488,11 @@ onMounted(() => {
 .question-card-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.question-card-header > div {
+  display: flex;
   align-items: center;
 }
 
