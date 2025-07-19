@@ -392,42 +392,6 @@ const formatExplanation = (text) => {
   return text.replace(/\n/g, '<br>');
 };
 
-// 在detailDialogVisible变量后添加以下内容
-const solutionDialogVisible = ref(false);
-const solutionLoading = ref(false);
-const currentSolution = ref('');
-
-// 获取题目解答
-const handleGetSolution = async (row) => {
-  if (!row || row.status !== 'COMPLETED') {
-    ElMessage.warning('只能为已完成生成的题目生成解答');
-    return;
-  }
-  
-  try {
-    solutionLoading.value = true;
-    currentQuestion.value = row;
-    
-    const response = await axios.get(`${BaseUrl}api/question-generator/${row.id}/solution`, {
-      headers: {
-        'Authorization': `Bearer ${getToken()}`
-      }
-    });
-    
-    if (response.data && response.data.success) {
-      currentSolution.value = response.data.solution || '解答生成成功，但内容为空';
-      solutionDialogVisible.value = true;
-    } else {
-      ElMessage.error(response.data?.message || '获取题目解答失败');
-    }
-  } catch (error) {
-    console.error('获取题目解答失败:', error);
-    ElMessage.error('获取题目解答失败: ' + (error.response?.data?.message || error.message));
-  } finally {
-    solutionLoading.value = false;
-  }
-};
-
 // 批量删除题目
 const selectedQuestions = ref([]);
 
@@ -471,34 +435,6 @@ const handleBatchDelete = async () => {
       console.error('批量删除题目失败:', error);
       ElMessage.error('批量删除题目失败: ' + (error.response?.data?.message || error.message));
     }
-  }
-};
-
-// 添加 markdownToHtml 和 handleCopySolution 方法
-const markdownToHtml = (markdown) => {
-  if (!markdown) return '';
-  // 检查window.marked是否可用
-  if (typeof window.marked === 'undefined') {
-    // 如果marked不可用，简单返回原始文本并添加基本HTML格式
-    return markdown
-      .replace(/\n/g, '<br>')
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
-  }
-  return window.marked.parse(markdown);
-};
-
-const handleCopySolution = () => {
-  if (currentSolution.value) {
-    copyToClipboard(currentSolution.value)
-      .then(() => {
-        ElMessage.success('解答内容已复制到剪贴板');
-      })
-      .catch(err => {
-        console.error('复制失败:', err);
-        ElMessage.error('复制失败，请手动复制');
-      });
   }
 };
 
@@ -1178,7 +1114,7 @@ const getScoreLevel = (score) => {
           {{ scope.row.createdAt ? new Date(scope.row.createdAt).toLocaleString() : '未知' }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="380" fixed="right">
+      <el-table-column label="操作" width="320" fixed="right">
         <template #default="scope">
           <el-button 
             type="primary" 
@@ -1187,14 +1123,6 @@ const getScoreLevel = (score) => {
             :disabled="scope.row.status !== 'COMPLETED'"
           >
             查看
-          </el-button>
-          <el-button
-            type="info"
-            link
-            @click="handleGetSolution(scope.row)"
-            :disabled="scope.row.status !== 'COMPLETED'"
-          >
-            解答
           </el-button>
           <el-button
             type="warning"
@@ -1478,172 +1406,6 @@ const getScoreLevel = (score) => {
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="detailDialogVisible = false">关闭</el-button>
-        </div>
-      </template>
-    </el-dialog>
-    
-
-
-    <!-- 题目解答对话框 -->
-    <el-dialog
-      v-model="solutionDialogVisible"
-      title="题目解答"
-      width="70%"
-      append-to-body
-    >
-      <div v-loading="solutionLoading">
-        <div class="question-info" v-if="currentQuestion">
-          <div class="info-item">
-            <span class="info-label">检索词:</span>
-            <span class="info-value">{{ currentQuestion.query }}</span>
-          </div>
-          <div class="info-item">
-            <span class="info-label">题目类型:</span>
-            <span class="info-value">{{ formatQuestionType(currentQuestion.questionType) }}</span>
-          </div>
-        </div>
-        
-        <el-divider content-position="center">题目内容</el-divider>
-        
-        <div class="question-content" v-if="currentQuestion && currentQuestion.questionJson">
-          <!-- 选择题专用显示 -->
-          <div v-if="renderQuestion(currentQuestion.questionJson).type === '选择题'" class="choice-question">
-            <div class="question-title">
-              <span class="question-type-tag">【选择题】</span>
-              {{ renderQuestion(currentQuestion.questionJson).question }}
-            </div>
-            <div class="options-container">
-              <div 
-                v-for="(option, key) in renderQuestion(currentQuestion.questionJson).options" 
-                :key="key"
-                class="option-item"
-                :class="{'correct-option': key === renderQuestion(currentQuestion.questionJson).answer}"
-              >
-                <span class="option-key">{{ key }}.</span>
-                <span class="option-content">{{ option }}</span>
-              </div>
-            </div>
-            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer">
-              <span class="answer-label">答案：</span>
-              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
-            </div>
-            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
-              <div class="explanation-label">解析：</div>
-              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
-            </div>
-          </div>
-          <!-- 判断题专用显示 -->
-          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '判断题'" class="true-false-question">
-            <div class="question-title">
-              <span class="question-type-tag judge-tag">【判断题】</span>
-              {{ renderQuestion(currentQuestion.questionJson).statement }}
-            </div>
-            <div class="judge-options">
-              <div 
-                class="judge-option" 
-                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '正确' }"
-              >
-                <span class="judge-icon">✓</span>正确
-              </div>
-              <div 
-                class="judge-option"
-                :class="{ 'selected-option': renderQuestion(currentQuestion.questionJson).answer === '错误' }"
-              >
-                <span class="judge-icon">✗</span>错误
-              </div>
-            </div>
-            <div class="question-answer">
-              <span class="answer-label">答案：</span>
-              <span class="answer-content">{{ renderQuestion(currentQuestion.questionJson).answer }}</span>
-            </div>
-            <div v-if="renderQuestion(currentQuestion.questionJson).explanation" class="question-explanation">
-              <div class="explanation-label">解析：</div>
-              <div class="explanation-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).explanation)"></div>
-            </div>
-          </div>
-          <!-- 问答题专用显示 -->
-          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '问答题'" class="qa-question">
-            <div class="question-title">
-              <span class="question-type-tag qa-tag">【问答题】</span>
-              {{ renderQuestion(currentQuestion.questionJson).question }}
-            </div>
-            <div v-if="renderQuestion(currentQuestion.questionJson).key_points && renderQuestion(currentQuestion.questionJson).key_points.length > 0" class="key-points">
-              <div class="key-points-title">关键点：</div>
-              <ul class="key-points-list">
-                <li v-for="(point, index) in renderQuestion(currentQuestion.questionJson).key_points" :key="index">
-                  {{ point }}
-                </li>
-              </ul>
-            </div>
-            <div v-if="renderQuestion(currentQuestion.questionJson).answer" class="question-answer qa-answer">
-              <div class="answer-label">参考答案：</div>
-              <div class="answer-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).answer)"></div>
-            </div>
-          </div>
-          <!-- 编程题专用显示 -->
-          <div v-else-if="renderQuestion(currentQuestion.questionJson).type === '编程题'" class="programming-question">
-            <div class="question-title">
-              <span class="question-type-tag programming-tag">【编程题】</span>
-              {{ renderQuestion(currentQuestion.questionJson).title }}
-            </div>
-            
-            <div class="section">
-              <div class="section-title">题目描述：</div>
-              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).description)"></div>
-            </div>
-            
-            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).input_format">
-              <div class="section-title">输入格式：</div>
-              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).input_format }}</pre>
-            </div>
-            
-            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).output_format">
-              <div class="section-title">输出格式：</div>
-              <div class="section-content">{{ renderQuestion(currentQuestion.questionJson).output_format }}</div>
-            </div>
-            
-            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).examples && renderQuestion(currentQuestion.questionJson).examples.length > 0">
-              <div class="section-title">示例：</div>
-              <div v-for="(example, index) in renderQuestion(currentQuestion.questionJson).examples" :key="index" class="example-item">
-                <div class="example-header">示例 {{ index + 1 }}：</div>
-                <div class="example-content">
-                  <div class="example-input">
-                    <div class="example-label">输入：</div>
-                    <pre class="code-block">{{ example.input }}</pre>
-                  </div>
-                  <div class="example-output">
-                    <div class="example-label">输出：</div>
-                    <pre class="code-block">{{ example.output }}</pre>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).solution_approach">
-              <div class="section-title">解题思路：</div>
-              <div class="section-content" v-html="formatExplanation(renderQuestion(currentQuestion.questionJson).solution_approach)"></div>
-            </div>
-            
-            <div class="section" v-if="renderQuestion(currentQuestion.questionJson).reference_code">
-              <div class="section-title">参考代码：</div>
-              <pre class="code-block">{{ renderQuestion(currentQuestion.questionJson).reference_code }}</pre>
-            </div>
-          </div>
-          <!-- 其他题型仍使用JSON格式展示 -->
-          <pre v-else>{{ formatJson(currentQuestion.questionJson) }}</pre>
-        </div>
-        
-        <el-divider content-position="center">题目解答</el-divider>
-        
-        <div class="solution-content">
-          <div v-if="currentSolution" v-html="markdownToHtml(currentSolution)"></div>
-          <el-empty v-else description="暂无解答内容" />
-        </div>
-      </div>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="solutionDialogVisible = false">关闭</el-button>
-          <el-button type="primary" @click="handleCopySolution" v-if="currentSolution">复制解答</el-button>
         </div>
       </template>
     </el-dialog>

@@ -1015,59 +1015,63 @@ onUnmounted(() => {
         label-width="120px"
       >
         <el-form-item label="选择文件夹" prop="folderId">
-          <div class="folder-navigation">
-            <div v-if="currentPath" class="folder-breadcrumb">
-              <el-breadcrumb separator="/">
-                <el-breadcrumb-item @click="getRootFolders">根目录</el-breadcrumb-item>
-                <el-breadcrumb-item v-for="(part, index) in currentPath.split('/')" 
-                  :key="index" 
-                  v-if="part"
-                  @click="getFoldersByPath(currentPath.split('/').slice(0, index + 1).join('/'))">
-                  {{ part }}
-                </el-breadcrumb-item>
-              </el-breadcrumb>
-            </div>
-                                <el-table 
-          :data="folderList"
-          style="width: 100%"
-          @row-click="row => row.directory ? getFoldersByPath(row.filePath) : null"
-          height="250"
-          :row-class-name="tableRowClassName">
-          <el-table-column label="名称" min-width="180">
-            <template #default="scope">
-              <div class="file-item">
-                <el-icon v-if="scope.row.directory"><Folder /></el-icon>
-                <el-icon v-else><Document /></el-icon>
-                <span class="file-name">{{ scope.row.fileName }}</span>
+          <div>
+            <div class="folder-navigation">
+              <div v-if="currentPath" class="folder-breadcrumb">
+                <el-breadcrumb separator="/">
+                  <el-breadcrumb-item @click="getRootFolders">根目录</el-breadcrumb-item>
+                  <el-breadcrumb-item v-for="(part, index) in currentPath.split('/')" 
+                    :key="index" 
+                    v-if="part"
+                    @click="getFoldersByPath(currentPath.split('/').slice(0, index + 1).join('/'))">
+                    {{ part }}
+                  </el-breadcrumb-item>
+                </el-breadcrumb>
               </div>
-            </template>
-          </el-table-column>
-          <el-table-column label="类型" width="80">
-            <template #default="{ row }">
-              <span>{{ row.directory ? '文件夹' : '文件' }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="大小" width="100" align="right">
-            <template #default="{ row }">
-              <span>{{ row.fileSize ? `${(row.fileSize / 1024).toFixed(2)} KB` : '-' }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="120" align="center">
-            <template #default="{ row }">
-              <el-button 
-                size="small"
-                :type="generateFromFileForm.folderId === row.id ? 'success' : 'primary'"
-                @click.stop="selectFolder(row)">
-                {{ generateFromFileForm.folderId === row.id ? '已选择' : '选择' }}
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+              <el-table 
+                :data="folderList"
+                style="width: 100%"
+                @row-click="row => row.directory ? getFoldersByPath(row.filePath) : null"
+                height="250"
+                :row-class-name="tableRowClassName">
+                <el-table-column label="名称" min-width="180">
+                  <template #default="scope">
+                    <div class="file-item">
+                      <el-icon v-if="scope.row.directory"><Folder /></el-icon>
+                      <el-icon v-else><Document /></el-icon>
+                      <span class="file-name">{{ scope.row.fileName }}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="类型" width="80">
+                  <template #default="{ row }">
+                    <span>{{ row.directory ? '文件夹' : '文件' }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="大小" width="100" align="right">
+                  <template #default="{ row }">
+                    <span>{{ row.fileSize ? `${(row.fileSize / 1024).toFixed(2)} KB` : '-' }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" width="120" align="center">
+                  <template #default="{ row }">
+                    <el-button 
+                      size="small"
+                      :type="generateFromFileForm.folderId === row.id ? 'success' : 'primary'"
+                      @click.stop="selectFolder(row)"
+                      :disabled="!row.directory"
+                      >
+                      {{ generateFromFileForm.folderId === row.id ? '已选择' : '选择' }}
+                    </el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div v-if="generateFromFileForm.folderId" class="selected-folder">
+              已选择文件夹: {{ folderList.find(f => f.id === generateFromFileForm.folderId)?.fileName }}
+              <el-button size="small" type="danger" @click="generateFromFileForm.folderId = null">取消选择</el-button>
+            </div>
           </div>
-                <div v-if="generateFromFileForm.folderId" class="selected-folder">
-        已选择文件夹: {{ folderList.find(f => f.id === generateFromFileForm.folderId)?.fileName }}
-        <el-button size="small" type="danger" @click="generateFromFileForm.folderId = null">取消选择</el-button>
-      </div>
         </el-form-item>
         <el-form-item label="RAG名称" prop="ragName">
           <el-input v-model="generateFromFileForm.ragName" placeholder="请输入RAG名称" />

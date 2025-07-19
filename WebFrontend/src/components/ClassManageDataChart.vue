@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
-import { ElMessage, ElDatePicker } from 'element-plus'
-import { ArrowLeft, Clock, Timer, Calendar } from '@element-plus/icons-vue'
+import { ref, onMounted, onUnmounted, nextTick, computed, watch, reactive } from 'vue'
+import { ElMessage, ElDatePicker, ElMessageBox } from 'element-plus'
+import { ArrowLeft, Clock, Timer, Calendar, Search, DataAnalysis, Document } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import axios from 'axios'
 import { useRoute, useRouter } from 'vue-router'
@@ -29,6 +29,29 @@ const studyStatistics = ref({
   studentCount: 0,
   averageDurationPerStudent: 0
 })
+
+// 新增：知识点掌握情况数据
+const knowledgePointStats = ref([])
+const knowledgePointLoading = ref(true)
+
+// 添加题目生成相关变量
+const generateQuestionDialogVisible = ref(false)
+const generateForm = reactive({
+  query: '',
+  ragId: null,
+  questionType: ''
+})
+const questionTypes = ref(['选择题', '判断题', '问答题', '编程题'])
+const generatingQuestion = ref(false)
+const generateFormRef = ref(null)
+
+// 题目生成表单验证规则
+const generateRules = {
+  query: [
+    { required: true, message: '请输入检索词', trigger: 'blur' },
+    { min: 2, max: 100, message: '长度在 2 到 100 个字符', trigger: 'blur' }
+  ]
+}
 
 // 日期范围
 const dateRange = ref([
@@ -108,6 +131,30 @@ const getStudyStatistics = async () => {
     console.error('获取学习统计信息失败:', error)
     ElMessage.error('获取学习统计信息失败')
     statsLoading.value = false
+  }
+}
+
+// 获取班级知识点掌握情况（假设后端接口为 /practice-records/stats/class/{classId}/knowledge-points）
+const getKnowledgePointStats = async () => {
+  try {
+    knowledgePointLoading.value = true
+    const response = await axios.get(`${BaseUrl}practice-records/stats/class/${classId.value}/knowledge-points`, { 
+      headers: { 'Authorization': `Bearer ${getToken()}` } 
+    })
+    if (response.data) {
+      knowledgePointStats.value = response.data
+    } else {
+      knowledgePointStats.value = []
+    }
+    await nextTick()
+    initKnowledgePointChart()
+    knowledgePointLoading.value = false
+  } catch (error) {
+    knowledgePointLoading.value = false
+    knowledgePointStats.value = []
+    ElMessage.error('获取知识点掌握情况失败')
+    await nextTick()
+    initKnowledgePointChart()
   }
 }
 
@@ -463,6 +510,64 @@ const initStudentPerformanceChart = (data) => {
   studentPerformanceChart.setOption(option)
 }
 
+// 初始化知识点掌握情况图表
+let knowledgePointChart = null
+const initKnowledgePointChart = () => {
+  const chartDom = document.getElementById('knowledgePointChart')
+  if (!chartDom) return
+  if (knowledgePointChart) knowledgePointChart.dispose()
+  knowledgePointChart = echarts.init(chartDom)
+  if (!knowledgePointStats.value.length) {
+    knowledgePointChart.setOption({ title: { text: '暂无数据', left: 'center', top: 'center' } })
+    return
+  }
+  const xData = knowledgePointStats.value.map(item => item.knowledge_point.length > 12 ? item.knowledge_point.slice(0,12)+'...' : item.knowledge_point)
+  const avgScores = knowledgePointStats.value.map(item => Number(item.average_score?.toFixed(1) || 0))
+  const attemptCounts = knowledgePointStats.value.map(item => item.attempt_count)
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: params => {
+        const idx = params[0].dataIndex
+        return `知识点: ${knowledgePointStats.value[idx].knowledge_point}<br/>平均分: ${avgScores[idx]}<br/>答题次数: ${attemptCounts[idx]}`
+      }
+    },
+    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+    xAxis: { type: 'category', data: xData, axisLabel: { interval: 0, rotate: 30 } },
+    yAxis: [
+      { type: 'value', name: '平均分', min: 0, max: 100 },
+      { type: 'value', name: '答题次数', min: 0, max: Math.max(...attemptCounts, 10) }
+    ],
+    legend: { data: ['平均分', '答题次数'] },
+    series: [
+      {
+        name: '平均分',
+        type: 'bar',
+        data: avgScores,
+        yAxisIndex: 0,
+        itemStyle: {
+          color: params => {
+            const score = avgScores[params.dataIndex]
+            if (score < 60) return '#F56C6C'
+            if (score < 80) return '#E6A23C'
+            return '#67C23A'
+          }
+        },
+        label: { show: true, position: 'top', formatter: '{c}' }
+      },
+      {
+        name: '答题次数',
+        type: 'line',
+        data: attemptCounts,
+        yAxisIndex: 1,
+        itemStyle: { color: '#409EFF' },
+        label: { show: false }
+      }
+    ]
+  }
+  knowledgePointChart.setOption(option)
+}
+
 // 生成班级学习概要
 const generateClassSummary = () => {
   if (!studyStatistics.value || studyStatistics.value.recordCount === 0) {
@@ -499,11 +604,72 @@ const goBack = () => {
   router.push('/manage/classes')
 }
 
+// 打开生成题目对话框
+const openGenerateQuestionDialog = (rag) => {
+  generateForm.query = ''
+  generateForm.ragId = rag.id
+  generateForm.questionType = ''
+  generateQuestionDialogVisible.value = true
+}
+
+// 提交生成题目
+const submitGenerateForm = async (formEl) => {
+  if (!formEl) return
+  
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      try {
+        generatingQuestion.value = true
+        
+        // 使用RAG ID生成题目
+        const url = `http://localhost:8080/api/question-generator/generate-with-rag`
+        const requestData = {
+          query: generateForm.query,
+          ragId: generateForm.ragId,
+          questionType: generateForm.questionType || undefined
+        }
+        
+        const response = await axios.post(url, requestData, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        })
+        
+        if (response.data && response.data.success) {
+          ElMessage.success('题目生成任务已提交')
+          generateQuestionDialogVisible.value = false
+          
+          // 询问用户是否跳转到问题生成页面
+          ElMessageBox.confirm(
+            '题目生成任务已提交，是否跳转到问题生成页面查看进度？',
+            '提示',
+            {
+              confirmButtonText: '是',
+              cancelButtonText: '否',
+              type: 'info'
+            }
+          ).then(() => {
+            router.push('/question-generator')
+          }).catch(() => {})
+        } else {
+          ElMessage.error(response.data?.message || '提交题目生成任务失败')
+        }
+      } catch (error) {
+        console.error('提交题目生成任务失败:', error)
+        ElMessage.error(error.response?.data?.message || '提交题目生成任务失败')
+      } finally {
+        generatingQuestion.value = false
+      }
+    }
+  })
+}
+
 // 处理窗口调整事件
 const handleResize = () => {
   if (studyDurationChart) studyDurationChart.resize()
   if (courseDistributionChart) courseDistributionChart.resize()
   if (studentPerformanceChart) studentPerformanceChart.resize()
+  if (knowledgePointChart) knowledgePointChart.resize()
 }
 
 // 生命周期钩子
@@ -511,7 +677,7 @@ onMounted(async () => {
   await getClassInfo()
   await getStudyStatistics()
   await getStudyDurationRecords()
-  
+  await getKnowledgePointStats()
   window.addEventListener('resize', handleResize)
 })
 
@@ -522,6 +688,7 @@ onUnmounted(() => {
   if (studyDurationChart) studyDurationChart.dispose()
   if (courseDistributionChart) courseDistributionChart.dispose()
   if (studentPerformanceChart) studentPerformanceChart.dispose()
+  if (knowledgePointChart) knowledgePointChart.dispose()
 })
 
 // 监听日期范围变化
@@ -634,7 +801,76 @@ watch(dateRange, () => {
         <div class="chart-title">学生学习时长排名</div>
         <div id="studentPerformanceChart" class="chart"></div>
       </el-card>
+
+      <!-- 知识点掌握情况图 -->
+      <el-card class="chart-card full-width-card">
+        <template #header>
+          <div class="card-header">
+            <span>知识点掌握情况</span>
+            <el-button text>导出</el-button>
+          </div>
+        </template>
+        <div v-loading="knowledgePointLoading" class="chart-container">
+          <div id="knowledgePointChart" class="chart-inner">
+            <!-- 在rag-actions中添加生成题目按钮 -->
+            <div class="rag-actions">
+              <el-button type="primary" @click="openGenerateQuestionDialog(rag)">
+                <el-icon><Search /></el-icon> 知识查询
+              </el-button>
+              <el-button type="info" @click="viewKnowledgeGraph(rag)">
+                <el-icon><DataAnalysis /></el-icon> 查看知识图谱
+              </el-button>
+              <el-button type="success" @click="openGenerateQuestionDialog(rag)">
+                <el-icon><Document /></el-icon> 生成题目
+              </el-button>
+            </div>
+          </div>
+        </div>
+      </el-card>
     </div>
+
+    <!-- 添加生成题目对话框 -->
+    <el-dialog
+      v-model="generateQuestionDialogVisible"
+      title="生成题目"
+      width="500px"
+      append-to-body
+    >
+      <el-form
+        ref="generateFormRef"
+        :model="generateForm"
+        :rules="generateRules"
+        label-width="100px"
+      >
+        <el-form-item label="检索词" prop="query">
+          <el-input v-model="generateForm.query" placeholder="请输入检索词" />
+        </el-form-item>
+        
+        <el-form-item label="题目类型">
+          <el-select v-model="generateForm.questionType" placeholder="请选择题目类型（可选）" clearable style="width: 100%">
+            <el-option
+              v-for="item in questionTypes"
+              :key="item"
+              :label="item"
+              :value="item"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="generateQuestionDialogVisible = false">取消</el-button>
+          <el-button 
+            type="primary" 
+            @click="submitGenerateForm(generateFormRef)" 
+            :loading="generatingQuestion"
+          >
+            生成题目
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -758,6 +994,26 @@ watch(dateRange, () => {
 
 .chart {
   height: 400px;
+  width: 100%;
+}
+
+.full-width-card {
+  grid-column: span 2;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-container {
+  height: 400px; /* Adjust height as needed */
+  width: 100%;
+}
+
+.chart-inner {
+  height: 100%;
   width: 100%;
 }
 

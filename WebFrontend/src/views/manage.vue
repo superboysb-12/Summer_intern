@@ -38,7 +38,6 @@ const getActiveMenu = () => {
   if (path.includes('/manage/deepseek')) return 'deepseek'
   if (path.includes('/manage/teaching-plan')) return 'teaching-plan'
   if (path.includes('/manage/tools')) return 'tools'
-  if (path.includes('/manage/data')) return 'data-overview'
   if (path.includes('/manage/settings')) return 'settings'
   if (path.includes('/manage/assignments')) return 'assignments'
   if (path.includes('/manage/study-records')) return 'study-records'
@@ -76,7 +75,6 @@ const menuItems = [
     icon: DataAnalysis, 
     roles: [ROLES.ADMIN, ROLES.TEACHER],
     children: [
-      { key: 'data-overview', title: '数据概览', path: '/manage/data', roles: [ROLES.ADMIN, ROLES.TEACHER] },
       { key: 'enrollment-stats', title: '选课统计', path: '/manage/enrollment-stats', roles: [ROLES.ADMIN, ROLES.TEACHER] },
       { key: 'usage-statistics', title: '使用统计', path: '/manage/usage-statistics', roles: [ROLES.ADMIN, ROLES.TEACHER] }
     ]
@@ -93,10 +91,9 @@ const menuItems = [
   { key: 'private-messages', title: '私信', icon: ChatDotRound, path: '/manage/private-messages', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'rag', title: 'RAG知识库', icon: Collection, path: '/manage/rag', roles: [ROLES.ADMIN] },
   { key: 'teaching-plan', title: '教案生成', icon: Edit, path: '/manage/teaching-plan', roles: [ROLES.ADMIN, ROLES.TEACHER] },
-  { key: 'question-generator', title: '题目生成', icon: Document, path: '/manage/question-generator', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { key: 'question-generator', title: '题目生成', icon: Document, path: '/manage/question-generator', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'deepseek', title: 'DeepSeek Chat', icon: ChatDotRound, path: '/manage/deepseek', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'tools', title: '实用工具', icon: Tools, path: '/manage/tools', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
-  { key: 'settings', title: '系统设置', icon: Setting, path: '/manage/settings', roles: [ROLES.ADMIN] },
 ]
 
 // 根据用户角色过滤菜单项
@@ -150,7 +147,7 @@ watch(() => route.path, () => {
           type="primary"
           text
         />
-        <h1 class="logo">管理系统</h1>
+        <h1 class="logo">融慧修心智能体实训平台</h1>
       </div>
       <div class="header-right">
         <NotificationPanel />

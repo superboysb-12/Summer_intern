@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watchEffect } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import axios from 'axios';
 import * as echarts from 'echarts';
 import { ElMessage } from 'element-plus';
@@ -376,7 +376,7 @@ const handleResize = () => {
 };
 
 // 监听时间范围变化
-watchEffect(() => {
+watch(selectedTimeRange, () => {
   if (roleChart && moduleChart) {
     updateRoleChart();
     updateModuleChart();
@@ -407,8 +407,10 @@ onUnmounted(() => {
 
 <style scoped>
 .usage-statistics-container {
-  padding: 20px;
+  padding: 24px;
   width: 100%;
+  background-color: #f9fafb;
+  min-height: 100vh;
 }
 
 .header-section {
@@ -416,67 +418,82 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
+  padding: 0 10px;
 }
 
 .time-range-selector {
   width: 120px;
 }
 
-.loading-container {
+.loading-container, .el-empty {
   padding: 40px;
-  border-radius: 4px;
-  background-color: #f5f7fa;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 .statistics-content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.charts-section {
-  display: flex;
-  flex-wrap: wrap;
   gap: 20px;
 }
 
-.chart-card {
-  flex: 1;
-  min-width: 300px;
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.chart-card{
+  height: 600px;
+}
+
+.chart-card, .data-tabs {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease-in-out;
+
+}
+
+.chart-card:hover, .data-tabs:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 8px; /* Add padding for spacing */
 }
 
 .chart-container {
-  height: 300px;
+  height: 400px; /* Increased height */
+  width: 100%;
 }
 
 .data-tabs {
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 h2 {
   margin: 0;
-  color: #303133;
-  font-size: 20px;
+  color: #1f2937;
+  font-size: 22px;
+  font-weight: 600;
 }
 
 h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
 }
 
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 992px) {
   .charts-section {
-    flex-direction: column;
-  }
-  
-  .chart-card {
-    width: 100%;
+    grid-template-columns: 1fr;
   }
 }
 </style> 

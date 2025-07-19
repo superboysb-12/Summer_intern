@@ -18,4 +18,6 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, Lo
 
     // 按状态查询学生课程关系
     List<StudentCourse> findByStudentIdAndStatus(Long studentId, String status);
+
+    long countByCourseId(Long courseId);
 }

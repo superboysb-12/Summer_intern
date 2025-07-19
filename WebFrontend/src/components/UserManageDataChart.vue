@@ -30,9 +30,24 @@ const studyStatistics = ref({
   recordCount: 0
 })
 
+// Practice record data
+const practiceRecords = ref([])
+const practiceStatistics = ref({
+  totalScore: 0,
+  averageScore: 0,
+  completedCount: 0,
+  totalCount: 0,
+  completionRate: 0
+})
+const practiceLoading = ref(true)
+
 // Emotion data
 const emotionRecords = ref([])
 const emotionLoading = ref(true)
+
+// 新增：知识点掌握情况数据
+const knowledgePointStats = ref([])
+const knowledgePointLoading = ref(true)
 
 // 日期范围
 const dateRange = ref([
@@ -50,6 +65,7 @@ let studyDurationChart = null
 let courseDistributionChart = null
 let weeklyActivityChart = null
 let emotionChart = null
+let knowledgePointChart = null
 
 // Get user information
 const getUserInfo = async () => {
@@ -146,6 +162,67 @@ const getStudentEmotions = async () => {
   }
 }
 
+// 获取用户练习记录统计
+const getPracticeStatistics = async () => {
+  try {
+    practiceLoading.value = true
+    
+    // 获取所有练习记录
+    const recordsResponse = await axios.get(`${BaseUrl}practice-records/student/${userId.value}`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (recordsResponse.data) {
+      practiceRecords.value = recordsResponse.data
+      
+      // 计算总分和平均分
+      const totalScore = practiceRecords.value.reduce((sum, record) => sum + record.score, 0)
+      const averageScore = practiceRecords.value.length > 0 ? totalScore / practiceRecords.value.length : 0
+      const completedCount = practiceRecords.value.length
+      
+      practiceStatistics.value = {
+        totalScore,
+        averageScore,
+        completedCount,
+        totalCount: completedCount, // 这里可能需要从后端获取总题目数
+        completionRate: 1 // 假设所有练习都已完成
+      }
+      
+      // 处理数据后初始化图表
+      processPracticeRecordsData()
+    }
+    
+    practiceLoading.value = false
+  } catch (error) {
+    console.error('获取练习记录失败:', error)
+    ElMessage.error('获取练习记录失败')
+    practiceLoading.value = false
+  }
+}
+
+// 获取知识点掌握情况
+const getKnowledgePointStats = async () => {
+  try {
+    knowledgePointLoading.value = true
+    const response = await axios.get(`${BaseUrl}practice-records/stats/student/${userId.value}/knowledge-points`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    if (response.data) {
+      knowledgePointStats.value = response.data
+      await nextTick()
+      initKnowledgePointChart()
+    }
+    knowledgePointLoading.value = false
+  } catch (error) {
+    knowledgePointLoading.value = false
+    ElMessage.error('获取知识点掌握情况失败')
+  }
+}
+
 // 处理学习记录数据并初始化图表
 const processStudyRecordsData = async () => {
   // 处理学习活动数据
@@ -235,6 +312,11 @@ const processWeeklyStudyData = () => {
   })
   
   return { weekdays, durations: durationsPerDay }
+}
+
+// 处理练习记录数据并初始化图表
+const processPracticeRecordsData = async () => {
+  // All charts related to practice records are processed here
 }
 
 // 处理情绪数据并初始化图表
@@ -404,6 +486,65 @@ const initEmotionChart = (dates, marks) => {
   
   // 应用配置
   emotionChart.setOption(option)
+}
+
+// 初始化知识点掌握情况图表
+const initKnowledgePointChart = () => {
+  const chartDom = document.getElementById('knowledgePointChart')
+  if (!chartDom) return
+  if (knowledgePointChart) knowledgePointChart.dispose()
+  knowledgePointChart = echarts.init(chartDom)
+  if (!knowledgePointStats.value.length) {
+    knowledgePointChart.setOption({
+      title: { text: '暂无数据', left: 'center', top: 'center' }
+    })
+    return
+  }
+  const xData = knowledgePointStats.value.map(item => item.knowledge_point.length > 12 ? item.knowledge_point.slice(0,12)+'...' : item.knowledge_point)
+  const avgScores = knowledgePointStats.value.map(item => Number(item.average_score?.toFixed(1) || 0))
+  const attemptCounts = knowledgePointStats.value.map(item => item.attempt_count)
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: params => {
+        const idx = params[0].dataIndex
+        return `知识点: ${knowledgePointStats.value[idx].knowledge_point}<br/>平均分: ${avgScores[idx]}<br/>答题次数: ${attemptCounts[idx]}`
+      }
+    },
+    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+    xAxis: { type: 'category', data: xData, axisLabel: { interval: 0, rotate: 30 } },
+    yAxis: [
+      { type: 'value', name: '平均分', min: 0, max: 100 },
+      { type: 'value', name: '答题次数', min: 0, max: Math.max(...attemptCounts, 10) }
+    ],
+    legend: { data: ['平均分', '答题次数'] },
+    series: [
+      {
+        name: '平均分',
+        type: 'bar',
+        data: avgScores,
+        yAxisIndex: 0,
+        itemStyle: {
+          color: params => {
+            const score = avgScores[params.dataIndex]
+            if (score < 60) return '#F56C6C'
+            if (score < 80) return '#E6A23C'
+            return '#67C23A'
+          }
+        },
+        label: { show: true, position: 'top', formatter: '{c}' }
+      },
+      {
+        name: '答题次数',
+        type: 'line',
+        data: attemptCounts,
+        yAxisIndex: 1,
+        itemStyle: { color: '#409EFF' },
+        label: { show: false }
+      }
+    ]
+  }
+  knowledgePointChart.setOption(option)
 }
 
 // 日期范围变更
@@ -752,6 +893,7 @@ const handleResize = () => {
   if (courseDistributionChart) courseDistributionChart.resize()
   if (weeklyActivityChart) weeklyActivityChart.resize()
   if (emotionChart) emotionChart.resize()
+  if (knowledgePointChart) knowledgePointChart.resize()
 }
 
 // Lifecycle hooks
@@ -760,7 +902,8 @@ onMounted(async () => {
   await getStudyStatistics()
   await getStudyDurationRecords()
   await getStudentEmotions()
-  
+  await getPracticeStatistics()
+  await getKnowledgePointStats()
   window.addEventListener('resize', handleResize)
 })
 
@@ -772,6 +915,7 @@ onUnmounted(() => {
   if (courseDistributionChart) courseDistributionChart.dispose()
   if (weeklyActivityChart) weeklyActivityChart.dispose()
   if (emotionChart) emotionChart.dispose()
+  if (knowledgePointChart) knowledgePointChart.dispose()
 })
 </script>
 
@@ -939,6 +1083,77 @@ onUnmounted(() => {
           </div>
         </div>
       </el-card>
+      
+      <!-- 练习记录统计卡片 -->
+      <el-card class="stats-card" v-loading="practiceLoading">
+        <template #header>
+          <div class="card-header">
+            <span>练习记录统计</span>
+          </div>
+        </template>
+        
+        <div class="stats-content">
+          <div class="stats-overview">
+            <div class="stat-visual">
+              <el-progress
+                type="dashboard"
+                :percentage="practiceStatistics.completionRate * 100 || 0"
+                :stroke-width="8"
+                :width="120"
+                :status="practiceStatistics.averageScore >= 80 ? 'success' : practiceStatistics.averageScore >= 60 ? 'warning' : 'exception'"
+              >
+                <template #default>
+                  <div class="progress-content">
+                    <div class="progress-value">{{ practiceStatistics.averageScore?.toFixed(1) || 0 }}</div>
+                    <div class="progress-label">平均分数</div>
+                  </div>
+                </template>
+              </el-progress>
+            </div>
+            <div class="stats-summary">
+              <div class="summary-title">练习概况</div>
+              <div class="summary-text">
+                该用户共完成 {{ practiceStatistics.completedCount || 0 }} 次练习，
+                总分 {{ practiceStatistics.totalScore?.toFixed(1) || 0 }} 分，
+                平均得分 {{ practiceStatistics.averageScore?.toFixed(1) || 0 }} 分，
+                完成率 {{ (practiceStatistics.completionRate * 100)?.toFixed(1) || 0 }}%。
+              </div>
+            </div>
+          </div>
+          
+          <div class="stats-details">
+            <div class="stats-item">
+              <div class="stats-icon" style="background-color: #f0f9eb; color: #67C23A">
+                <i class="el-icon-check"></i>
+              </div>
+              <div class="stats-info">
+                <div class="stats-value">{{ practiceStatistics.completedCount || 0 }}</div>
+                <div class="stats-label">完成练习数</div>
+              </div>
+            </div>
+            
+            <div class="stats-item">
+              <div class="stats-icon" style="background-color: #fdf6ec; color: #E6A23C">
+                <i class="el-icon-star-on"></i>
+              </div>
+              <div class="stats-info">
+                <div class="stats-value">{{ practiceStatistics.totalScore?.toFixed(1) || 0 }}</div>
+                <div class="stats-label">总得分</div>
+              </div>
+            </div>
+            
+            <div class="stats-item">
+              <div class="stats-icon" style="background-color: #fef0f0; color: #F56C6C">
+                <i class="el-icon-data-analysis"></i>
+              </div>
+              <div class="stats-info">
+                <div class="stats-value">{{ ((practiceStatistics.completionRate || 0) * 100).toFixed(0) }}%</div>
+                <div class="stats-label">完成率</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </el-card>
     </div>
     
     <div class="chart-grid">
@@ -1001,6 +1216,21 @@ onUnmounted(() => {
             <div class="emotion-legend-color" style="background-color: #F56C6C"></div>
             <div class="emotion-legend-text">低情绪 (0-30)</div>
           </div>
+        </div>
+      </el-card>
+      
+      <!-- 练习记录统计图表 -->
+      
+      <!-- 知识点掌握情况图表 -->
+      <el-card class="chart-card full-width-card">
+        <template #header>
+          <div class="card-header">
+            <span>知识点掌握情况</span>
+            <el-button text>导出</el-button>
+          </div>
+        </template>
+        <div v-loading="knowledgePointLoading" class="chart-container">
+          <div id="knowledgePointChart" class="chart-inner"></div>
         </div>
       </el-card>
     </div>

@@ -30,6 +30,15 @@ const studyStatistics = ref({
   recordCount: 0
 })
 
+// Practice record data
+const practiceRecords = ref([])
+const homeworkStatistics = ref([])
+const practiceLoading = ref(true)
+
+// 新增：知识点掌握情况数据
+const knowledgePointStats = ref([])
+const knowledgePointLoading = ref(true)
+
 // 日期范围
 const dateRange = ref([
   new Date(new Date().setMonth(new Date().getMonth() - 1)),
@@ -44,6 +53,7 @@ const statsLoading = ref(true)
 let studyDurationChart = null
 let userDistributionChart = null
 let weeklyActivityChart = null
+let homeworkCompletionChart = null
 
 // Get course information
 const getCourseInfo = async () => {
@@ -111,6 +121,57 @@ const getStudyStatistics = async () => {
   }
 }
 
+// 获取课程练习记录统计
+const getPracticeStatistics = async () => {
+  try {
+    practiceLoading.value = true
+    
+    // 获取课程的作业统计数据
+    const response = await axios.get(`${BaseUrl}practice-records/stats/course/${courseId.value}`, {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
+      }
+    })
+    
+    if (response.data) {
+      homeworkStatistics.value = response.data || []
+      
+      // 处理数据后初始化图表
+      processPracticeRecordsData()
+    }
+    
+    practiceLoading.value = false
+  } catch (error) {
+    console.error('获取练习记录失败:', error)
+    ElMessage.error('获取练习记录失败')
+    practiceLoading.value = false
+  }
+}
+
+// 获取课程知识点掌握情况（假设后端接口为 /practice-records/stats/course/{courseId}/knowledge-points）
+const getKnowledgePointStats = async () => {
+  try {
+    knowledgePointLoading.value = true
+    const response = await axios.get(`${BaseUrl}practice-records/stats/course/${courseId.value}/knowledge-points`, { 
+      headers: { 'Authorization': `Bearer ${getToken()}` } 
+    })
+    if (response.data) {
+      knowledgePointStats.value = response.data
+    } else {
+      knowledgePointStats.value = []
+    }
+    await nextTick()
+    initKnowledgePointChart()
+    knowledgePointLoading.value = false
+  } catch (error) {
+    knowledgePointLoading.value = false
+    knowledgePointStats.value = []
+    ElMessage.error('获取知识点掌握情况失败')
+    await nextTick()
+    initKnowledgePointChart()
+  }
+}
+
 // 处理学习记录数据并初始化图表
 const processStudyRecordsData = async () => {
   // 处理学习活动数据
@@ -127,6 +188,13 @@ const processStudyRecordsData = async () => {
   const weeklyData = processWeeklyStudyData()
   await nextTick()
   initWeeklyActivityChart(weeklyData.weekdays, weeklyData.durations)
+}
+
+// 处理练习记录数据并初始化图表
+const processPracticeRecordsData = async () => {
+  // 处理作业完成率数据
+  await nextTick()
+  initHomeworkCompletionChart()
 }
 
 // 处理学习活动数据
@@ -459,6 +527,170 @@ const initWeeklyActivityChart = (weekdays, durations) => {
   weeklyActivityChart.setOption(option)
 }
 
+// 初始化作业完成率图表
+const initHomeworkCompletionChart = () => {
+  const chartDom = document.getElementById('homeworkCompletionChart')
+  if (!chartDom) return
+  
+  // 如果图表实例已存在，销毁它
+  if (homeworkCompletionChart) {
+    homeworkCompletionChart.dispose()
+  }
+  
+  // 创建新的图表实例
+  homeworkCompletionChart = echarts.init(chartDom)
+  
+  // 如果没有数据，显示无数据提示
+  if (!homeworkStatistics.value.length) {
+    homeworkCompletionChart.setOption({
+      title: {
+        text: '暂无数据',
+        left: 'center',
+        top: 'center'
+      }
+    })
+    return
+  }
+  
+  // 提取作业数据
+  const homeworkNames = homeworkStatistics.value.map(h => h.homeworkTitle)
+  const completionRates = homeworkStatistics.value.map(h => (h.completionRate * 100).toFixed(1))
+  const averageScores = homeworkStatistics.value.map(h => h.averageScore.toFixed(1))
+  
+  // 图表配置
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      },
+      formatter: function(params) {
+        const homework = homeworkStatistics.value[params[0].dataIndex]
+        return `${homework.homeworkTitle}<br/>
+                完成率: ${params[0].value}%<br/>
+                平均分: ${params[1].value}分<br/>
+                参与人数: ${homework.studentCount}人`
+      }
+    },
+    legend: {
+      data: ['完成率 (%)', '平均分']
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '15%',
+      top: '10%',
+      containLabel: true
+    },
+    xAxis: [
+      {
+        type: 'category',
+        data: homeworkNames,
+        axisLabel: {
+          interval: 0,
+          rotate: 30
+        }
+      }
+    ],
+    yAxis: [
+      {
+        type: 'value',
+        name: '完成率 (%)',
+        min: 0,
+        max: 100
+      },
+      {
+        type: 'value',
+        name: '平均分',
+        min: 0,
+        max: 100
+      }
+    ],
+    series: [
+      {
+        name: '完成率 (%)',
+        type: 'bar',
+        barWidth: 20,
+        data: completionRates,
+        itemStyle: {
+          color: '#409EFF'
+        }
+      },
+      {
+        name: '平均分',
+        type: 'line',
+        yAxisIndex: 1,
+        data: averageScores,
+        symbolSize: 8,
+        itemStyle: {
+          color: '#67C23A'
+        }
+      }
+    ]
+  }
+  
+  // 应用配置
+  homeworkCompletionChart.setOption(option)
+}
+
+// 初始化知识点掌握情况图表
+let knowledgePointChart = null
+const initKnowledgePointChart = () => {
+  const chartDom = document.getElementById('knowledgePointChart')
+  if (!chartDom) return
+  if (knowledgePointChart) knowledgePointChart.dispose()
+  knowledgePointChart = echarts.init(chartDom)
+  if (!knowledgePointStats.value.length) {
+    knowledgePointChart.setOption({ title: { text: '暂无数据', left: 'center', top: 'center' } })
+    return
+  }
+  const xData = knowledgePointStats.value.map(item => item.knowledge_point.length > 12 ? item.knowledge_point.slice(0,12)+'...' : item.knowledge_point)
+  const avgScores = knowledgePointStats.value.map(item => Number(item.average_score?.toFixed(1) || 0))
+  const attemptCounts = knowledgePointStats.value.map(item => item.attempt_count)
+  const option = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: params => {
+        const idx = params[0].dataIndex
+        return `知识点: ${knowledgePointStats.value[idx].knowledge_point}<br/>平均分: ${avgScores[idx]}<br/>答题次数: ${attemptCounts[idx]}`
+      }
+    },
+    grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true },
+    xAxis: { type: 'category', data: xData, axisLabel: { interval: 0, rotate: 30 } },
+    yAxis: [
+      { type: 'value', name: '平均分', min: 0, max: 100 },
+      { type: 'value', name: '答题次数', min: 0, max: Math.max(...attemptCounts, 10) }
+    ],
+    legend: { data: ['平均分', '答题次数'] },
+    series: [
+      {
+        name: '平均分',
+        type: 'bar',
+        data: avgScores,
+        yAxisIndex: 0,
+        itemStyle: {
+          color: params => {
+            const score = avgScores[params.dataIndex]
+            if (score < 60) return '#F56C6C'
+            if (score < 80) return '#E6A23C'
+            return '#67C23A'
+          }
+        },
+        label: { show: true, position: 'top', formatter: '{c}' }
+      },
+      {
+        name: '答题次数',
+        type: 'line',
+        data: attemptCounts,
+        yAxisIndex: 1,
+        itemStyle: { color: '#409EFF' },
+        label: { show: false }
+      }
+    ]
+  }
+  knowledgePointChart.setOption(option)
+}
+
 // 格式化时长显示为小时和分钟
 const formatDuration = (minutes) => {
   if (!minutes) return '0分钟'
@@ -552,6 +784,8 @@ const handleResize = () => {
   if (studyDurationChart) studyDurationChart.resize()
   if (userDistributionChart) userDistributionChart.resize()
   if (weeklyActivityChart) weeklyActivityChart.resize()
+  if (homeworkCompletionChart) homeworkCompletionChart.resize()
+  if (knowledgePointChart) knowledgePointChart.resize()
 }
 
 // Lifecycle hooks
@@ -559,7 +793,8 @@ onMounted(async () => {
   await getCourseInfo()
   await getStudyStatistics()
   await getStudyDurationRecords()
-  
+  await getPracticeStatistics()
+  await getKnowledgePointStats()
   window.addEventListener('resize', handleResize)
 })
 
@@ -570,6 +805,8 @@ onUnmounted(() => {
   if (studyDurationChart) studyDurationChart.dispose()
   if (userDistributionChart) userDistributionChart.dispose()
   if (weeklyActivityChart) weeklyActivityChart.dispose()
+  if (homeworkCompletionChart) homeworkCompletionChart.dispose()
+  if (knowledgePointChart) knowledgePointChart.dispose()
 })
 </script>
 
@@ -751,6 +988,32 @@ onUnmounted(() => {
         </template>
         <div v-loading="chartLoading" class="chart-container weekly-chart-container">
           <div id="weeklyActivityChart" class="chart-inner"></div>
+        </div>
+      </el-card>
+      
+      <!-- 作业统计图表 -->
+      <el-card class="chart-card full-width-card">
+        <template #header>
+          <div class="card-header">
+            <span>作业完成率和平均分</span>
+            <el-button text>导出</el-button>
+          </div>
+        </template>
+        <div v-loading="practiceLoading" class="chart-container">
+          <div id="homeworkCompletionChart" class="chart-inner"></div>
+        </div>
+      </el-card>
+
+      <!-- 知识点掌握情况图表 -->
+      <el-card class="chart-card full-width-card">
+        <template #header>
+          <div class="card-header">
+            <span>知识点掌握情况</span>
+            <el-button text>导出</el-button>
+          </div>
+        </template>
+        <div v-loading="knowledgePointLoading" class="chart-container">
+          <div id="knowledgePointChart" class="chart-inner"></div>
         </div>
       </el-card>
     </div>

@@ -972,6 +972,85 @@ const formatTripleText = (triple) => {
 const isKnowledgePointLearned = (index) => {
   return learnedPoints.value.includes(index)
 }
+
+// ==================== 问题生成相关 ====================
+const generateQuestionDialogVisible = ref(false)
+const generateQuestionForm = reactive({
+  questionType: ''
+})
+const generatingQuestionLoading = ref(false)
+const questionTypes = ref([])
+const questionTypesLoading = ref(false)
+
+// 获取题目类型
+const getQuestionTypes = async () => {
+  if (questionTypes.value.length > 0) return
+  
+  questionTypesLoading.value = true
+  try {
+    const response = await axios.get('http://localhost:8080/api/question-generator/types', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      questionTypes.value = response.data.types || []
+    } else {
+      ElMessage.error(response.data?.message || '获取题目类型失败')
+    }
+  } catch (error) {
+    console.error('获取题目类型失败:', error)
+    ElMessage.error('获取题目类型失败')
+  } finally {
+    questionTypesLoading.value = false
+  }
+}
+
+// 打开生成题目对话框
+const handleGenerateQuestion = () => {
+  // 重置表单
+  generateQuestionForm.questionType = ''
+  // 获取题目类型
+  getQuestionTypes()
+  // 打开对话框
+  generateQuestionDialogVisible.value = true
+}
+
+// 提交生成题目任务
+const submitGenerateQuestion = async () => {
+  if (!currentLearningRag.value || !currentKnowledgePoint.value) {
+    ElMessage.error('无法获取当前的知识库或知识点信息')
+    return
+  }
+  
+  generatingQuestionLoading.value = true
+  try {
+    const requestData = {
+      query: formatTripleText(currentKnowledgePoint.value),
+      ragName: currentLearningRag.value.name,
+      questionType: generateQuestionForm.questionType || undefined
+    }
+    
+    const response = await axios.post('http://localhost:8080/api/question-generator/generate-with-rag-name', requestData, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+    
+    if (response.data && response.data.success) {
+      ElMessage.success('题目生成任务已提交，请稍后到问题生成页面查看')
+      generateQuestionDialogVisible.value = false
+    } else {
+      ElMessage.error(response.data?.message || '提交题目生成任务失败')
+    }
+  } catch (error) {
+    console.error('提交题目生成任务失败:', error)
+    ElMessage.error(error.response?.data?.message || '提交题目生成任务失败')
+  } finally {
+    generatingQuestionLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -1616,6 +1695,9 @@ const isKnowledgePointLearned = (index) => {
                   <el-button type="danger" plain @click="resetLearningProgress">
                     重置进度
                   </el-button>
+                  <el-button type="success" @click="handleGenerateQuestion">
+                    <el-icon><Plus /></el-icon> 生成题目
+                  </el-button>
                 </div>
                 
                 <el-button type="primary" @click="nextKnowledgePoint">
@@ -1629,6 +1711,52 @@ const isKnowledgePointLearned = (index) => {
       
       <template #footer>
         <el-button @click="continueDialogVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 生成题目对话框 -->
+    <el-dialog
+      v-model="generateQuestionDialogVisible"
+      title="生成题目"
+      width="500px"
+      append-to-body
+    >
+      <div v-if="currentKnowledgePoint">
+        <p>将根据以下知识点生成题目：</p>
+        <el-alert
+          :title="formatTripleText(currentKnowledgePoint)"
+          type="info"
+          :closable="false"
+          class="mb-md"
+        />
+        <el-form :model="generateQuestionForm" label-width="80px">
+          <el-form-item label="题目类型" prop="questionType">
+            <el-select 
+              v-model="generateQuestionForm.questionType" 
+              placeholder="请选择题目类型（可选）" 
+              style="width: 100%"
+              clearable
+              :loading="questionTypesLoading"
+            >
+              <el-option 
+                v-for="type in questionTypes" 
+                :key="type" 
+                :label="type" 
+                :value="type" 
+              />
+            </el-select>
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="generateQuestionDialogVisible = false">取消</el-button>
+        <el-button 
+          type="primary" 
+          @click="submitGenerateQuestion" 
+          :loading="generatingQuestionLoading"
+        >
+          提交
+        </el-button>
       </template>
     </el-dialog>
   </div>

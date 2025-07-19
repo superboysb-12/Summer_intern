@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 const Login = () => import('../views/login.vue')
 const Register = () => import('../views/register.vue')
 const Manage = () => import('../views/manage.vue')
-const DataOverview = () => import('../components/DataOverview.vue')
 const DataCharts = () => import('../components/DataCharts.vue')
 const UserManageDataChart = () => import('../components/UserManageDataChart.vue')
 const CourseManageDataChart = () => import('../components/CourseManageDataChart.vue')
@@ -27,6 +26,7 @@ const UtilityTools = () => import('../components/UtilityTools.vue')
 // 学生专属组件
 const StudentCourses = () => import('../components/student/StudentCourses.vue')
 const StudentAssignments = () => import('../components/student/StudentAssignments.vue')
+const StudentAssignmentDetail = () => import('../components/student/StudentAssignmentDetail.vue')
 const StudentResources = () => import('../components/student/StudentResources.vue')
 const StudentRecords = () => import('../components/student/StudentRecords.vue')
 
@@ -105,14 +105,7 @@ const routes = [
                     roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]  // 所有角色可访问
                 }
             },
-            {
-                path: 'data',
-                component: DataOverview,
-                meta: {
-                    title: '系统管理 - 数据概览',
-                    roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
-                }
-            },
+
             {
                 path: 'enrollment-stats',
                 component: EnrollmentStats,
@@ -142,7 +135,7 @@ const routes = [
                 component: QuestionGenerator,
                 meta: {
                     title: '系统管理 - 题目生成',
-                    roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
+                    roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]  // 管理员和教师可访问
                 }
             },
             {
@@ -167,6 +160,14 @@ const routes = [
                 component: StudentAssignments,
                 meta: {
                     title: '系统管理 - 作业管理',
+                    roles: [ROLES.STUDENT]  // 仅学生可访问
+                }
+            },
+            {
+                path: 'assignment/:id',
+                component: StudentAssignmentDetail,
+                meta: {
+                    title: '系统管理 - 作业题目',
                     roles: [ROLES.STUDENT]  // 仅学生可访问
                 }
             },
@@ -215,15 +216,7 @@ const routes = [
             }
         ]
     },
-    {
-        path: '/data-overview',
-        component: DataOverview,
-        meta: {
-            requiresAuth: true,
-            title: '数据概览',
-            roles: [ROLES.ADMIN, ROLES.TEACHER]  // 管理员和教师可访问
-        }
-    },
+
     {
         path: '/course-data/:courseId',
         component: DataCharts,
