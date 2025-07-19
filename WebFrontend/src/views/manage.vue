@@ -15,7 +15,9 @@ import {
   Collection,
   ChatDotRound,
   Edit,
-  PieChart
+  PieChart,
+  Histogram,
+  QuestionFilled
 } from '@element-plus/icons-vue'
 import { useCounterStore } from '../stores/counter'
 import { useRouter, useRoute } from 'vue-router'
@@ -37,11 +39,10 @@ const getActiveMenu = () => {
   if (path.includes('/manage/rag')) return 'rag'
   if (path.includes('/manage/deepseek')) return 'deepseek'
   if (path.includes('/manage/teaching-plan')) return 'teaching-plan'
+  if (path.includes('/manage/ppt-generator')) return 'ppt-generator'
   if (path.includes('/manage/tools')) return 'tools'
   if (path.includes('/manage/settings')) return 'settings'
   if (path.includes('/manage/assignments')) return 'assignments'
-  if (path.includes('/manage/study-records')) return 'study-records'
-  if (path.includes('/manage/resources')) return 'resources'
   if (path.includes('/manage/enrollment-stats')) return 'enrollment-stats'
   if (path.includes('/manage/messages')) return 'messages'
   if (path.includes('/manage/usage-statistics')) return 'usage-statistics'
@@ -84,16 +85,15 @@ const menuItems = [
   { key: 'courses', title: '课程管理', icon: Reading, path: '/manage/courses', roles: [ROLES.ADMIN, ROLES.TEACHER] },
   { key: 'student-courses', title: '我的课程', icon: Reading, path: '/manage/student-courses', roles: [ROLES.STUDENT] },
   { key: 'assignments', title: '作业管理', icon: Document, path: '/manage/assignments', roles: [ROLES.STUDENT] },
-  { key: 'study-records', title: '学习记录', icon: DataAnalysis, path: '/manage/study-records', roles: [ROLES.STUDENT] },
-  { key: 'resources', title: '学习资源', icon: Collection, path: '/manage/resources', roles: [ROLES.STUDENT] },
   { key: 'files', title: '文件管理', icon: Document, path: '/manage/files', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'messages', title: '通知管理', icon: Bell, path: '/manage/messages', roles: [ROLES.ADMIN] },
   { key: 'private-messages', title: '私信', icon: ChatDotRound, path: '/manage/private-messages', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'rag', title: 'RAG知识库', icon: Collection, path: '/manage/rag', roles: [ROLES.ADMIN] },
   { key: 'teaching-plan', title: '教案生成', icon: Edit, path: '/manage/teaching-plan', roles: [ROLES.ADMIN, ROLES.TEACHER] },
-  { key: 'question-generator', title: '题目生成', icon: Document, path: '/manage/question-generator', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { key: 'ppt-generator', title: 'PPT生成', icon: Histogram, path: '/manage/ppt-generator', roles: [ROLES.ADMIN, ROLES.TEACHER] },
+  { key: 'question-generator', title: '题目生成', icon: QuestionFilled, path: '/manage/question-generator', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
   { key: 'deepseek', title: 'DeepSeek Chat', icon: ChatDotRound, path: '/manage/deepseek', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
-  { key: 'tools', title: '实用工具', icon: Tools, path: '/manage/tools', roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT] },
+  { key: 'tools', title: '实用工具', icon: Tools, path: '/manage/tools', roles: [ROLES.ADMIN, ROLES.TEACHER] },
 ]
 
 // 根据用户角色过滤菜单项

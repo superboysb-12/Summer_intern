@@ -21,14 +21,13 @@ const DeepSeekChat = () => import('../components/DeepSeekChat.vue')
 const TeachingPlanGenerator = () => import('../components/TeachingPlanGenerator.vue')
 const TeachingPlanEditor = () => import('../components/TeachingPlanEditor.vue')
 const QuestionGenerator = () => import('../components/QuestionGenerator.vue')
+const PPTGenerator = () => import('../components/PPTGenerator.vue')
 const UtilityTools = () => import('../components/UtilityTools.vue')
 
 // 学生专属组件
 const StudentCourses = () => import('../components/student/StudentCourses.vue')
 const StudentAssignments = () => import('../components/student/StudentAssignments.vue')
 const StudentAssignmentDetail = () => import('../components/student/StudentAssignmentDetail.vue')
-const StudentResources = () => import('../components/student/StudentResources.vue')
-const StudentRecords = () => import('../components/student/StudentRecords.vue')
 
 // 角色权限常量
 const ROLES = {
@@ -131,6 +130,14 @@ const routes = [
                 }
             },
             {
+                path: 'ppt-generator',
+                component: PPTGenerator,
+                meta: {
+                    title: '系统管理 - PPT生成',
+                    roles: [ROLES.ADMIN, ROLES.TEACHER]
+                }
+            },
+            {
                 path: 'question-generator',
                 component: QuestionGenerator,
                 meta: {
@@ -151,7 +158,7 @@ const routes = [
                 component: UtilityTools,
                 meta: {
                     title: '系统管理 - 实用工具',
-                    roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STUDENT]  // 所有角色可访问
+                    roles: [ROLES.ADMIN, ROLES.TEACHER]  // 仅管理员和教师可访问
                 }
             },
             // 学生专属页面
@@ -168,22 +175,6 @@ const routes = [
                 component: StudentAssignmentDetail,
                 meta: {
                     title: '系统管理 - 作业题目',
-                    roles: [ROLES.STUDENT]  // 仅学生可访问
-                }
-            },
-            {
-                path: 'study-records',
-                component: StudentRecords,
-                meta: {
-                    title: '系统管理 - 学习记录',
-                    roles: [ROLES.STUDENT]  // 仅学生可访问
-                }
-            },
-            {
-                path: 'resources',
-                component: StudentResources,
-                meta: {
-                    title: '系统管理 - 学习资源',
                     roles: [ROLES.STUDENT]  // 仅学生可访问
                 }
             },

@@ -12,7 +12,11 @@ import {
   Tickets,
   Edit,
   Operation,
-  PieChart
+  PieChart,
+  Histogram,
+  Bell,
+  QuestionFilled,
+  Tools
 } from '@element-plus/icons-vue'
 
 // 获取用户信息和路由
@@ -64,6 +68,20 @@ const cards = computed(() => {
           color: 'rgb(245, 108, 108)', 
           route: '/manage/files' 
         },
+        {
+          title: '通知管理',
+          description: '发布和管理系统通知',
+          icon: Bell,
+          color: 'rgb(230, 162, 60)',
+          route: '/manage/messages'
+        },
+        {
+          title: '私信',
+          description: '查看和发送私信',
+          icon: ChatDotRound,
+          color: 'rgb(103, 194, 58)',
+          route: '/manage/private-messages'
+        },
         { 
           title: 'RAG知识库', 
           description: '管理和查询系统知识库', 
@@ -71,12 +89,40 @@ const cards = computed(() => {
           color: 'rgb(83, 168, 255)', 
           route: '/manage/rag' 
         },
+        {
+          title: '题目生成',
+          description: '使用AI生成各种类型的题目',
+          icon: QuestionFilled,
+          color: 'rgb(144, 147, 153)',
+          route: '/manage/question-generator'
+        },
         { 
-          title: 'AI助手', 
+          title: '教案生成', 
+          description: '使用AI生成教学计划', 
+          icon: Edit, 
+          color: 'rgb(245, 108, 108)', 
+          route: '/manage/teaching-plan' 
+        },
+        {
+          title: 'PPT生成',
+          description: '根据教案一键生成PPT',
+          icon: Histogram,
+          color: 'rgb(255, 159, 64)',
+          route: '/manage/ppt-generator'
+        },
+        { 
+          title: 'DeepSeek Chat', 
           description: '使用DeepSeek智能助手', 
           icon: ChatDotRound, 
           color: 'rgb(121, 187, 255)', 
           route: '/manage/deepseek' 
+        },
+        {
+          title: '实用工具',
+          description: '教学辅助工具集合',
+          icon: Tools,
+          color: 'rgb(245, 108, 108)',
+          route: '/manage/tools'
         }
       ]
       break
@@ -103,12 +149,26 @@ const cards = computed(() => {
           color: 'rgb(144, 147, 153)', 
           route: '/manage/enrollment-stats' 
         },
+        {
+          title: '题目生成',
+          description: '使用AI生成各种类型的题目',
+          icon: QuestionFilled,
+          color: 'rgb(121, 187, 255)',
+          route: '/manage/question-generator'
+        },
         { 
           title: '教案生成', 
           description: '使用AI生成教学计划', 
           icon: Edit, 
           color: 'rgb(245, 108, 108)', 
           route: '/manage/teaching-plan' 
+        },
+        {
+          title: 'PPT生成',
+          description: '根据教案一键生成PPT',
+          icon: Histogram,
+          color: 'rgb(255, 159, 64)',
+          route: '/manage/ppt-generator'
         },
         { 
           title: '文件管理', 
@@ -117,8 +177,15 @@ const cards = computed(() => {
           color: 'rgb(121, 187, 255)', 
           route: '/manage/files' 
         },
+        {
+          title: '私信',
+          description: '查看和发送私信',
+          icon: ChatDotRound,
+          color: 'rgb(103, 194, 58)',
+          route: '/manage/private-messages'
+        },
         { 
-          title: 'AI助手', 
+          title: 'DeepSeek Chat', 
           description: '使用DeepSeek智能助手', 
           icon: ChatDotRound, 
           color: 'rgb(144, 147, 255)', 
@@ -149,33 +216,33 @@ const cards = computed(() => {
           color: 'rgb(230, 162, 60)', 
           route: '/manage/assignments' 
         },
-        { 
-          title: '学习记录', 
-          description: '查看个人学习数据和成绩', 
-          icon: Tickets, 
-          color: 'rgb(103, 194, 58)', 
-          route: '/manage/study-records' 
+        {
+          title: '文件管理',
+          description: '查看和下载课程文件',
+          icon: Document,
+          color: 'rgb(103, 194, 58)',
+          route: '/manage/files'
+        },
+        {
+          title: '题目生成',
+          description: '使用AI进行练习和提问',
+          icon: QuestionFilled,
+          color: 'rgb(245, 108, 108)',
+          route: '/manage/question-generator'
+        },
+        {
+          title: '私信',
+          description: '与老师和同学进行交流',
+          icon: ChatDotRound,
+          color: 'rgb(144, 147, 153)',
+          route: '/manage/private-messages'
         },
         { 
-          title: '学习资源', 
-          description: '浏览和下载学习资料', 
-          icon: Collection, 
-          color: 'rgb(144, 147, 153)', 
-          route: '/manage/resources' 
-        },
-        { 
-          title: 'AI助手', 
+          title: 'DeepSeek Chat', 
           description: '使用DeepSeek智能助手', 
           icon: ChatDotRound, 
           color: 'rgb(121, 187, 255)', 
           route: '/manage/deepseek' 
-        },
-        { 
-          title: '实用工具', 
-          description: '学习辅助工具集合', 
-          icon: Operation, 
-          color: 'rgb(245, 108, 108)', 
-          route: '/manage/tools' 
         }
       ]
       break
